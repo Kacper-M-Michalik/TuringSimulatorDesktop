@@ -11,12 +11,21 @@ namespace TuringSimulatorDesktop.Input
 {
     public static class InputManager
     {
-        public static List<IClickable> AllClickableObjects = new List<IClickable>();
+        //will be probnlem in future -> clikc priority -> maybe group ui elements for click priorty?
+        //group would be index via an id, lets yuou move whoel iwndow priority at a time, also would support grou bounds -> means eeach ui elementdoesnt have to store a scissor area
+
+        static List<IClickable> ClickableObjects = new List<IClickable>();
+        static IClickable PreviouslyClickedObject;
+        static List<IPoll> PollableObjects = new List<IPoll>();
+
+        static List<IClickable> ClickableObjectsToAdd = new List<IClickable>();
+        static List<IPoll> PollableObjectsToAdd = new List<IPoll>();
+        static List<IClickable> ClickableObjectsToRemove = new List<IClickable>();
+        static List<IPoll> PollableObjectsToRemove = new List<IPoll>();
+
+        static bool ClearOnQueue;
 
         public static MouseState MouseData;
-
-        static object MouseOwner;
-        static bool IsMouseBusy;
 
         public static Vector2 CurrentMousePosition;
         public static Vector2 PreviousMousePosition;
@@ -66,36 +75,102 @@ namespace TuringSimulatorDesktop.Input
 
             if (LeftMousePressed)
             {
-                int i = AllClickableObjects.Count-1;
+                int i = ClickableObjects.Count-1;
                 bool RecepientFound = false;
                 while (i > -1 && !RecepientFound)
                 {
-                    if (AllClickableObjects[i].IsMouseOver())
+                    if (ClickableObjects[i].IsMouseOver())
                     {
-                        AllClickableObjects[i].Clicked();
-                        RecepientFound = true;
+                        bool PassThrough = ClickableObjects[i].Clicked();
+
+                        if (!PassThrough)
+                        {
+                            if (PreviouslyClickedObject != null && ClickableObjects[i] != PreviouslyClickedObject) PreviouslyClickedObject.ClickedAway();
+
+                            PreviouslyClickedObject = ClickableObjects[i];
+                            RecepientFound = true;
+                        }
                     }
 
                     i--;
                 }
+
+                if (PreviouslyClickedObject != null && RecepientFound == false) PreviouslyClickedObject.ClickedAway();
+
             }
+
+            for (int i = 0; i < PollableObjects.Count; i++)
+            {
+                PollableObjects[i].PollInput();                
+            }
+
+            if (!ClearOnQueue)
+            {
+                for (int i = 0; i < ClickableObjectsToRemove.Count; i++)
+                {
+                    ClickableObjects.Remove(ClickableObjectsToRemove[i]);
+                }
+                for (int i = 0; i < PollableObjectsToRemove.Count; i++)
+                {
+                    PollableObjects.Remove(PollableObjectsToRemove[i]);
+                }
+
+                for (int i = 0; i < ClickableObjectsToAdd.Count; i++)
+                {
+                    ClickableObjects.Add(ClickableObjectsToAdd[i]);
+                }
+                for (int i = 0; i < PollableObjectsToAdd.Count; i++)
+                {
+                    PollableObjects.Add(PollableObjectsToAdd[i]);
+                }
+                ClickableObjectsToRemove.Clear();
+                PollableObjectsToRemove.Clear();
+                ClickableObjectsToAdd.Clear();
+                PollableObjectsToAdd.Clear();
+
+            }
+            else
+            {
+                ClickableObjects.Clear();
+                PollableObjects.Clear();
+                PreviouslyClickedObject = null;
+                ClearOnQueue = false;
+            }
+
         }
 
-        public static void ReserveMouse(object Reserver)
+        public static void RegisterClickableObjectOnQueue(IClickable Object)
         {
-            IsMouseBusy = true;
-            MouseOwner = Reserver;
+            ClickableObjectsToAdd.Add(Object);
         }
 
-        public static void FreeMouse()
+        public static void RegisterPollableObjectOnQueue(IPoll Object)
         {
-            IsMouseBusy = false;
+            PollableObjectsToAdd.Add(Object);
         }
 
-        public static bool IsMouseAvailable(object Querier)
+        public static void RemoveListenersUnsafe()
         {
-            if (!IsMouseBusy) return true;
-            return MouseOwner == Querier;
+            ClickableObjects.Clear();
+            PollableObjects.Clear();
+
+            PreviouslyClickedObject = null;
         }
+
+        public static void RemoveListenersOnQueue()
+        {
+            ClearOnQueue = true;
+        }
+
+        public static void RemoveClickableObjectOnQueue(IClickable Object)
+        {
+            ClickableObjectsToRemove.Add(Object);
+        }
+
+        public static void RemovePollableObjectOnQueue(IPoll Object)
+        {
+            PollableObjectsToRemove.Add(Object);
+        }
+
     }
 }

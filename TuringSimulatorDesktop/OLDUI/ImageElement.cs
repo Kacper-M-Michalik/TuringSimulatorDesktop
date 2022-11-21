@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace TuringSimulatorDesktop.UI
 {
+    /*
     public class ImageElement : UIElement
     {
         public Texture2D Sprite;
@@ -22,5 +23,11 @@ namespace TuringSimulatorDesktop.UI
         {
             OwnerSpriteBatch.Draw(Sprite, new Vector2(Position.X - Sprite.Width / 2, Position.Y - Sprite.Height / 2 ), Color.White);
         }
+
+        public override Vector2 GetBounds()
+        {
+            throw new NotImplementedException();
+        }
     }
+    */
 }

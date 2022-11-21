@@ -5,7 +5,7 @@ using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TuringSimulatorDesktop.UI.Prefab
+namespace TuringSimulatorDesktop.UI
 {
     public class StateTransitionPrefab
     {
@@ -23,6 +23,23 @@ namespace TuringSimulatorDesktop.UI.Prefab
         public StateTransitionPrefab()
         {
             BackgroundLabel = new TextLabel();
+
+            CurrentStateTextBox = new TextBox();
+            TapeValueTextBox = new TextBox();
+            NewStateTextBox = new TextBox();
+            NewTapeValueTextBox = new TextBox();
+            MoveDirectionTextBox = new TextBox();
+
+            CurrentStateTextBox.EditEvent += ResizeElements;
+            TapeValueTextBox.EditEvent += ResizeElements;
+            NewStateTextBox.EditEvent += ResizeElements;
+            NewTapeValueTextBox.EditEvent += ResizeElements;
+            MoveDirectionTextBox.EditEvent += ResizeElements;
+        }
+
+        public void ResizeElements(TextBox Sender)
+        {
+
         }
     }
 }

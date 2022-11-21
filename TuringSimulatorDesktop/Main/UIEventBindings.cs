@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using TuringBackend;
 using TuringBackend.Networking;
 
-namespace TuringSimulatorDesktop
+namespace TuringBackend
 {
+    //DEPRECATED
     public delegate void ReceivedDataCallback(Packet Data);
 
     public static class UIEventBindings
@@ -16,5 +16,7 @@ namespace TuringSimulatorDesktop
         public static EventHandler RecievedErrorNotification;
 
         public static EventHandler UpdateFileBrowser;
+
+        public static Dictionary<int, List<ReceivedDataCallback>> DataSubscribers = new Dictionary<int, List<ReceivedDataCallback>>();
     }
 }

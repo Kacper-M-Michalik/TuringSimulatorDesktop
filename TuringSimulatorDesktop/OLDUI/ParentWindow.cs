@@ -10,6 +10,7 @@ using TuringSimulatorDesktop.Input;
 
 namespace TuringSimulatorDesktop.UI
 {
+    /*
     public abstract class ParentWindow : UIElement
     {
         protected SpriteBatch LocalSpriteBatch;
@@ -37,5 +38,5 @@ namespace TuringSimulatorDesktop.UI
             OwnerSpriteBatch.Draw(ViewRenderTarget, Position, Color.White);
         }
     }
-
+    */
 }

@@ -9,20 +9,26 @@ using TuringSimulatorDesktop.Input;
 
 namespace TuringSimulatorDesktop.UI
 {
-    public class Window : IClickable
+    /*
+    public class Window 
     {
         public Vector2 Position;
 
         public List<UIElement> Views;
         public List<Button> ViewButtons;
 
-        UIElement CurrentView;
+        public UIElement CurrentView;
 
         RenderTarget2D TabTexture;
         RenderTarget2D ViewTexture;
 
         int Width { get { return ViewTexture.Width; } }
         int Height { get { return TabTexture.Height + ViewTexture.Height; } }
+
+        Vector2 localPosition;
+        public Vector2 LocalPosition { get => localPosition; set => localPosition = value; }
+
+        public Vector2 GlobalPosition => throw new NotImplementedException();
 
         public Window(int SetWidth, int SetHeight)
         {
@@ -32,7 +38,7 @@ namespace TuringSimulatorDesktop.UI
             Views = new List<UIElement>();
             ViewButtons = new List<Button>();
 
-            InputManager.AllClickableObjects.Add(this);
+            //InputManager.ClickableObjects.Add(this);
         }
 
         //created list of button visual elements, let them deal with setting active view?
@@ -43,23 +49,32 @@ namespace TuringSimulatorDesktop.UI
             //call update of view here?
         }
         
-        public void Draw(SpriteBatch Batch)
+        public void Draw(SpriteBatch ScreenBatch)
         {
             GlobalGraphicsData.Device.SetRenderTarget(TabTexture);
-            GlobalGraphicsData.Device.Clear(Color.White);
+            GlobalGraphicsData.Device.Clear(GlobalGraphicsData.AccentColor);
+
+            SpriteBatch LocalSpaceBatch = new SpriteBatch(GlobalGraphicsData.Device);
+            LocalSpaceBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.AnisotropicWrap, null, null, null, Matrix.Identity);
 
             for (int i = 0; i < ViewButtons.Count; i++)
             {
-                ViewButtons[i].Draw(Batch, TabTexture);
+                ViewButtons[i].Draw(LocalSpaceBatch, TabTexture);
             }
 
+            LocalSpaceBatch.End();
+
             GlobalGraphicsData.Device.SetRenderTarget(ViewTexture);
-            GlobalGraphicsData.Device.Clear(Color.Black);
+            GlobalGraphicsData.Device.Clear(GlobalGraphicsData.BackgroundColor);
 
-            if (CurrentView != null) CurrentView.Draw(Batch, ViewTexture);
+            LocalSpaceBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, null, null, null, Matrix.Identity);
 
-            Batch.Draw(TabTexture, Position, Color.White);
-            Batch.Draw(ViewTexture, new Vector2(Position.X, Position.Y + TabTexture.Height), Color.White);
+            if (CurrentView != null) CurrentView.Draw(LocalSpaceBatch, ViewTexture);
+
+            LocalSpaceBatch.End();
+
+            ScreenBatch.Draw(TabTexture, Position, Color.White);
+            ScreenBatch.Draw(ViewTexture, new Vector2(Position.X, Position.Y + TabTexture.Height), Color.White);
         }
 
         public void AddView()
@@ -88,5 +103,11 @@ namespace TuringSimulatorDesktop.UI
         {
             return IsMouseOverWindow();
         }
+
+        public void ClickedAway()
+        {
+
+        }
     }
+    */
 }

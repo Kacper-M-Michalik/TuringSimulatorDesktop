@@ -10,6 +10,7 @@ using TuringSimulatorDesktop.Input;
 
 namespace TuringSimulatorDesktop.UI
 {
+    /*
     public class OldWindow : UIElement
     {
         protected int Width { get { return WindowTexture.Width; } }
@@ -66,6 +67,11 @@ namespace TuringSimulatorDesktop.UI
             OwnerSpriteBatch.Draw(WindowTexture, Position, Color.White);
         }
 
+        public override Vector2 GetBounds()
+        {
+            throw new NotImplementedException();
+        }
+
         /*
         public override void Update(GameTime gameTime)
         {
@@ -98,5 +104,6 @@ namespace TuringSimulatorDesktop.UI
         }
         */
 
-    }
+    
+
 }

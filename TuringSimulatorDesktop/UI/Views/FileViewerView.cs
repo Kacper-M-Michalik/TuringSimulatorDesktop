@@ -11,7 +11,8 @@ using TuringSimulatorDesktop.Main;
 
 namespace TuringSimulatorDesktop.UI
 {
-    public class FileViewerWindow : UIElement
+    /*
+    public class FileViewerView : View
     {
         List<FileData> Files;
 
@@ -39,21 +40,24 @@ namespace TuringSimulatorDesktop.UI
 
             Elements = new List<Button>();
 
+            Vector2 NewPosition = new Vector2(10, 10);
             for (int i = 0; i < Files.Count; i++)
             {
                 if (Files[i].Type == FileType.Folder)
                 {
-                    Button Button = new Button(UIElement.TextureLookup[TextureLookupKey.StateNodeBackground], Vector2.Zero, Files[i].Name);
-                    Button.Clicked += (Button) => { ClickedFileIcon(Files[i].ID); };
-                    Elements.Add(Button);
+                    //Button Button = new Button(NewPosition, GlobalGraphicsData.TextureLookup[TextureLookupKey.StateNodeBackground], Files[i].Name);
+                   // Button.ClickEvent += (Button) => { ClickedFileIcon(Files[i].ID); };
+                   // Elements.Add(Button);
                 }
                 else
                 {
                     //change icon later
-                    Button Button = new Button(UIElement.TextureLookup[TextureLookupKey.StateNodeBackground], Vector2.Zero, Files[i].Name);
-                    Button.Clicked += (Button) => { ClickedFileIcon(Files[i].ID); };
-                    Elements.Add(Button);
+                   // Button Button = new Button(NewPosition, GlobalGraphicsData.TextureLookup[TextureLookupKey.StateNodeBackground], Files[i].Name);
+                   // Button.ClickEvent += (Button) => { ClickedFileIcon(Files[i].ID); };
+                   // Elements.Add(Button);
                 }
+
+                NewPosition = new Vector2(NewPosition.X + 30, NewPosition.Y);
             }
         }
 
@@ -68,12 +72,23 @@ namespace TuringSimulatorDesktop.UI
             ClientSendFunctions.RequestFolderData(ID);
         }
 
-        public override void Draw(SpriteBatch OwnerSpriteBatch, RenderTarget2D PreviousRenderTarget)
+        public override void Draw()
         {
-
+            throw new NotImplementedException();
         }
 
-    }
+        /*
+        public override void Draw(SpriteBatch OwnerSpriteBatch, RenderTarget2D PreviousRenderTarget)
+        {
+            for (int i = 0; i < Elements.Count; i++)
+            {
+                Elements[i].Draw(OwnerSpriteBatch, PreviousRenderTarget);
+            }
+        }
+        */
+    
+
+   // }
 
     public enum FileType {File, Folder};
 

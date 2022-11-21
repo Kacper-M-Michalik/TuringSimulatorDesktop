@@ -2,61 +2,52 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using System.Data.Common;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TuringSimulatorDesktop.UI
 {
-    public class MeshData
-    {
-        public VertexPositionColor[] Vertices;
-        public int[] Indices;
-
-        public MeshData(VertexPositionColor[] SetVertices, int[] SetIndices)
-        {
-            Vertices = SetVertices;
-            Indices = SetIndices;
-        }
-    }
-
     public class MeshRenderer : IDisposable
     {
         bool IsDisposed;
         GraphicsDevice Device;
         public BasicEffect Effect;
 
+        /*
         VertexPositionColor[] Vertices;
         int[] Indices;
+        */
 
-        List<MeshData> Meshes;
+        List<Mesh> Meshes;
 
-        public MeshRenderer(GraphicsDevice SetDevice)
+        public MeshRenderer(GraphicsDevice SetDevice, int Width, int Height)
         {
             Device = SetDevice;
-            Meshes = new List<MeshData>();
+            Meshes = new List<Mesh>();
 
             Effect = new BasicEffect(Device);
-            Effect.TextureEnabled = false;
+            Effect.TextureEnabled = true;
             Effect.FogEnabled = false;
             Effect.LightingEnabled = false;
             Effect.VertexColorEnabled = true;
             Effect.World = Matrix.Identity;
             Effect.View = Matrix.Identity;
-            Effect.Projection = Matrix.CreateOrthographicOffCenter(0, 100, 0, 100, 0f, 1f);
+            RecalculateProjection(0, 0, Width, Height);
+        }
+        public void RecalculateProjection(int X, int Y, int Width, int Height)
+        {
+            Effect.Projection = Matrix.CreateOrthographicOffCenter(X, X + Width, Y + Height, Y, 0f, 1f);
         }
 
-        public void AddMesh(MeshData Data)
+        public void AddMesh(Mesh Data)
         {
             Meshes.Add(Data);
         }
 
-        public void DeleteMesh(MeshData Data)
+        public void DeleteMesh(Mesh Data)
         {
             Meshes.Remove(Data);
         }
 
+        /*
         public void FinaliseMeshAddtionsAndDeletions()
         {
             int TotalVertices = 0;
@@ -90,13 +81,41 @@ namespace TuringSimulatorDesktop.UI
                 Device.DrawUserIndexedPrimitives<VertexPositionColor>(PrimitiveType.TriangleList, Vertices, 0, Vertices.Length, Indices, 0, Indices.Length / 3);
             }
         }
+        */
+
+        public void Draw()
+        {
+            foreach (Mesh Data in Meshes)
+            {                
+                if (Data.Texture != null)
+                {
+                    Effect.Texture = Data.Texture;
+                    Effect.TextureEnabled = true;
+                }
+                else
+                {
+                    Effect.Texture = null;
+                    Effect.TextureEnabled = false;
+                }
+                Effect.World = Data.MeshTransformations;
+
+                foreach (EffectPass Pass in Effect.CurrentTechnique.Passes)
+                {
+                    Pass.Apply();
+                    Device.DrawUserIndexedPrimitives<VertexPositionColor>(PrimitiveType.TriangleList, Data.Vertices, 0, Data.Vertices.Length, Data.Indices, 0, Data.Indices.Length / 3);
+                }
+            }
+
+        }
 
         public void Dispose()
         {
             if (IsDisposed) return;
 
             Effect?.Dispose();
+            Meshes.Clear();
             IsDisposed = true;
         }
+
     }
 }

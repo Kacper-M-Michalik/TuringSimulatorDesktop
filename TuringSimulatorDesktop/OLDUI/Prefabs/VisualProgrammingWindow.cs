@@ -11,6 +11,7 @@ using TuringSimulatorDesktop.Input;
 
 namespace TuringSimulatorDesktop.UI
 {
+    /*
     public class VisualProgrammingWindow : ParentWindow
     {
         public VisualProgrammingProject LoadedProject;
@@ -26,6 +27,11 @@ namespace TuringSimulatorDesktop.UI
             Zoom = 1f;
         }
 
+        public override Vector2 GetBounds()
+        {
+            throw new NotImplementedException();
+        }
+
         public override void GetView()
         {
             RendererGraphicsDevice.SetRenderTarget(ViewRenderTarget);
@@ -37,7 +43,7 @@ namespace TuringSimulatorDesktop.UI
             {
                 foreach (Node node in LoadedProject.StoredNodes)
                 {
-                    Texture2D Texture = TextureLookup[TextureLookupKey.StateNodeBackground];
+                    Texture2D Texture = GlobalGraphicsData.TextureLookup[TextureLookupKey.StateNodeBackground];
                     LocalSpriteBatch.Draw(Texture, new Vector2(node.X * Zoom + CameraPosition.X, node.Y * Zoom + CameraPosition.Y), null, Color.White, 0f, new Vector2(Texture.Width / 2f, Texture.Height / 2f), Zoom, SpriteEffects.None, 0f);
                 }
             }
@@ -67,5 +73,6 @@ namespace TuringSimulatorDesktop.UI
             }            
         }
         */
-    }
+
+   
 }

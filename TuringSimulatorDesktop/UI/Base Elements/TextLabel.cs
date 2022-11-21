@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,12 @@ namespace TuringSimulatorDesktop.UI
     {
         public string Text;
 
-        public override void Draw(SpriteBatch OwnerSpriteBatch, RenderTarget2D PreviousRenderTarget)
+        public TextLabel(string SetText = "")
+        {
+            Text = SetText;
+        }
+
+        public override Vector2 GetBounds()
         {
             throw new NotImplementedException();
         }

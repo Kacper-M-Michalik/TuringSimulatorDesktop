@@ -8,6 +8,7 @@ using TuringSimulatorDesktop.Input;
 
 namespace TuringSimulatorDesktop.UI
 {
+    /*
     public class WindowManager
     {
         public List<Window> Windows;
@@ -56,7 +57,7 @@ namespace TuringSimulatorDesktop.UI
                 }
                 if (!AssignedFocus) DebugManager.CurrentWindow = null;
             }
-            */
+            *//*
             int i = Windows.Count - 1;
             bool AssignedFocus = false;
             if (!IsDragging)
@@ -103,17 +104,18 @@ namespace TuringSimulatorDesktop.UI
              ////////////////////deal with movement and snmap of windows?
         }
 
-        public void Draw(SpriteBatch Batch)
+        public void Draw(SpriteBatch ScreenBatch)
         {
             for (int i = 0; i < Windows.Count; i++)
             {
-                Windows[i].Draw(Batch);
+                Windows[i].Draw(ScreenBatch);
             }            
         }
 
         public void AddWindow()
         {
             Window Win = new Window(300, 400);
+            Win.CurrentView = new TextBox("test");
             Windows.Add(Win);
         }
     }
@@ -126,4 +128,5 @@ namespace TuringSimulatorDesktop.UI
         float SnapX, SnapY;
         float SnapWidth, SnapHeight;
     }
+    */
 }

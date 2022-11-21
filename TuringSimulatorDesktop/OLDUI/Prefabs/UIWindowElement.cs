@@ -9,6 +9,7 @@ using TuringSimulatorDesktop.UI;
 
 namespace TuringSimulatorDesktop
 {
+    /*
     public class RenderWindow : ParentWindow
     {
         public List<UIElement> UIElements = new List<UIElement>();
@@ -16,6 +17,11 @@ namespace TuringSimulatorDesktop
 
         public RenderWindow(GraphicsDevice graphicsDevice, int SetWidth, int SetHeight) : base(graphicsDevice, SetWidth, SetHeight)
         {            
+        }
+
+        public override Vector2 GetBounds()
+        {
+            throw new NotImplementedException();
         }
 
         public override void GetView()
@@ -31,4 +37,5 @@ namespace TuringSimulatorDesktop
             LocalSpriteBatch.End();
         }
     }
+    */
 }

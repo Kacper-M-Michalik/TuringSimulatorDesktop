@@ -7,11 +7,11 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using TuringSimulatorDesktop.Input;
+using TuringSimulatorDesktop.UI;
 
 namespace TuringSimulatorDesktop.UI
 {
-    public delegate void OnClick(Button Sender);
-
+    /*
     public class Button : ImageElement, IClickable
     {
         public string Text;
@@ -21,9 +21,9 @@ namespace TuringSimulatorDesktop.UI
         public int BoundUp;
         public int BoundDown;
 
-        public event OnClick Clicked;
+        public event OnClick ClickEvent;
 
-        public Button(Texture2D SetSprite, Vector2 SetPosition, string SetText = "") : base(SetSprite, SetPosition)
+        public Button(Vector2 SetPosition, Texture2D SetSprite, string SetText = "") : base(SetSprite, SetPosition)
         {
             if (Sprite.Width % 2 == 1) 
                 BoundRight = (Sprite.Width / 2) + 1;
@@ -41,16 +41,40 @@ namespace TuringSimulatorDesktop.UI
 
             Text = SetText;
 
-            InputManager.AllClickableObjects.Add(this);
+            InputManager.ClickableObjects.Add(this);
         }
-        public Button(Texture2D SetSprite, Vector2 SetPosition, int SetBoundLeft, int SetBoundRight, int SetBoundUp, int SetBoundDown) : base(SetSprite, SetPosition)
+        public Button(Vector2 SetPosition, Texture2D SetSprite = null) : base(SetSprite, SetPosition)
+        {
+            if (SetSprite == null) SetSprite = GlobalGraphicsData.TextureLookup[TextureLookupKey.StateNodeBackground];
+
+            if (Sprite.Width % 2 == 1)
+                BoundRight = (Sprite.Width / 2) + 1;
+            else
+                BoundRight = (Sprite.Width / 2);
+
+            BoundLeft = Sprite.Width / 2;
+
+            if (Sprite.Height % 2 == 1)
+                BoundDown = (Sprite.Height / 2) + 1;
+            else
+                BoundDown = (Sprite.Height / 2);
+
+            BoundUp = Sprite.Height / 2;
+
+            Text = "";
+
+            InputManager.ClickableObjects.Add(this);
+        }
+        public Button(Vector2 SetPosition, Texture2D SetSprite, int SetBoundLeft, int SetBoundRight, int SetBoundUp, int SetBoundDown, string SetText = "") : base(SetSprite, SetPosition)
         {
             BoundLeft = SetBoundLeft;
             BoundRight = SetBoundRight;
             BoundUp = SetBoundUp;
             BoundDown = SetBoundDown;
 
-            InputManager.AllClickableObjects.Add(this);
+            Text = SetText;
+
+            InputManager.ClickableObjects.Add(this);
         }
 
         public override void Draw(SpriteBatch OwnerSpriteBatch, RenderTarget2D CurrentRenderTarget)
@@ -59,14 +83,20 @@ namespace TuringSimulatorDesktop.UI
             OwnerSpriteBatch.DrawString(GlobalGraphicsData.Font, Text, Position, Color.White);
         }
 
-        void IClickable.Clicked()
+        public void Clicked()
         {
-            Clicked?.Invoke(this);
+            //ClickEvent?.Invoke(this);
         }
 
         public bool IsMouseOver()
         {
             return (InputManager.LeftMousePressed && InputManager.MouseData.X >= Position.X - BoundLeft && InputManager.MouseData.X <= Position.X + BoundRight && InputManager.MouseData.Y >= Position.Y - BoundUp && InputManager.MouseData.Y <= Position.Y + BoundDown);
         }
+
+        public void ClickedAway()
+        {
+
+        }
     }
+    */
 }
