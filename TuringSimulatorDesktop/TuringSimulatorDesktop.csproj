@@ -24,7 +24,7 @@
     <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.1.303" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\TuringBackend\TuringBackend\TuringCore.csproj" />
+    <ProjectReference Include="..\TuringCore\TuringCore.csproj" />
     <ProjectReference Include="..\TuringServer\TuringServer.csproj" />
   </ItemGroup>
   <Target Name="RestoreDotnetTools" BeforeTargets="Restore">

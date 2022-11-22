@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TuringBackend\TuringBackend\TuringCore.csproj" />
+    <ProjectReference Include="..\TuringCore\TuringCore.csproj" />
   </ItemGroup>
 
 </Project>

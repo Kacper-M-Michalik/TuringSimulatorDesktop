@@ -5,9 +5,9 @@ VisualStudioVersion = 17.3.32811.315
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TuringSimulatorDesktop", "TuringSimulatorDesktop\TuringSimulatorDesktop.csproj", "{B801C321-820C-4C36-8F1F-2BE31C0983B9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TuringTesting", "TuringBackend\TuringTesting\TuringTesting.csproj", "{DE64D64C-623B-4D0E-9EA5-908584CC70B6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TuringTesting", "TuringTesting\TuringTesting.csproj", "{DE64D64C-623B-4D0E-9EA5-908584CC70B6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TuringCore", "TuringBackend\TuringBackend\TuringCore.csproj", "{99F286CF-520B-406D-A5BF-3044FDC007B2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TuringCore", "TuringCore\TuringCore.csproj", "{99F286CF-520B-406D-A5BF-3044FDC007B2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TuringServer", "TuringServer\TuringServer.csproj", "{251D2B54-F5ED-46FA-9D7E-9599D7150733}"
 EndProject

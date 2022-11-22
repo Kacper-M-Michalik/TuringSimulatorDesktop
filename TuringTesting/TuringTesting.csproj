@@ -6,8 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\TuringServer\TuringServer.csproj" />
-    <ProjectReference Include="..\TuringBackend\TuringCore.csproj" />
+    <ProjectReference Include="..\TuringCore\TuringCore.csproj" />
+    <ProjectReference Include="..\TuringServer\TuringServer.csproj" />
   </ItemGroup>
 
 </Project>
