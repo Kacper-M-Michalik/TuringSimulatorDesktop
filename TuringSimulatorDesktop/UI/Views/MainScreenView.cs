@@ -19,7 +19,8 @@ namespace TuringSimulatorDesktop.UI
 {
     public class MainScreenView : View
     {
-        MeshRenderer Renderer;
+        List<IRenderable> RenderElements;
+        Viewport Port;
 
         public Button NewProjectButton;
         public Button LoadProjectButton;
@@ -29,23 +30,18 @@ namespace TuringSimulatorDesktop.UI
 
         public MainScreenView(int Width, int Height)
         {
-            Renderer = new MeshRenderer(GlobalGraphicsData.Device, Width, Height);
+            RenderElements = new List<IRenderable>();
+            Port = new Viewport(0, 0, Width, Height);
 
             NewProjectButton = new Button(new Vector2(100f,100f), Mesh.CreateRectangle(Vector2.Zero, 100f, 30f, Color.White), ElementCreateType.Persistent);
-
             LoadProjectButton = new Button(new Vector2(100f, 150f), Mesh.CreateRectangle(Vector2.Zero, 100f, 30f, Color.Red), ElementCreateType.Persistent);
             LoadProjectButton.ClickEvent += SelectProjectLocation;
 
             JoinProjectButton = new Button(new Vector2(100f, 200f), Mesh.CreateRectangle(Vector2.Zero, 100f, 30f, Color.Blue), ElementCreateType.Persistent);
 
-            Renderer.AddMesh(NewProjectButton.MeshData);
-            Renderer.AddMesh(LoadProjectButton.MeshData);
-            Renderer.AddMesh(JoinProjectButton.MeshData);
-        }
-
-        ~MainScreenView()
-        {
-            Renderer.Dispose();
+            RenderElements.Add(NewProjectButton);
+            RenderElements.Add(LoadProjectButton);
+            RenderElements.Add(JoinProjectButton);
         }
 
         public void SelectProjectLocation(Button Sender)
@@ -78,24 +74,24 @@ namespace TuringSimulatorDesktop.UI
             }
                 */
             // "E:\\Professional Programming\\MAIN\\TestLocation"
-            BackendInterface.StartProjectServer(1, 28104);
-            //Client.
 
-            //client.sendloadproject
+            BackendInterface.StartProjectServer(1, 28104);
+            //conenct client here
 
             InputManager.RemoveAllListenersOnQueue();    
-            GlobalGraphicsData.BaseWindow.CurrentView = new ProjectScreenView();
+            GlobalGraphicsData.BaseWindow.CurrentView = new ProjectScreenView(GlobalGraphicsData.Device.PresentationParameters.BackBufferWidth, GlobalGraphicsData.Device.PresentationParameters.BackBufferHeight);
 
         }
 
         public override void Draw()
         {
-            Renderer.Draw();
+            GlobalMeshRenderer.Draw(RenderElements, Port);
         }
 
         public override void ViewResize(int NewWidth, int NewHeight)
         {
-            Renderer.RecalculateProjection(0, 0, NewWidth, NewHeight);
+            Port.Width = NewWidth;
+            Port.Height = NewHeight;
         }
     }
 }

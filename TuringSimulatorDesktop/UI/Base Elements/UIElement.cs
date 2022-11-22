@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace TuringSimulatorDesktop.UI
 {
-    public abstract class UIElement
+    public abstract class UIElement : IRenderable
     {
         Vector2 position;
         public Vector2 Position { 
@@ -34,5 +34,10 @@ namespace TuringSimulatorDesktop.UI
         }
 
         public abstract Vector2 GetBounds();
+
+        public Mesh GetMesh()
+        {
+            return meshData;
+        }
     }
 }

@@ -125,7 +125,7 @@ namespace TuringSimulatorDesktop.UI
 
             RecalculateRenderData();
 
-            CurrentView.ViewResize(Width, Height);
+            if (CurrentView != null) CurrentView.ViewResize(Width, Height);
         }
 
         public void AddView(View NewView)

@@ -56,6 +56,8 @@ namespace TuringSimulatorDesktop
 
             GlobalGraphicsData.TabHeight = 25;
 
+            GlobalMeshRenderer.Setup(GlobalGraphicsData.Device, GraphicsDevice.PresentationParameters.BackBufferWidth, GraphicsDevice.PresentationParameters.BackBufferHeight);
+
             CurrentView = new MainScreenView(GraphicsDevice.PresentationParameters.BackBufferWidth, GraphicsDevice.PresentationParameters.BackBufferHeight);
         }
 

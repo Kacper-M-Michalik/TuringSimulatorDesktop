@@ -5,10 +5,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TuringSimulatorDesktop.UI;
 
-namespace TuringSimulatorDesktop.UI
+namespace TuringSimulatorDesktop
 {
-    public class Mesh
+    public class Mesh : IRenderable
     {
         public Matrix MeshTransformations;
 
@@ -19,7 +20,7 @@ namespace TuringSimulatorDesktop.UI
 
         public Mesh()
         {
-            MeshTransformations = Matrix.CreateWorld(new Vector3(0, 0, 0), Vector3.Forward, Vector3.Up);
+            MeshTransformations = Matrix.CreateWorld(Vector3.Zero, Vector3.Forward, Vector3.Up);
         }
         public Mesh(VertexPositionColor[] SetVertices, int[] SetIndices, Texture2D SetTexture = null)
         {
@@ -27,7 +28,12 @@ namespace TuringSimulatorDesktop.UI
             Indices = SetIndices;
             Texture = SetTexture;
 
-            MeshTransformations = Matrix.CreateWorld(new Vector3(0, 0, 0), new Vector3(0, 0, 1), new Vector3(0, -1, 0));
+            MeshTransformations = Matrix.CreateWorld(Vector3.Zero, Vector3.Forward, Vector3.Up);
+        }
+
+        public Mesh GetMesh()
+        {
+            return this;
         }
 
         public float GetFurthestRightVertexPoint()

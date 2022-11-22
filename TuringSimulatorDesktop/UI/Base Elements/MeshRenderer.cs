@@ -7,8 +7,8 @@ namespace TuringSimulatorDesktop.UI
 {
     public class MeshRenderer : IDisposable
     {
-        bool IsDisposed;
-        GraphicsDevice Device;
+        private bool IsDisposed;
+        private GraphicsDevice Device;
         public BasicEffect Effect;
 
         /*

@@ -5,26 +5,34 @@ using System.Text;
 using System.Threading.Tasks;
 using TuringSimulatorDesktop.Input;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace TuringSimulatorDesktop.UI
 {
     public class ProjectScreenView : View, IPoll
     {
-        MeshRenderer Renderer;
+        List<IRenderable> RenderElements;
+        Viewport Port;
+
         Button AddWindowButton;
 
         List<WindowView> Windows;
         WindowView CurrentlyFocusedWindow;
+
         bool IsDragging;
 
+        // DEBUG
         WindowView DebugWindow;
 
-        public ProjectScreenView()
+        public ProjectScreenView(int Width, int Height)
         {
-            Renderer = new MeshRenderer(GlobalGraphicsData.Device, GlobalGraphicsData.Device.PresentationParameters.BackBufferWidth, GlobalGraphicsData.Device.PresentationParameters.BackBufferHeight);
+            RenderElements = new List<IRenderable>();
+            Port = new Viewport(0, 0, Width, Height);
+
             AddWindowButton = new Button(new Vector2(20f, 20f), Mesh.CreateRectangle(Vector2.Zero, 40, 20, Color.Yellow), ElementCreateType.Persistent);
             AddWindowButton.ClickEvent += AddNewWindow;
-            Renderer.AddMesh(AddWindowButton.MeshData);
+
+            RenderElements.Add(AddWindowButton);
 
             Windows = new List<WindowView>();
 
@@ -39,11 +47,6 @@ namespace TuringSimulatorDesktop.UI
 
             InputManager.RegisterPollableObjectOnQueuePersistent(this);
         }
-        ~ProjectScreenView()
-        {
-            Renderer.Dispose();
-        }
-
 
         public void PollInput()
         {
@@ -101,12 +104,14 @@ namespace TuringSimulatorDesktop.UI
             {
                 Windows[i].Draw();
             }
-            Renderer.Draw();
+
+            GlobalMeshRenderer.Draw(RenderElements, Port);
         }
 
         public override void ViewResize(int NewWidth, int NewHeight)
         {
-            Renderer.RecalculateProjection(0, 0, NewWidth, NewHeight);
+            Port.Width = NewWidth;
+            Port.Height = NewHeight;
         }
     }
 }
