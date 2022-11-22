@@ -22,7 +22,7 @@ namespace TuringSimulatorDesktop.UI
         public ProjectScreenView()
         {
             Renderer = new MeshRenderer(GlobalGraphicsData.Device, GlobalGraphicsData.Device.PresentationParameters.BackBufferWidth, GlobalGraphicsData.Device.PresentationParameters.BackBufferHeight);
-            AddWindowButton = new Button(new Vector2(20f, 20f), Mesh.CreateRectangle(Vector2.Zero, 40, 20, Color.Yellow));
+            AddWindowButton = new Button(new Vector2(20f, 20f), Mesh.CreateRectangle(Vector2.Zero, 40, 20, Color.Yellow), ElementCreateType.Persistent);
             AddWindowButton.ClickEvent += AddNewWindow;
             Renderer.AddMesh(AddWindowButton.MeshData);
 
@@ -37,7 +37,7 @@ namespace TuringSimulatorDesktop.UI
             Win2.MoveWindow(0, 25);
             Windows.Add(Win2);
 
-            InputManager.RegisterPollableObjectOnQueue(this);
+            InputManager.RegisterPollableObjectOnQueuePersistent(this);
         }
         ~ProjectScreenView()
         {

@@ -90,6 +90,7 @@ namespace TuringSimulatorDesktop
                 try
                 {
                     CustomConsole.Log("CLIENT: Client is writing data to server");
+                    Data.InsertPacketLength();
                     DataStream.BeginWrite(Data.SaveTemporaryBufferToPernamentReadBuffer(), 0, Data.Length(), null, null);
                 }
                 catch (Exception E)

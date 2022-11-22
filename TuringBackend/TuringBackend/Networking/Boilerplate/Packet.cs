@@ -6,6 +6,9 @@ namespace TuringBackend
 {
     public enum ClientSendPackets
     {
+        LoadProject,
+        RequestLogReceieverStatus,
+
         RequestProjectData,
         RequestFolderData,
         RequestFile,
@@ -25,6 +28,7 @@ namespace TuringBackend
 
     public enum ServerSendPackets
     {
+        LogData,
         ErrorNotification,
 
         SentProjectData,

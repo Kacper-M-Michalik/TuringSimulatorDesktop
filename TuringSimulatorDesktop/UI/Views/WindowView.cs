@@ -34,6 +34,7 @@ namespace TuringSimulatorDesktop.UI
         public int LastProjectionY;
         public int LastProjectionWidth;
         public int LastProjectionHeight;
+        //
 
         public WindowView(int SetWidth, int SetHeight)
         {
@@ -110,7 +111,7 @@ namespace TuringSimulatorDesktop.UI
             RecalculateRenderData();
         }
 
-        public void RecalculateRenderData()
+        void RecalculateRenderData()
         {
             Port.X = X;
             Port.Y = Y;

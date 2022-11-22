@@ -20,7 +20,7 @@ namespace TuringBackend
         }
     }
 
-    public class Project
+    public class ProjectData
     {
         //Cache System
         public Dictionary<int, CacheFileData> CacheDataLookup;

@@ -5,18 +5,30 @@ using System.Text;
 using System.Threading.Tasks;
 using TuringBackend;
 
-namespace TuringSimulatorDesktop
+namespace TuringBackend.Networking
 {
     public static class ClientSendFunctions
     {
-        private static void SendTCPData(Packet Data)
+        public static Packet LoadProject(string Location)
         {
-            Data.InsertPacketLength();
-            Client.TCP.SendDataToServer(Data);
-            Data.Dispose();
+            Packet Data = new Packet();
+
+            Data.Write((int)ClientSendPackets.LoadProject);
+            Data.Write(Location);
+
+            return Data;
         }
 
-        public static void RequestFile(int FileID, bool RecieveUpdates)
+        public static Packet RequestLogReceiverStatus()
+        {
+            Packet Data = new Packet();
+
+            Data.Write((int)ClientSendPackets.RequestLogReceieverStatus);
+
+            return Data;
+        }
+
+        public static Packet RequestFile(int FileID, bool RecieveUpdates)
         {
             Packet Data = new Packet();
 
@@ -24,20 +36,20 @@ namespace TuringSimulatorDesktop
             Data.Write(FileID);
             Data.Write(RecieveUpdates);
 
-            SendTCPData(Data);
+            return Data;
         }
 
-        public static void RequestFolderData(int FolderID)
+        public static Packet RequestFolderData(int FolderID)
         {
             Packet Data = new Packet();
 
             Data.Write((int)ClientSendPackets.RequestFolderData);
             Data.Write(FolderID);
 
-            SendTCPData(Data);
+            return Data;
         }
 
-        public static void CreateFile(int Folder, string NewName)
+        public static Packet CreateFile(int Folder, string NewName)
         {
             Packet Data = new Packet();
 
@@ -45,10 +57,10 @@ namespace TuringSimulatorDesktop
             Data.Write(Folder);
             Data.Write(NewName);
 
-            SendTCPData(Data);
+            return Data;
         }
 
-        public static void UpdateFile(int FileID, int Version, string NewContents)
+        public static Packet UpdateFile(int FileID, int Version, string NewContents)
         {
             Packet Data = new Packet();
 
@@ -57,10 +69,10 @@ namespace TuringSimulatorDesktop
             Data.Write(Version);
             Data.Write(Encoding.ASCII.GetBytes(NewContents));
 
-            SendTCPData(Data);
+            return Data;
         }
 
-        public static void RenameFile(int FileID, string NewFileName)
+        public static Packet RenameFile(int FileID, string NewFileName)
         {
             Packet Data = new Packet();
 
@@ -68,10 +80,10 @@ namespace TuringSimulatorDesktop
             Data.Write(FileID);
             Data.Write(NewFileName);
 
-            SendTCPData(Data);
+            return Data;
         }
 
-        public static void MoveFile(int FileID, int NewFolderID)
+        public static Packet MoveFile(int FileID, int NewFolderID)
         {
             Packet Data = new Packet();
 
@@ -79,31 +91,31 @@ namespace TuringSimulatorDesktop
             Data.Write(FileID);
             Data.Write(NewFolderID);
 
-            SendTCPData(Data);
+            return Data;
         }
 
-        public static void DeleteFile(int FileID)
+        public static Packet DeleteFile(int FileID)
         {
             Packet Data = new Packet();
 
             Data.Write((int)ClientSendPackets.DeleteFile);
             Data.Write(FileID);
 
-            SendTCPData(Data);
+            return Data;
         }
 
-        public static void UnsubscribeFromFileUpdates(int FileID)
+        public static Packet UnsubscribeFromFileUpdates(int FileID)
         {
             Packet Data = new Packet();
 
             Data.Write((int)ClientSendPackets.UnsubscribeFromUpdatesForFile);
             Data.Write(FileID);
 
-            SendTCPData(Data);
+            return Data;
         }
 
 
-        public static void CreateFolder(int BaseFolder, string NewName)
+        public static Packet CreateFolder(int BaseFolder, string NewName)
         {
             Packet Data = new Packet();
 
@@ -111,10 +123,10 @@ namespace TuringSimulatorDesktop
             Data.Write(BaseFolder);
             Data.Write(NewName);
 
-            SendTCPData(Data);
+            return Data;
         }
 
-        public static void RenameFolder(int Folder, string NewName)
+        public static Packet RenameFolder(int Folder, string NewName)
         {
             Packet Data = new Packet();
 
@@ -122,10 +134,10 @@ namespace TuringSimulatorDesktop
             Data.Write(Folder);
             Data.Write(NewName);
 
-            SendTCPData(Data);
+            return Data;
         }
 
-        public static void MoveFolder(int Folder, int TargetFolder)
+        public static Packet MoveFolder(int Folder, int TargetFolder)
         {
             Packet Data = new Packet();
 
@@ -133,17 +145,17 @@ namespace TuringSimulatorDesktop
             Data.Write(Folder);
             Data.Write(TargetFolder);
 
-            SendTCPData(Data);
+            return Data;
         }
 
-        public static void DeleteFolder(int Folder)
+        public static Packet DeleteFolder(int Folder)
         {
             Packet Data = new Packet();
 
             Data.Write((int)ClientSendPackets.DeleteFolder);
             Data.Write(Folder);
 
-            SendTCPData(Data);
+            return Data;
         }
     }
 }

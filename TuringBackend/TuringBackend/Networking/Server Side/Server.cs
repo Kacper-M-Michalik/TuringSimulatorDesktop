@@ -9,6 +9,9 @@ namespace TuringBackend.Networking
 {
     public static class Server
     {
+        //possible bug -> when user joins as they are added onto clients on new thread, having simualtenous SendTCPDataToAllClients may have problems
+        //may have to add packet "User joined server" -> other thread creates, adds onto queue, server send this new client the project data, aka jsut folder structure for now
+
         public static bool IsServerOn;
 
         public static int MaxClients { get; private set; }
@@ -24,34 +27,13 @@ namespace TuringBackend.Networking
         static bool MarkForClosing;
         static long LastTick;
 
+        public static ProjectData LoadedProject;
 
         public static void StartServer(int SetMaxPlayers, int SetPort)
         {
-            if (ProjectInstance.LoadedProject == null) throw new Exception("Cannot start server with unloaded project");
-
             MaxClients = SetMaxPlayers;
             Port = SetPort;
 
-            ServerThread = new Thread(RunServer);
-            ServerThread.Start();
-        }
-
-        public static void AddPacketToProcessOnServerThread(int SenderID, Packet PacketToAdd)
-        {
-            lock (PacketProcessingQueue)
-            {
-                PacketToAdd.InsertPacketSenderIDUnsafe(SenderID);
-                PacketProcessingQueue.Enqueue(PacketToAdd);
-            }
-        }
-
-        public static void CloseServer()
-        {
-            MarkForClosing = true;
-        }
-
-        private static void RunServer()
-        {
             CustomConsole.Log("THREAD NOTIF SERVER: SERVER INIT ON THREAD " + Thread.CurrentThread.ManagedThreadId.ToString());
 
             IsServerOn = true;
@@ -72,7 +54,36 @@ namespace TuringBackend.Networking
             ServerTcpListener.BeginAcceptTcpClient(new AsyncCallback(NewTCPClientConnectedCallback), null);
 
             PacketProcessingQueue = new Queue<Packet>();
+            
+            RunServer();
 
+                /*
+                 * 
+            if (LoadedProject != null) throw new Exception("Already loaded project.");
+
+            LoadedProject = FileManager.LoadProjectFile(Location);
+
+            if (LoadedProject != null)
+            {
+                CustomConsole.Log("Loader Successful");
+                //raise event here?
+                RunServer();
+            }
+            else
+            {
+                CustomConsole.Log("Loader Unsuccessful");
+                //raise event here?
+            }
+                 * 
+            
+            /*
+            ServerThread = new Thread(RunServer);
+            ServerThread.Start();
+            */
+        }
+
+        static void RunServer()
+        {    
             while (!MarkForClosing)
             {
                 if (PacketProcessingQueue.Count > 0)
@@ -108,13 +119,13 @@ namespace TuringBackend.Networking
                 }
 
                 long CurrentTime = DateTime.UtcNow.Ticks;
-                foreach (KeyValuePair<int, CacheFileData> CachedFile in ProjectInstance.LoadedProject.CacheDataLookup)
+                foreach (KeyValuePair<int, CacheFileData> CachedFile in LoadedProject.CacheDataLookup)
                 {
                     CachedFile.Value.ExpiryTimer += CurrentTime - LastTick;
 
                     if (CachedFile.Value.ExpiryTimer > CacheExpiryTime)
                     {
-                        ProjectInstance.LoadedProject.CacheDataLookup.Remove(CachedFile.Key);
+                        LoadedProject.CacheDataLookup.Remove(CachedFile.Key);
                     }
                 }
                 LastTick = CurrentTime;              
@@ -123,7 +134,21 @@ namespace TuringBackend.Networking
             ShutDown();
         }
 
-        private static void NewTCPClientConnectedCallback(IAsyncResult Result)
+        public static void CloseServer()
+        {
+            MarkForClosing = true;
+        }
+
+        public static void AddPacketToProcessOnServerThread(int SenderID, Packet PacketToAdd)
+        {
+            lock (PacketProcessingQueue)
+            {
+                PacketToAdd.InsertPacketSenderIDUnsafe(SenderID);
+                PacketProcessingQueue.Enqueue(PacketToAdd);
+            }
+        }
+
+        static void NewTCPClientConnectedCallback(IAsyncResult Result)
         {
             if (!IsServerOn) return;
 
@@ -147,7 +172,7 @@ namespace TuringBackend.Networking
             NewClient.Close();
         }
 
-        private static void ShutDown()
+        static void ShutDown()
         {
             IsServerOn = false;
             ServerTcpListener.Stop();
@@ -155,6 +180,7 @@ namespace TuringBackend.Networking
             Clients = null;
             PacketProcessingQueue = null;
             PacketsBeingProcessed = null;
+            LoadedProject = null;
 
             CustomConsole.Log("SERVER: Server Closed");
         }
@@ -206,8 +232,11 @@ namespace TuringBackend.Networking
 
             public void SendDataToClient(Packet Data)
             {
+                if (ConnectionSocket == null) return;
+
                 try
                 {
+                    Data.InsertPacketLength();
                     DataStream.BeginWrite(Data.SaveTemporaryBufferToPernamentReadBuffer(), 0, Data.Length(), null, null);
                 }
                 catch (Exception E)
@@ -225,10 +254,14 @@ namespace TuringBackend.Networking
                     CustomConsole.Log("THREAD NOTIF SERVER: Server dealing with incoming data on thread " + Thread.CurrentThread.ManagedThreadId.ToString());
                     int IncomingDataLength = DataStream.EndRead(Result);
 
+                    //warning -> if ther are packets that are intended for this client after disconnect, shit will hit the fan, possible bug with customconsole, as changing logclientid on seperate thread than variable is used on
                     if (IncomingDataLength == 0)
                     {
                         TCPInternalDisconnect();
                         CustomConsole.Log("SERVER: Client " + ID.ToString() + " has disconnected!");
+
+                        if (CustomConsole.LogClientID == ID) CustomConsole.LogClientID = -1;
+
                         return;
                     }
 

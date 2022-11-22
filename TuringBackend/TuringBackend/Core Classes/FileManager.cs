@@ -5,6 +5,7 @@ using System.IO;
 using TuringBackend.Logging;
 using System.Text.Json;
 using TuringBackend.SaveFiles;
+using TuringBackend.Networking;
 
 namespace TuringBackend
 {
@@ -35,7 +36,7 @@ namespace TuringBackend
             return NextID++;
         }
 
-        public static Project LoadProjectFile(string FilePath)
+        public static ProjectData LoadProjectFile(string FilePath)
         {
             string CorrectPath = "";
             if (FilePath.Substring(FilePath.Length-6) == ".tproj")
@@ -112,7 +113,7 @@ namespace TuringBackend
                 }
             }
 
-            return new Project()
+            return new ProjectData()
             {
                 ProjectName = SaveFile.ProjectName,
                 TuringTypeRule = SaveFile.TuringTypeRule,
@@ -130,19 +131,19 @@ namespace TuringBackend
 
         public static bool LoadFileIntoCache(int FileID)
         {
-            if (ProjectInstance.LoadedProject.FileDataLookup.ContainsKey(FileID))
+            if (Server.LoadedProject.FileDataLookup.ContainsKey(FileID))
             {
-                if (ProjectInstance.LoadedProject.CacheDataLookup.ContainsKey(FileID))
+                if (Server.LoadedProject.CacheDataLookup.ContainsKey(FileID))
                 {
-                    ProjectInstance.LoadedProject.CacheDataLookup[FileID].ResetExpiryTimer();
+                    Server.LoadedProject.CacheDataLookup[FileID].ResetExpiryTimer();
                     return true;
                 }
                 else
                 {
                     try
                     {
-                        ProjectInstance.LoadedProject.CacheDataLookup.Add(FileID, new CacheFileData(
-                                File.ReadAllBytes(ProjectInstance.LoadedProject.BasePath + ProjectInstance.LoadedProject.FileDataLookup[FileID].GetLocalPath())
+                        Server.LoadedProject.CacheDataLookup.Add(FileID, new CacheFileData(
+                                File.ReadAllBytes(Server.LoadedProject.BasePath + Server.LoadedProject.FileDataLookup[FileID].GetLocalPath())
                             ));
                         return true;
                     }
@@ -190,14 +191,15 @@ namespace TuringBackend
             return true;
         }
 
+        //is there a point of this?
         public static bool SaveProject()
         {
             JsonSerializerOptions Options = new JsonSerializerOptions() { WriteIndented = true };
-            string SaveJson = JsonSerializer.Serialize(new ProjectSaveFile(ProjectInstance.LoadedProject.ProjectName, ProjectInstance.LoadedProject.BaseDirectoryFolder.Name, ProjectInstance.LoadedProject.TuringTypeRule), Options);
+            string SaveJson = JsonSerializer.Serialize(new ProjectSaveFile(Server.LoadedProject.ProjectName, Server.LoadedProject.BaseDirectoryFolder.Name, Server.LoadedProject.TuringTypeRule), Options);
 
             try
             {
-                File.WriteAllBytes(ProjectInstance.LoadedProject.ProjectFilePath, Encoding.ASCII.GetBytes(SaveJson));
+                File.WriteAllBytes(Server.LoadedProject.ProjectFilePath, Encoding.ASCII.GetBytes(SaveJson));
             }            
             catch (Exception E)
             {

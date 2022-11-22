@@ -11,6 +11,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using TuringSimulatorDesktop.Input;
+using System.Threading;
 
 namespace TuringSimulatorDesktop.UI
 {
@@ -28,12 +29,12 @@ namespace TuringSimulatorDesktop.UI
         {
             Renderer = new MeshRenderer(GlobalGraphicsData.Device, Width, Height);
 
-            NewProjectButton = new Button(new Vector2(100f,100f), Mesh.CreateRectangle(Vector2.Zero, 100f, 30f, Color.White));
+            NewProjectButton = new Button(new Vector2(100f,100f), Mesh.CreateRectangle(Vector2.Zero, 100f, 30f, Color.White), ElementCreateType.Persistent);
 
-            LoadProjectButton = new Button(new Vector2(100f, 150f), Mesh.CreateRectangle(Vector2.Zero, 100f, 30f, Color.Red));
+            LoadProjectButton = new Button(new Vector2(100f, 150f), Mesh.CreateRectangle(Vector2.Zero, 100f, 30f, Color.Red), ElementCreateType.Persistent);
             LoadProjectButton.ClickEvent += SelectProjectLocation;
 
-            JoinProjectButton = new Button(new Vector2(100f, 200f), Mesh.CreateRectangle(Vector2.Zero, 100f, 30f, Color.Blue));
+            JoinProjectButton = new Button(new Vector2(100f, 200f), Mesh.CreateRectangle(Vector2.Zero, 100f, 30f, Color.Blue), ElementCreateType.Persistent);
 
             Renderer.AddMesh(NewProjectButton.MeshData);
             Renderer.AddMesh(LoadProjectButton.MeshData);
@@ -74,9 +75,11 @@ namespace TuringSimulatorDesktop.UI
                 GlobalGraphicsData.BaseWindow.CurrentView = new ProjectScreenView();
             }
                 */
+            // "E:\\Professional Programming\\MAIN\\TestLocation"
+            BackendInterface.StartProjectServer(1, 28104);
+            //client.sendloadproject
 
-            ProjectInstance.StartProjectServer("E:\\Professional Programming\\MAIN\\TestLocation", 1, 28104);
-            InputManager.RemoveListenersOnQueue();    
+            InputManager.RemoveAllListenersOnQueue();    
             GlobalGraphicsData.BaseWindow.CurrentView = new ProjectScreenView();
 
         }

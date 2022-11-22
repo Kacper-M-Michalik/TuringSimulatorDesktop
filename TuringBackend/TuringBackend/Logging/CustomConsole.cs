@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Text;
 using System.Diagnostics;
 using System.IO;
+using TuringBackend.Networking;
 
 namespace TuringBackend.Logging
 {
     public static class CustomConsole
     {
+        public static int LogClientID = -1;
         public delegate void LogMethod(string Message);
         public static LogMethod LogPointer;
         public static LogMethod WritePointer;
@@ -17,10 +19,15 @@ namespace TuringBackend.Logging
 
         static CustomConsole()
         {
+            LogPointer = delegate (string Message) { if (LogClientID != -1) { ServerSendFunctions.SendTCPData(LogClientID, ServerSendFunctions.LogData(Message)); Debug.WriteLine(Message); } };
+            WritePointer = delegate (string Message) { if (LogClientID != -1) { ServerSendFunctions.SendTCPData(LogClientID, ServerSendFunctions.LogData(Message)); Debug.Write(Message); } };
+
+            /*
             #if DEBUG
                 LogPointer = delegate (string Message) { Debug.WriteLine(Message); };
                 WritePointer = delegate (string Message) { Debug.Write(Message); };
             #endif
+            */
 
             Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + Path.DirectorySeparatorChar + "Turing Machine - Desktop");
             LogFilePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + Path.DirectorySeparatorChar + "Turing Machine - Desktop" + Path.DirectorySeparatorChar + "Log--" + DateTime.Now.ToString("yyyy-MM-dd--HH-mm") + ".txt";

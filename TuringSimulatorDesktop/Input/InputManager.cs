@@ -22,6 +22,8 @@ namespace TuringSimulatorDesktop.Input
         static List<IPoll> PollableObjectsToAdd = new List<IPoll>();
         static List<IClickable> ClickableObjectsToRemove = new List<IClickable>();
         static List<IPoll> PollableObjectsToRemove = new List<IPoll>();
+        static List<IClickable> ClickableObjectsToAddPersistent = new List<IClickable>();
+        static List<IPoll> PollableObjectsToAddPersistent = new List<IPoll>();
 
         static bool ClearOnQueue;
 
@@ -133,10 +135,24 @@ namespace TuringSimulatorDesktop.Input
             {
                 ClickableObjects.Clear();
                 PollableObjects.Clear();
+                ClickableObjectsToRemove.Clear();
+                PollableObjectsToRemove.Clear();
+                ClickableObjectsToAdd.Clear();
+                PollableObjectsToAdd.Clear();
                 PreviouslyClickedObject = null;
                 ClearOnQueue = false;
             }
 
+            for (int i = 0; i < ClickableObjectsToAddPersistent.Count; i++)
+            {
+                ClickableObjects.Add(ClickableObjectsToAddPersistent[i]);
+            }
+            ClickableObjectsToAddPersistent.Clear();
+            for (int i = 0; i < PollableObjectsToAddPersistent.Count; i++)
+            {
+                PollableObjects.Add(PollableObjectsToAddPersistent[i]);
+            }
+            PollableObjectsToAddPersistent.Clear();
         }
 
         public static void RegisterClickableObjectOnQueue(IClickable Object)
@@ -149,15 +165,30 @@ namespace TuringSimulatorDesktop.Input
             PollableObjectsToAdd.Add(Object);
         }
 
-        public static void RemoveListenersUnsafe()
+        public static void RegisterClickableObjectOnQueuePersistent(IClickable Object)
+        {
+            ClickableObjectsToAddPersistent.Add(Object);
+        }
+
+        public static void RegisterPollableObjectOnQueuePersistent(IPoll Object)
+        {
+            PollableObjectsToAddPersistent.Add(Object);
+        }
+
+
+        public static void RemoveAllListenersUnsafe()
         {
             ClickableObjects.Clear();
             PollableObjects.Clear();
+            ClickableObjectsToRemove.Clear();
+            PollableObjectsToRemove.Clear();
+            ClickableObjectsToAdd.Clear();
+            PollableObjectsToAdd.Clear();
 
             PreviouslyClickedObject = null;
         }
 
-        public static void RemoveListenersOnQueue()
+        public static void RemoveAllListenersOnQueue()
         {
             ClearOnQueue = true;
         }

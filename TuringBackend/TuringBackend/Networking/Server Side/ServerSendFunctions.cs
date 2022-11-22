@@ -6,157 +6,175 @@ namespace TuringBackend.Networking
     static class ServerSendFunctions
     {
         #region Helper Functions
-        private static void SendTCPData(int ClientID, Packet Data)
+        public static void SendTCPData(int ClientID, Packet Data)
         {
-            Data.InsertPacketLength();
             Server.Clients[ClientID].TCP.SendDataToClient(Data);
-            Data.Dispose();
         }
 
-        private static void SendTCPToAllClients(Packet Data)
+        public static void SendTCPToAllClients(Packet Data)
         {
-            for (int i = 1; i < Server.MaxClients; i++)
+            for (int i = 0; i < Server.MaxClients; i++)
             {
                 if (Server.Clients[i].TCP.ConnectionSocket != null)
                 {
-                    Data.InsertPacketLength();
                     Server.Clients[i].TCP.SendDataToClient(Data);
                 }
             }
-            Data.Dispose();
+            //Data.Dispose();
         }
         #endregion
 
         #region Main
-        public static void SendErrorNotification(int ClientID, string ErrorString)
+        public static Packet LogData(string LogData)
+        {
+            Packet Data = new Packet();
+
+            Data.Write((int)ServerSendPackets.LogData);
+            Data.Write(LogData);
+
+            return Data;
+        }
+
+        public static Packet ErrorNotification(string ErrorString)
         {
             Packet Data = new Packet();
 
             Data.Write((int)ServerSendPackets.ErrorNotification);
             Data.Write(ErrorString);
 
-            SendTCPData(ClientID, Data);
+            return Data;
         }
 
-        public static void SendProjectData(int ClientID)
+        public static Packet ProjectData()
         {
             //send rules
             //send directory
+            return null;
         }
 
-        public static void SendFolderData(int ClientID, int FolderID)
+        public static Packet FolderData(int FolderID)
         {
             Packet Data = new Packet();
 
             Data.Write((int)ServerSendPackets.SentFolderData);
             Data.Write(FolderID);
 
-            Data.Write(ProjectInstance.LoadedProject.FolderDataLookup[FolderID].SubFolders.Count);
-            foreach (DirectoryFolder Folder in ProjectInstance.LoadedProject.FolderDataLookup[FolderID].SubFolders)
+            Data.Write(Server.LoadedProject.FolderDataLookup[FolderID].SubFolders.Count);
+            foreach (DirectoryFolder Folder in Server.LoadedProject.FolderDataLookup[FolderID].SubFolders)
             {
                 Data.Write(Folder.Name);
                 Data.Write(Folder.ID);
             }
 
-            Data.Write(ProjectInstance.LoadedProject.FolderDataLookup[FolderID].SubFiles.Count);
-            foreach (DirectoryFile File in ProjectInstance.LoadedProject.FolderDataLookup[FolderID].SubFiles)
+            Data.Write(Server.LoadedProject.FolderDataLookup[FolderID].SubFiles.Count);
+            foreach (DirectoryFile File in Server.LoadedProject.FolderDataLookup[FolderID].SubFiles)
             {
                 Data.Write(File.Name);
                 Data.Write(File.ID);
             }
 
-            SendTCPData(ClientID, Data);
+            return Data;
         }
 
-        public static void SendFile(int ClientID, int FileID)
+        public static Packet FileData(int FileID)
         {
             Packet Data = new Packet();
 
             Data.Write((int)ServerSendPackets.SentOrUpdatedFile);
-            Data.Write(ProjectInstance.LoadedProject.FileDataLookup[FileID].Version);
-            Data.Write(ProjectInstance.LoadedProject.CacheDataLookup[FileID].FileData);
+            Data.Write(Server.LoadedProject.FileDataLookup[FileID].Version);
+            Data.Write(Server.LoadedProject.CacheDataLookup[FileID].FileData);
 
-            SendTCPData(ClientID, Data);
+            return Data;
         }
 
-        public static void SendFileRenamed(int FileID)
+        public static Packet FileRenamed(int FileID)
         {
             Packet Data = new Packet();
 
             Data.Write((int)ServerSendPackets.RenamedFile);
             ///
 
-            SendTCPToAllClients(Data);
+            return Data;
+            //SendTCPToAllClients(Data);
         }
 
-        public static void SendFileMoved(int FileID)
+        public static Packet FileMoved(int FileID)
         {
             Packet Data = new Packet();
 
             Data.Write((int)ServerSendPackets.MovedFile);
             ///
 
-            SendTCPToAllClients(Data);
+            return Data;
+            //SendTCPToAllClients(Data);
         }
 
-        public static void SendFileDeleted(int FileID)
+        public static Packet FileDeleted(int FileID)
         {
             Packet Data = new Packet();
 
             Data.Write((int)ServerSendPackets.DeletedFile);
             Data.Write(FileID);
 
-            SendTCPToAllClients(Data);
+            //SendTCPToAllClients(Data);
+            return Data;
         }
 
-        public static void SendFileUnsubscribed(int FileID)
+        /*
+        public static Packet FileUnsubscribed(int FileID)
         {
             Packet Data = new Packet();
 
-            Data.Write((int)ServerSendPackets.DeletedFile);
+            Data.Write((int)ServerSendPackets.);
             Data.Write(FileID);
 
-            SendTCPToAllClients(Data);
+            //SendTCPToAllClients(Data);
+            return Data;
         }
+        */
 
-        public static void SendFolderCreated(int FolderID)
+        public static Packet FolderCreated(int FolderID)
         {
             Packet Data = new Packet();
 
             Data.Write((int)ServerSendPackets.CreatedFolder);
             Data.Write(FolderID);
 
-            SendTCPToAllClients(Data);
+            //SendTCPToAllClients(Data);
+            return Data;
         }
 
-        public static void SendFolderRenamed(int FolderID)
+        public static Packet FolderRenamed(int FolderID)
         {
             Packet Data = new Packet();
 
             Data.Write((int)ServerSendPackets.RenamedFolder);
             Data.Write(FolderID);
 
-            SendTCPToAllClients(Data);
+            //SendTCPToAllClients(Data);
+            return Data;
         }
 
-        public static void SendFolderMoved(int FolderID)
+        public static Packet FolderMoved(int FolderID)
         {
             Packet Data = new Packet();
 
             Data.Write((int)ServerSendPackets.MovedFolder);
             Data.Write(FolderID);
 
-            SendTCPToAllClients(Data);
+            //SendTCPToAllClients(Data);
+            return Data;
         }
 
-        public static void SendFolderDeleted(int FolderID)
+        public static Packet FolderDeleted(int FolderID)
         {
             Packet Data = new Packet();
 
             Data.Write((int)ServerSendPackets.DeletedFolder);
             Data.Write(FolderID);
 
-            SendTCPToAllClients(Data);
+            //SendTCPToAllClients(Data);
+            return Data;
         }
         #endregion
     }

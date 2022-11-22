@@ -11,6 +11,7 @@ using TuringSimulatorDesktop.Input;
 namespace TuringSimulatorDesktop.UI
 {
     public delegate void OnClick(Button Sender);
+    public enum ElementCreateType {Persistent, Regular}
 
     public class Button : UIElement, IClickable
     {
@@ -21,7 +22,7 @@ namespace TuringSimulatorDesktop.UI
 
         public event OnClick ClickEvent;
 
-        public Button(Vector2 SetPosition, Mesh SetMeshData, string SetText = "")
+        public Button(Vector2 SetPosition, Mesh SetMeshData, ElementCreateType Type = ElementCreateType.Regular, string SetText = "")
         {
             Position = SetPosition;
 
@@ -33,7 +34,8 @@ namespace TuringSimulatorDesktop.UI
 
             BoundDown = Convert.ToInt32(MathF.Round(MeshData.GetFurthestDownVertexPoint(), MidpointRounding.AwayFromZero)); ;
 
-            InputManager.RegisterClickableObjectOnQueue(this);
+            if (Type == ElementCreateType.Regular) InputManager.RegisterClickableObjectOnQueue(this);
+            else InputManager.RegisterClickableObjectOnQueuePersistent(this);
         }
 
         bool IClickable.Clicked()
