@@ -5,10 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net;
 using System.Threading;
-using TuringBackend.Networking;
-using TuringBackend.Logging;
+using TuringCore;
+using TuringServer;
 
-namespace TuringBackend
+namespace TuringTesting
 {
     public static class ClientInstance
     { 
@@ -20,7 +20,7 @@ namespace TuringBackend
             }
             else
             {
-                CustomConsole.Log("Invalid IP Address");
+                CustomLogging.Log("Invalid IP Address");
             }
         }
 

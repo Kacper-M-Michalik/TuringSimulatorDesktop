@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TuringBackend;
-using TuringBackend.Logging;
-using TuringSimulatorDesktop.Main;
+using TuringCore;
+using TuringServer;
 
 namespace TuringSimulatorDesktop
 {

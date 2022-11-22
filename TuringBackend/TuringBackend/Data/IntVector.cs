@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TuringBackend
+namespace TuringCore
 {
     //Not in use, to be added, will allow for tape of any dimensions.
     class IntVector

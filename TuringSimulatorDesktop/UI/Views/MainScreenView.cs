@@ -5,7 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using TuringSimulatorDesktop.UI;
-using TuringBackend;
+using TuringCore;
+using TuringServer;
+using TuringSimulatorDesktop.Input;
 using System.IO;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
@@ -77,6 +79,8 @@ namespace TuringSimulatorDesktop.UI
                 */
             // "E:\\Professional Programming\\MAIN\\TestLocation"
             BackendInterface.StartProjectServer(1, 28104);
+            //Client.
+
             //client.sendloadproject
 
             InputManager.RemoveAllListenersOnQueue();    

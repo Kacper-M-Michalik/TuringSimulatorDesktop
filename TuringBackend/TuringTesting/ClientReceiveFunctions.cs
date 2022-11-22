@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TuringBackend.Logging;
+using TuringCore;
 
-namespace TuringBackend.Networking
+namespace TuringTesting
 {
     static class ClientReceiveFunctions
     {
@@ -20,12 +20,12 @@ namespace TuringBackend.Networking
 
         public static void ReceiveErrorNotification(Packet Data)
         {
-            CustomConsole.Log("CLIENT: ERROR MESSAGE FROM SERVER: " + Data.ReadString());
+            CustomLogging.Log("CLIENT: ERROR MESSAGE FROM SERVER: " + Data.ReadString());
         }
 
         public static void ReceivedFileFromServer(Packet Data)
         {
-            CustomConsole.Log("CLIENT: Recieved File");
+            CustomLogging.Log("CLIENT: Recieved File");
 
             if (UIEventBindings.DataSubscribers.ContainsKey(Data.ReadInt(false)))
             {
@@ -42,21 +42,21 @@ namespace TuringBackend.Networking
 
         public static void ReceivedFolderDataFromServer(Packet Data)
         {
-            CustomConsole.Log("CLIENT: Recieved Folder Data");
+            CustomLogging.Log("CLIENT: Recieved Folder Data");
 
             int Folders = Data.ReadInt();
             for (int i = 0; i < Folders; i++)
             {
-                CustomConsole.Log("FOLDER");
-                CustomConsole.Log(Data.ReadString());
-                CustomConsole.Log(Data.ReadInt().ToString());
+                CustomLogging.Log("FOLDER");
+                CustomLogging.Log(Data.ReadString());
+                CustomLogging.Log(Data.ReadInt().ToString());
             }
             int Files = Data.ReadInt();
             for (int i = 0; i < Files; i++)
             {
-                CustomConsole.Log("FILE");
-                CustomConsole.Log(Data.ReadString());
-                CustomConsole.Log(Data.ReadInt().ToString());
+                CustomLogging.Log("FILE");
+                CustomLogging.Log(Data.ReadString());
+                CustomLogging.Log(Data.ReadInt().ToString());
             }
         }
 

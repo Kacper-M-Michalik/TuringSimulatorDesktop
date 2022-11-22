@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
-using TuringBackend.Logging;
+using TuringCore;
+using TuringServer.Logging;
 
-namespace TuringBackend.Networking
+namespace TuringServer
 {
     public static class Server
     {

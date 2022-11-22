@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TuringBackend;
+using TuringCore;
 
-namespace TuringBackend.Networking
+namespace TuringServer
 {
     public static class ClientSendFunctions
     {

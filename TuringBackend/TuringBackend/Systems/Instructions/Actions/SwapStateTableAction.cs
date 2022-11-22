@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TuringBackend.Actions
+namespace TuringCore.Actions
 {
     public class SwapStateTableAction : TuringAction
     {

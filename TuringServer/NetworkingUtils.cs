@@ -4,7 +4,7 @@ using System.Text;
 using System.Net;
 using System.Net.NetworkInformation;
 
-namespace TuringBackend.Networking
+namespace TuringServer
 {
     public static class NetworkingUtils
     {

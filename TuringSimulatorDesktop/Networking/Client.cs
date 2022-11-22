@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
-using TuringBackend;
-using TuringBackend.Logging;
+using TuringCore;
+using TuringServer;
 
 namespace TuringSimulatorDesktop
 {
@@ -48,15 +48,15 @@ namespace TuringSimulatorDesktop
 
                     if (!IsConnected)
                     {
-                        CustomConsole.Log("CLIENT: Connection timed out.");
+                        CustomLogging.Log("CLIENT: Connection timed out.");
                         TCPInternalDisconnect();
-                        UIEventBindings.ClientFailedConnecting?.Invoke(this, new EventArgs());
+                        //UIEventBindings.ClientFailedConnecting?.Invoke(this, new EventArgs());
                     }                                    
 
                 }
                 catch (Exception E)
                 {
-                    CustomConsole.Log("CLIENT: Connection attempt failure! " + E.ToString());
+                    CustomLogging.Log("CLIENT: Connection attempt failure! " + E.ToString());
                     TCPInternalDisconnect();
                 }
             }
@@ -68,19 +68,19 @@ namespace TuringSimulatorDesktop
                     //whats point of this?
                     if (ConnectionSocket == null) return;
 
-                    CustomConsole.Log("CLIENT: Connect callback called.");
+                    CustomLogging.Log("CLIENT: Connect callback called.");
 
                     ConnectionSocket.EndConnect(Result);
                     DataStream = ConnectionSocket.GetStream();
                     PacketCurrentlyBeingRebuilt = new Packet();
 
-                    UIEventBindings.ClientSuccessConnecting?.Invoke(this, new EventArgs());
+                    //UIEventBindings.ClientSuccessConnecting?.Invoke(this, new EventArgs());
 
                     DataStream.BeginRead(ReceiveDataBuffer, 0, DataBufferSize, OnReceiveDataFromServer, null);
                 }
                 catch (Exception E)
                 {
-                    CustomConsole.Log(E.ToString());
+                    CustomLogging.Log(E.ToString());
                     TCPInternalDisconnect();
                 }
             }
@@ -89,13 +89,13 @@ namespace TuringSimulatorDesktop
             {
                 try
                 {
-                    CustomConsole.Log("CLIENT: Client is writing data to server");
+                    CustomLogging.Log("CLIENT: Client is writing data to server");
                     Data.InsertPacketLength();
                     DataStream.BeginWrite(Data.SaveTemporaryBufferToPernamentReadBuffer(), 0, Data.Length(), null, null);
                 }
                 catch (Exception E)
                 {
-                    CustomConsole.Log("CLIENT: Error Sending Data To Server! " + E.ToString());
+                    CustomLogging.Log("CLIENT: Error Sending Data To Server! " + E.ToString());
                 }
             }
 
@@ -109,7 +109,7 @@ namespace TuringSimulatorDesktop
 
                     if (IncomingDataLength == 0)
                     {
-                        CustomConsole.Log("CLIENT: SERVER DISCONNECTED ME");
+                        CustomLogging.Log("CLIENT: SERVER DISCONNECTED ME");
                         TCPInternalDisconnect();
                         return;
                     }
@@ -148,7 +148,7 @@ namespace TuringSimulatorDesktop
                 }
                 catch (Exception E)
                 {
-                    CustomConsole.Log(E.ToString());
+                    CustomLogging.Log(E.ToString());
                 }
             }
             
@@ -211,7 +211,7 @@ namespace TuringSimulatorDesktop
 
         public static void Disconnect()
         {
-            CustomConsole.Log("CLIENT: DISCONNECTING FROM SERVER!");
+            CustomLogging.Log("CLIENT: DISCONNECTING FROM SERVER!");
             TCP.TCPInternalDisconnect();
         }
     }

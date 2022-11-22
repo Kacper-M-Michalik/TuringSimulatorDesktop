@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
-using TuringBackend.Logging;
 using System.Text.Json;
-using TuringBackend.SaveFiles;
-using TuringBackend.Networking;
+using TuringCore.SaveFiles;
+using TuringCore;
+using TuringServer.Logging;
 
-namespace TuringBackend
+namespace TuringServer
 {
     public static class FileManager
     {

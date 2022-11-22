@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace TuringBackend.SaveFiles
+namespace TuringCore.SaveFiles
 {
     public class ProjectSaveFile
     {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace TuringBackend
+namespace TuringServer
 {
     public class DirectoryFolder
     {

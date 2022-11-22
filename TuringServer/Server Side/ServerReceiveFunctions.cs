@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using TuringBackend.Logging;
+using TuringServer.Logging;
+using TuringCore;
 
-namespace TuringBackend.Networking
+namespace TuringServer
 {
     static class ServerReceiveFunctions
     {

@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TuringBackend;
+using TuringCore;
+using TuringServer;
 using TuringSimulatorDesktop.UI;
 
-namespace TuringSimulatorDesktop.Main
+namespace TuringSimulatorDesktop
 {
     public delegate void SubscriberDataCallback(Packet Data);
 

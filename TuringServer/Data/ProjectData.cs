@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using TuringCore;
 
-namespace TuringBackend
+namespace TuringServer
 {
     public class CacheFileData
     {

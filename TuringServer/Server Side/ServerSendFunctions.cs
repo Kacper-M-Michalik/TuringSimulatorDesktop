@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using TuringCore;
+using TuringServer.Logging;
 
-namespace TuringBackend.Networking
+namespace TuringServer
 {
     static class ServerSendFunctions
     {

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.Diagnostics;
 using System.IO;
-using TuringBackend.Networking;
+using TuringServer;
 
-namespace TuringBackend.Logging
+namespace TuringServer.Logging
 {
     public static class CustomConsole
     {

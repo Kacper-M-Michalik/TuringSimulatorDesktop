@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using TuringBackend.Networking;
-using TuringBackend.Logging;
+using TuringCore;
+using TuringServer.Logging;
 using System.Threading;
 
-namespace TuringBackend
+namespace TuringServer
 {
     public static class BackendInterface
     {

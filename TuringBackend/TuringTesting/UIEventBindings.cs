@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using TuringBackend.Networking;
+using TuringCore;
+using TuringServer;
 
-namespace TuringBackend
+namespace TuringTesting
 {
     public delegate void ReceivedDataCallback(Packet Data);
 

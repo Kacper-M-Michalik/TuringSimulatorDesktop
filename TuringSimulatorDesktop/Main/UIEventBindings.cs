@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using TuringBackend.Networking;
+using TuringCore;
+using TuringServer;
 
-namespace TuringBackend
+namespace TuringSimulatorDesktop
 {
+    /*
     //DEPRECATED
     public delegate void ReceivedDataCallback(Packet Data);
 
@@ -19,4 +21,5 @@ namespace TuringBackend
 
         public static Dictionary<int, List<ReceivedDataCallback>> DataSubscribers = new Dictionary<int, List<ReceivedDataCallback>>();
     }
+    */
 }
