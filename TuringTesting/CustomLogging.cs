@@ -11,11 +11,13 @@ namespace TuringTesting
     {
         public static void Log(string Message)
         {
+            Console.WriteLine(Message);
             Debug.WriteLine(Message);
         }
 
         public static void Write(string Message)
         {
+            Console.Write(Message);
             Debug.Write(Message);
         }
     }

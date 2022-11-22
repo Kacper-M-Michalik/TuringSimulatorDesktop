@@ -21,13 +21,15 @@ namespace TuringSimulatorDesktop.UI
         public Viewport Port;
         MeshRenderer Renderer;
 
-        public List<View> Views;
-        public List<Button> ViewChangeButtons;
+        List<View> Views;
+        List<Button> ViewChangeButtons;
 
         public View CurrentView;
 
         Mesh BackgroundTab;
         Mesh BackgroundWindow;
+
+        Vector2 NextButtonPlacementPosition;
 
         //DEBUG
         public int LastProjectionX;
@@ -66,32 +68,45 @@ namespace TuringSimulatorDesktop.UI
             return false;
         }
 
-        public override void Draw()
-        {
-            Viewport Original = GlobalGraphicsData.Device.Viewport;
-            GlobalGraphicsData.Device.Viewport = Port;
-            Renderer.Draw();
-            GlobalGraphicsData.Device.Viewport = Original;
-        }
-
         public void SetWindowPosition(int SetX, int SetY)
         {
             X = SetX;
             Y = SetY;
 
-            Renderer.Effect.View = Matrix.CreateTranslation(X, Y, 0f);
-
             RecalculateRenderData();
         }
 
-        public void MoveWindow(int SetX, int SetY)
+        public void MoveWindowPosition(int SetX, int SetY)
         {
             X += SetX;
             Y += SetY;
 
+            RecalculateRenderData();
+        }
+
+        void RecalculateRenderData()
+        {
             Renderer.Effect.View = Matrix.CreateTranslation(X, Y, 0f);
 
-            RecalculateRenderData();
+            Port.X = X;
+            Port.Y = Y;
+            Port.Width = Width;
+            Port.Height = Height;
+
+            LastProjectionX = X;
+            LastProjectionY = Y;
+            LastProjectionWidth = Width;
+            LastProjectionHeight = Height;
+            Renderer.RecalculateProjection(X, Y, Width, Height);
+        }
+
+        public override void Draw()
+        {
+            Viewport Original = GlobalGraphicsData.Device.Viewport;
+            GlobalGraphicsData.Device.Viewport = Port;
+            Renderer.Draw();
+            if (CurrentView != null) CurrentView.Draw();
+            GlobalGraphicsData.Device.Viewport = Original;
         }
 
         public override void ViewResize(int SetWindowWidth, int SetWindowHeight)
@@ -109,20 +124,25 @@ namespace TuringSimulatorDesktop.UI
             Renderer.AddMesh(BackgroundTab);
 
             RecalculateRenderData();
+
+            CurrentView.ViewResize(Width, Height);
         }
 
-        void RecalculateRenderData()
+        public void AddView(View NewView)
         {
-            Port.X = X;
-            Port.Y = Y;
-            Port.Width = Width;
-            Port.Height = Height;
+            Views.Add(NewView);
+            Mesh M = Mesh.CreateRectangle(Vector2.Zero, 40f, 20f, GlobalGraphicsData.BackgroundColor);
+            Renderer.AddMesh(M);
+            Button NewButton = new Button(NextButtonPlacementPosition, M);
+            NewButton.ClickEvent += (Button Sender) => { LoadView(Views.Count - 1); };
+            ViewChangeButtons.Add(NewButton);
+        }
 
-            LastProjectionX = X;
-            LastProjectionY = Y;
-            LastProjectionWidth = Width;
-            LastProjectionHeight = Height;
-            Renderer.RecalculateProjection(X, Y, Width, Height);
+        //problem -> if view coutn changes
+        public void LoadView(int ID)
+        {
+            CurrentView = Views[ID];
+            CurrentView.ViewResize(Width, Height);
         }
     }
 }

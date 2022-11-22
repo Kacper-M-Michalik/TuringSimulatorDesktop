@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using TuringCore;
 using TuringServer;
+using System.Net;
 
 namespace TuringTesting
 {
@@ -26,35 +27,55 @@ namespace TuringTesting
             string jsonString = JsonSerializer.Serialize<ProjectFile>(PF, Options);
             System.IO.File.WriteAllBytes("E:\\Professional Programming\\MAIN\\TestLocation\\TestProject.tproj", Encoding.ASCII.GetBytes(jsonString));
             */
+            Console.WriteLine("Directory?");
+            string Directory = Console.ReadLine();
+            if (Directory == "") Directory = "E:\\Professional Programming\\MAIN\\TestLocation";
 
             bool Continue = true;
             while (Continue)
-            {
+            {              
                 Client.ProcessPackets();                
                 string Option = Console.ReadLine(); 
-                string Directory = "E:\\Professional Programming\\MAIN\\TestLocation";
 
                 switch (Option.ToUpper())
                 {
-                    case ("START"):
+                    case ("QUICK"):
                         BackendInterface.StartProjectServer(2, 28104);
-                        ClientInstance.ConnectToLocalServer(28104);
+                        Thread.Sleep(100);
+                        Client.ConnectToServer(IPAddress.Parse("127.0.0.1"), 28104);
+                        Thread.Sleep(900);
+                        ClientSendFunctionsWrapper.SendTCPData(ClientSendFunctions.LoadProject(Directory));
                         break;
                     case ("SERVER"):
                         BackendInterface.StartProjectServer(2, 28104);
+                        break;
+                    case ("STOP SERVER"):
+                        BackendInterface.CloseProject();
+                        break;
+                    case ("CONNECT"):
+                        string IP = Console.ReadLine();
+                        Client.ConnectToServer(IPAddress.Parse(IP), 28104);
+                        break;
+                    case ("DISCONNECT"):
+                        Client.Disconnect();
+                        break;
+                    case ("KILLFCLIENT"):
+                        Server.Clients[0].DisconnectClientFromServer();
+                        break;
+                    case ("LOGSTATUS"):
+                        ClientSendFunctionsWrapper.SendTCPData(ClientSendFunctions.RequestLogReceiverStatus());
                         break;
                     case ("CPROJ"):
                         Directory = Console.ReadLine();
                         FileManager.CreateProject("TestProj", Directory, TuringProjectType.NonClassical);
                         break;
+                    case ("LPROJ"):
+                        Directory = Console.ReadLine();
+                        ClientSendFunctionsWrapper.SendTCPData(ClientSendFunctions.LoadProject(Directory));
+                        break;
                     case ("SAVE"):
+                        //maybe unsafe
                         FileManager.SaveProject();
-                        break;
-                    case ("CONNECT"):
-                        ClientInstance.ConnectToLocalServer(28104);
-                        break;
-                    case ("DISCONNECT"):
-                        ClientInstance.Disconnect();
                         break;
                     case ("SERVERID"):
                         CustomLogging.Log("SERVER THREAD: " + Server.ServerThread.ManagedThreadId.ToString());
@@ -115,14 +136,8 @@ namespace TuringTesting
                         int DFolder = Convert.ToInt32(Console.ReadLine());
                         ClientSendFunctionsWrapper.SendTCPData(ClientSendFunctions.DeleteFolder(DFolder));
                         break;
-                    case ("KILL CLIENT"):
-                        Server.Clients[0].DisconnectClientFromServer();
-                        break;
                     case ("BREAKPOINT"):
-                        break;
-                    case ("STOP"):
-                        BackendInterface.CloseProject();
-                        break;
+                        break;                    
                     default:
                         break;
                 }

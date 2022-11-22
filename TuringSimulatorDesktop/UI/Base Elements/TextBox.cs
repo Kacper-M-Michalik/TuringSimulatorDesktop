@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TuringSimulatorDesktop.Input;
-using TuringSimulatorDesktop.Main;
+using TuringSimulatorDesktop;
 
 namespace TuringSimulatorDesktop.UI
 {

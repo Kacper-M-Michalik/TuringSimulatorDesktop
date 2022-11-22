@@ -5,9 +5,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TuringBackend;
-using TuringBackend.Logging;
-using TuringSimulatorDesktop.Main;
+using TuringServer;
+using TuringCore;
+using TuringSimulatorDesktop;
 
 namespace TuringSimulatorDesktop.UI
 {

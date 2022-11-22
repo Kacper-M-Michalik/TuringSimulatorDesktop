@@ -11,7 +11,6 @@ namespace TuringTesting
     {
         public static void SendTCPData(Packet Data)
         {
-            Data.InsertPacketLength();
             Client.TCP.SendDataToServer(Data);
             Data.Dispose();
         }

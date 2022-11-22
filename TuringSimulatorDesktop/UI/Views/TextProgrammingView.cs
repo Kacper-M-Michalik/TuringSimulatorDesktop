@@ -8,8 +8,7 @@ using System.Threading.Tasks;
 using TuringSimulatorDesktop.UI;
 
 namespace TuringSimulatorDesktop.UI
-{
-    /*
+{    
     public class TextProgrammingView : View
     {
         Button SaveButton;
@@ -17,9 +16,12 @@ namespace TuringSimulatorDesktop.UI
 
         List<StateTransitionPrefab> TransitionList;
 
-        public TextProgrammingView()
+        MeshRenderer Renderer;
+
+        public TextProgrammingView(int Width, int Height)
         {
-            //SaveButton = new Button(Vector2.Zero);
+            Renderer = new MeshRenderer(GlobalGraphicsData.Device, Width, Height);
+           // SaveButton = new Button(Vector2.Zero, );
 
         }
 
@@ -45,7 +47,12 @@ namespace TuringSimulatorDesktop.UI
 
         public override void Draw()
         {
-            throw new NotImplementedException();
+
+        }
+
+        public override void ViewResize(int NewWidth, int NewHeight)
+        {
+
         }
 
         /*
@@ -62,5 +69,5 @@ namespace TuringSimulatorDesktop.UI
             }
         }
         */
-    //}
+    }
 }

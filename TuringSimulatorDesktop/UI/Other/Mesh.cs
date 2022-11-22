@@ -50,6 +50,11 @@ namespace TuringSimulatorDesktop.UI
             return FurthestPoint;
         }
 
+        public void RasteriseTexture(string Text = "", Texture2D Sprite = null)
+        {
+
+        }
+
         public static Mesh CreateRectangle(Vector2 Offset, float Width, float Height, Color BackgroundColor)
         {
             Mesh Data = new Mesh();

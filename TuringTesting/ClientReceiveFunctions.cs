@@ -13,6 +13,7 @@ namespace TuringTesting
         public static Dictionary<int, PacketFunctionPointer> PacketToFunction = new Dictionary<int, PacketFunctionPointer>()
         {
             {(int)ServerSendPackets.ErrorNotification, ReceiveErrorNotification},
+            {(int)ServerSendPackets.LogData, ReceiveLogData},
             {(int)ServerSendPackets.SentOrUpdatedFile, ReceivedFileFromServer},
             {(int)ServerSendPackets.SentFolderData, ReceivedFolderDataFromServer},
         };
@@ -20,8 +21,14 @@ namespace TuringTesting
 
         public static void ReceiveErrorNotification(Packet Data)
         {
-            CustomLogging.Log("CLIENT: ERROR MESSAGE FROM SERVER: " + Data.ReadString());
+            CustomLogging.Log("ERROR NOTIF FROM SERVER: " + Data.ReadString());
         }
+
+        public static void ReceiveLogData(Packet Data)
+        {
+            Console.WriteLine("LOG DATA FROM SERVER: " + Data.ReadString());
+        }
+
 
         public static void ReceivedFileFromServer(Packet Data)
         {

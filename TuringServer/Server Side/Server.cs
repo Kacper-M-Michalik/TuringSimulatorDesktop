@@ -120,13 +120,17 @@ namespace TuringServer
                 }
 
                 long CurrentTime = DateTime.UtcNow.Ticks;
-                foreach (KeyValuePair<int, CacheFileData> CachedFile in LoadedProject.CacheDataLookup)
-                {
-                    CachedFile.Value.ExpiryTimer += CurrentTime - LastTick;
 
-                    if (CachedFile.Value.ExpiryTimer > CacheExpiryTime)
+                if (LoadedProject != null)
+                {
+                    foreach (KeyValuePair<int, CacheFileData> CachedFile in LoadedProject.CacheDataLookup)
                     {
-                        LoadedProject.CacheDataLookup.Remove(CachedFile.Key);
+                        CachedFile.Value.ExpiryTimer += CurrentTime - LastTick;
+
+                        if (CachedFile.Value.ExpiryTimer > CacheExpiryTime)
+                        {
+                            LoadedProject.CacheDataLookup.Remove(CachedFile.Key);
+                        }
                     }
                 }
                 LastTick = CurrentTime;              

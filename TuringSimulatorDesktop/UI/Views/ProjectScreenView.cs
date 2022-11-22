@@ -29,12 +29,12 @@ namespace TuringSimulatorDesktop.UI
             Windows = new List<WindowView>();
 
             WindowView Win1 = new WindowView(350, 300);
-            Win1.MoveWindow(100, 100);
+            Win1.MoveWindowPosition(100, 100);
             Windows.Add(Win1);
             DebugWindow = Win1;
 
             WindowView Win2 = new WindowView(100, 400);
-            Win2.MoveWindow(0, 25);
+            Win2.MoveWindowPosition(0, 25);
             Windows.Add(Win2);
 
             InputManager.RegisterPollableObjectOnQueuePersistent(this);
@@ -74,7 +74,7 @@ namespace TuringSimulatorDesktop.UI
 
             if (IsDragging)
             {
-                CurrentlyFocusedWindow.MoveWindow(Convert.ToInt32(MathF.Round(InputManager.MouseDelta.X, MidpointRounding.AwayFromZero)), Convert.ToInt32(MathF.Round(InputManager.MouseDelta.Y, MidpointRounding.AwayFromZero)));
+                CurrentlyFocusedWindow.MoveWindowPosition(Convert.ToInt32(MathF.Round(InputManager.MouseDelta.X, MidpointRounding.AwayFromZero)), Convert.ToInt32(MathF.Round(InputManager.MouseDelta.Y, MidpointRounding.AwayFromZero)));
 
                 if (InputManager.LeftMouseReleased)
                 {
@@ -91,6 +91,7 @@ namespace TuringSimulatorDesktop.UI
         public void AddNewWindow(Button Sender)
         {
             WindowView Win = new WindowView(350, 300);
+            //Win.AddView(new TextProgrammingView());
             Windows.Add(Win);
         }
 
