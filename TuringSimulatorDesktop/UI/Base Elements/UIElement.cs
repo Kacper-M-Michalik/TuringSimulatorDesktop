@@ -5,10 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using TuringSimulatorDesktop.UI;
 
 namespace TuringSimulatorDesktop.UI
 {
-    public abstract class UIElement : IRenderable
+    public abstract class UIElement : IRenderable, ITileable
     {
         Vector2 position;
         public Vector2 Position { 
@@ -21,7 +22,6 @@ namespace TuringSimulatorDesktop.UI
             }         
         
         }
-        public bool Hidden;
         Mesh meshData;
         public Mesh MeshData 
         {
@@ -33,7 +33,10 @@ namespace TuringSimulatorDesktop.UI
             }        
         }
 
-        public abstract Vector2 GetBounds();
+        public int X { get; set; }
+        public int Y { get; set; }
+        public abstract int GetBoundX { get; }
+        public abstract int GetBoundY { get; }
 
         public Mesh GetMesh()
         {

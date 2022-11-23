@@ -17,9 +17,8 @@ namespace TuringSimulatorDesktop.UI
             Text = SetText;
         }
 
-        public override Vector2 GetBounds()
-        {
-            throw new NotImplementedException();
-        }
+        public override int GetBoundX => throw new NotImplementedException();
+
+        public override int GetBoundY => throw new NotImplementedException();
     }
 }

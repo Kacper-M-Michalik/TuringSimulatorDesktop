@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using TuringSimulatorDesktop.Input;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Taskbar;
 
 namespace TuringSimulatorDesktop.UI
 {
@@ -14,6 +15,11 @@ namespace TuringSimulatorDesktop.UI
         List<IRenderable> RenderElements;
         Viewport Port;
 
+        Mesh ScreenBackground;
+        Mesh ToolbarBackground;
+
+        //Button ExitProjectButton;
+        //Button WindowAddDropDown;
         Button AddWindowButton;
 
         List<WindowView> Windows;
@@ -24,10 +30,13 @@ namespace TuringSimulatorDesktop.UI
         // DEBUG
         WindowView DebugWindow;
 
-        public ProjectScreenView(int Width, int Height)
+        public ProjectScreenView()
         {
+            Port = new Viewport(0, 0, GlobalGraphicsData.Device.PresentationParameters.BackBufferWidth, GlobalGraphicsData.Device.PresentationParameters.BackBufferHeight);
             RenderElements = new List<IRenderable>();
-            Port = new Viewport(0, 0, Width, Height);
+
+            ToolbarBackground = Mesh.CreateRectangle(Vector2.Zero, GlobalGraphicsData.Device.PresentationParameters.BackBufferWidth, GlobalGraphicsData.ToolbarHeight, GlobalGraphicsData.AccentColor);
+            ScreenBackground = Mesh.CreateRectangle(Vector2.Zero, GlobalGraphicsData.Device.PresentationParameters.BackBufferWidth, GlobalGraphicsData.Device.PresentationParameters.BackBufferHeight, GlobalGraphicsData.BackgroundColor);
 
             AddWindowButton = new Button(new Vector2(20f, 20f), Mesh.CreateRectangle(Vector2.Zero, 40, 20, Color.Yellow), ElementCreateType.Persistent);
             AddWindowButton.ClickEvent += AddNewWindow;
@@ -36,8 +45,8 @@ namespace TuringSimulatorDesktop.UI
 
             Windows = new List<WindowView>();
 
-            WindowView Win1 = new WindowView(350, 300);
-            Win1.MoveWindowPosition(100, 100);
+            WindowView Win1 = new WindowView(200, 200);
+            Win1.SetWindowPosition(300, 0);
             Windows.Add(Win1);
             DebugWindow = Win1;
 
@@ -77,10 +86,11 @@ namespace TuringSimulatorDesktop.UI
 
             if (IsDragging)
             {
-                CurrentlyFocusedWindow.MoveWindowPosition(Convert.ToInt32(MathF.Round(InputManager.MouseDelta.X, MidpointRounding.AwayFromZero)), Convert.ToInt32(MathF.Round(InputManager.MouseDelta.Y, MidpointRounding.AwayFromZero)));
+                CurrentlyFocusedWindow.MoveWindowPosition(InputManager.MouseDeltaX, InputManager.MouseDeltaY);
 
                 if (InputManager.LeftMouseReleased)
                 {
+                    //do snap here
                     IsDragging = false;
                 }
             }
@@ -100,16 +110,23 @@ namespace TuringSimulatorDesktop.UI
 
         public override void Draw()
         {
+            GlobalMeshRenderer.Draw(ScreenBackground, Port);
             for (int i = 0; i < Windows.Count; i++)
             {
                 Windows[i].Draw();
             }
 
+            //draw snap pointss?
+
+            GlobalMeshRenderer.Draw(ToolbarBackground, Port);
             GlobalMeshRenderer.Draw(RenderElements, Port);
         }
 
         public override void ViewResize(int NewWidth, int NewHeight)
         {
+            ToolbarBackground = Mesh.CreateRectangle(Vector2.Zero, GlobalGraphicsData.Device.PresentationParameters.BackBufferWidth, GlobalGraphicsData.ToolbarHeight, GlobalGraphicsData.AccentColor);
+            ScreenBackground = Mesh.CreateRectangle(Vector2.Zero, GlobalGraphicsData.Device.PresentationParameters.BackBufferWidth, GlobalGraphicsData.Device.PresentationParameters.BackBufferHeight, GlobalGraphicsData.BackgroundColor);
+
             Port.Width = NewWidth;
             Port.Height = NewHeight;
         }

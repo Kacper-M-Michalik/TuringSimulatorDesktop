@@ -30,8 +30,8 @@ namespace TuringSimulatorDesktop.UI
 
         public MainScreenView(int Width, int Height)
         {
-            RenderElements = new List<IRenderable>();
             Port = new Viewport(0, 0, Width, Height);
+            RenderElements = new List<IRenderable>();
 
             NewProjectButton = new Button(new Vector2(100f,100f), Mesh.CreateRectangle(Vector2.Zero, 100f, 30f, Color.White), ElementCreateType.Persistent);
             LoadProjectButton = new Button(new Vector2(100f, 150f), Mesh.CreateRectangle(Vector2.Zero, 100f, 30f, Color.Red), ElementCreateType.Persistent);
@@ -79,7 +79,7 @@ namespace TuringSimulatorDesktop.UI
             //conenct client here
 
             InputManager.RemoveAllListenersOnQueue();    
-            GlobalGraphicsData.BaseWindow.CurrentView = new ProjectScreenView(GlobalGraphicsData.Device.PresentationParameters.BackBufferWidth, GlobalGraphicsData.Device.PresentationParameters.BackBufferHeight);
+            GlobalGraphicsData.BaseWindow.CurrentView = new ProjectScreenView();
 
         }
 

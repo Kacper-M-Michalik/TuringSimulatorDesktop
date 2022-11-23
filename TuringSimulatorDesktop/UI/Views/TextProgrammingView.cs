@@ -14,15 +14,13 @@ namespace TuringSimulatorDesktop.UI
         Button SaveButton;
         Button CompileButton;
 
+        TilerElement Tiler;
+
         List<StateTransitionPrefab> TransitionList;
 
-        MeshRenderer Renderer;
-
-        public TextProgrammingView(int Width, int Height)
+        public TextProgrammingView()
         {
-            Renderer = new MeshRenderer(GlobalGraphicsData.Device, Width, Height);
-           // SaveButton = new Button(Vector2.Zero, );
-
+            Tiler = new TilerElement();
         }
 
         public void SaveFile()
@@ -37,7 +35,10 @@ namespace TuringSimulatorDesktop.UI
 
         public void AddTransition()
         {
-
+            StateTransitionPrefab Transition = new StateTransitionPrefab();
+            TransitionList.Add(Transition);
+            Tiler.Elements.Add(Transition);
+            Tiler.Tile();
         }
 
         public void RemoveTransition()

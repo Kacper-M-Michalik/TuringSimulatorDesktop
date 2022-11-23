@@ -19,10 +19,11 @@ namespace TuringSimulatorDesktop
         public static GraphicsDevice Device;
         public static SpriteFont Font;
 
-        public static int TabHeight;
-        public static Color BackgroundColor = Color.White;
-        public static Color AccentColor = Color.DarkSlateGray;
-        public static Color FontColor = Color.Black;
+        public static int ToolbarHeight;
+        public static int WindowTabHeight;
+        public static Color BackgroundColor = Color.SlateGray;
+        public static Color AccentColor = Color.Black;
+        public static Color FontColor = Color.White;
 
         public static Dictionary<TextureLookupKey, Texture2D> TextureLookup = new Dictionary<TextureLookupKey, Texture2D>();
     }

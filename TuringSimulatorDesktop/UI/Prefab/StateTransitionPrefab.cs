@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace TuringSimulatorDesktop.UI
 {
-    public class StateTransitionPrefab
+    public class StateTransitionPrefab : ITileable
     {
         //( CurrentState , TapeValue ) => ( NewState , New Value, Move Dir  )
 
@@ -36,6 +36,13 @@ namespace TuringSimulatorDesktop.UI
             NewTapeValueTextBox.EditEvent += ResizeElements;
             MoveDirectionTextBox.EditEvent += ResizeElements;
         }
+
+        public int X { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public int Y { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+        public int GetBoundX => throw new NotImplementedException();
+
+        public int GetBoundY => throw new NotImplementedException();
 
         public void ResizeElements(TextBox Sender)
         {

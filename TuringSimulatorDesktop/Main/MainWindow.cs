@@ -27,8 +27,10 @@ namespace TuringSimulatorDesktop
 
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+            Window.IsBorderless = true;
 
             IsFixedTimeStep = false;
+
         }
 
         protected override void Initialize()
@@ -54,7 +56,8 @@ namespace TuringSimulatorDesktop
             GlobalGraphicsData.Device = GraphicsDevice;
             GlobalGraphicsData.Font = MainFont;
 
-            GlobalGraphicsData.TabHeight = 25;
+            GlobalGraphicsData.ToolbarHeight = 35;
+            GlobalGraphicsData.WindowTabHeight = 25;
 
             GlobalMeshRenderer.Setup(GlobalGraphicsData.Device, GraphicsDevice.PresentationParameters.BackBufferWidth, GraphicsDevice.PresentationParameters.BackBufferHeight);
 

@@ -29,9 +29,10 @@ namespace TuringSimulatorDesktop.Input
 
         public static MouseState MouseData;
 
-        public static Vector2 CurrentMousePosition;
-        public static Vector2 PreviousMousePosition;
-        public static Vector2 MouseDelta;
+        public static int MouseDeltaX;
+        public static int MouseDeltaY;
+        public static int PreviousMouseX;
+        public static int PreviousMouseY;
 
         public static bool LeftMousePressed;
         public static bool LeftMouseReleased;
@@ -62,10 +63,10 @@ namespace TuringSimulatorDesktop.Input
             if (MouseData.RightButton == ButtonState.Released && PreviousRightClickState == ButtonState.Pressed) RightMouseReleased = true;
             PreviousRightClickState = MouseData.RightButton;
 
-            PreviousMousePosition = CurrentMousePosition;
-            //get rid off
-            CurrentMousePosition = new Vector2(MouseData.X, MouseData.Y);
-            MouseDelta = CurrentMousePosition - PreviousMousePosition;
+            MouseDeltaX = MouseData.X - PreviousMouseX;
+            MouseDeltaY = MouseData.Y - PreviousMouseY;
+            PreviousMouseX = MouseData.X;
+            PreviousMouseY = MouseData.Y;
 
             ScrollWheelDelta = MouseData.ScrollWheelValue - PreviousScrollWheel;
             PreviousScrollWheel = MouseData.ScrollWheelValue;

@@ -20,6 +20,7 @@ namespace TuringSimulatorDesktop.UI
         public int BoundRight;
         public int BoundDown;
 
+
         public event OnClick ClickEvent;
 
         public Button(Vector2 SetPosition, Mesh SetMeshData, ElementCreateType Type = ElementCreateType.Regular, string SetText = "")
@@ -38,6 +39,10 @@ namespace TuringSimulatorDesktop.UI
             else InputManager.RegisterClickableObjectOnQueuePersistent(this);
         }
 
+        public override int GetBoundX { get { return BoundRight; } }
+
+        public override int GetBoundY { get { return BoundDown; } }
+
         bool IClickable.Clicked()
         {
             ClickEvent?.Invoke(this);
@@ -54,9 +59,5 @@ namespace TuringSimulatorDesktop.UI
             return (InputManager.LeftMousePressed && InputManager.MouseData.X >= Position.X && InputManager.MouseData.X <= Position.X + BoundRight && InputManager.MouseData.Y >= Position.Y && InputManager.MouseData.Y <= Position.Y + BoundDown);
         }
 
-        public override Vector2 GetBounds()
-        {
-            return new Vector2(BoundRight, BoundDown);
-        }
     }
 }

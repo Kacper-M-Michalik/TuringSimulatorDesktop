@@ -29,6 +29,11 @@ namespace TuringSimulatorDesktop
             Effect.Projection = Matrix.CreateOrthographicOffCenter(X, X + Width, Y + Height, Y, 0f, 1f);
         }
 
+        public static void Draw(Mesh DrawMesh, Viewport Port)
+        {
+            Draw(new List<Mesh>(1) { DrawMesh }, Port);
+        }
+
         public static void Draw(List<IRenderable> MeshList, Viewport Port)
         {
             Viewport OriginalPort = Device.Viewport;
@@ -60,11 +65,11 @@ namespace TuringSimulatorDesktop
 
             Device.Viewport = OriginalPort;
         }
-
         public static void Draw(List<Mesh> MeshList, Viewport Port)
         {
             Viewport OriginalPort = Device.Viewport;
             Device.Viewport = Port;
+            RecalculateProjection(Port.X, Port.Y, Port.Width, Port.Height);
 
             foreach (Mesh Data in MeshList)
             {

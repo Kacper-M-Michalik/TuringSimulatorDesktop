@@ -11,23 +11,22 @@ namespace TuringSimulatorDesktop.UI
 {
     public class WindowView : View
     {
-        public int X { get; private set; }
-        public int Y { get; private set; }
-                
-        public int Width;
-        public int Height;
-        public int TabHeight = GlobalGraphicsData.TabHeight;
+        public int X { get { return Port.X; } }
+        public int Y { get { return Port.Y; } }
+        public int Width { get { return Port.Width; } }
+        public int Height { get { return Port.Height; } }
 
         public Viewport Port;
-        MeshRenderer Renderer;
+        public int TabHeight;
 
         List<View> Views;
         List<Button> ViewChangeButtons;
-
         public View CurrentView;
 
         Mesh BackgroundTab;
-        Mesh BackgroundWindow;
+        Mesh Background;
+
+        List<IRenderable> RenderElements;
 
         Vector2 NextButtonPlacementPosition;
 
@@ -40,20 +39,22 @@ namespace TuringSimulatorDesktop.UI
 
         public WindowView(int SetWidth, int SetHeight)
         {
-            Width = SetWidth;
-            Height = SetHeight;
+            Port = new Viewport(0, 0, SetWidth, SetHeight);
+            RenderElements = new List<IRenderable>();
 
-            Renderer = new MeshRenderer(GlobalGraphicsData.Device, GlobalGraphicsData.Device.PresentationParameters.BackBufferWidth, GlobalGraphicsData.Device.PresentationParameters.BackBufferHeight);
+            TabHeight = GlobalGraphicsData.WindowTabHeight;
 
             BackgroundTab = Mesh.CreateRectangle(Vector2.Zero, Width, TabHeight, GlobalGraphicsData.AccentColor);
-            BackgroundWindow = Mesh.CreateRectangle(new Vector2(0f, TabHeight), Width, Height, GlobalGraphicsData.BackgroundColor);
-            Renderer.AddMesh(BackgroundWindow);
-            Renderer.AddMesh(BackgroundTab);
+            Background = Mesh.CreateRectangle(Vector2.Zero, Width, Height, GlobalGraphicsData.BackgroundColor);
+
+            Views = new List<View>();
+            ViewChangeButtons = new List<Button>();
+
+            Button TestButton = new Button(Vector2.Zero, Mesh.CreateRectangle(Vector2.Zero, 100f, 40f, Color.Red));
+            ViewChangeButtons.Add(TestButton);
+            RenderElements.Add(TestButton);
 
             DebugManager.LastCreatedWindow = this;
-
-            Port = new Viewport();
-            RecalculateRenderData();
         }
 
         public bool IsMouseOverWindow()
@@ -70,60 +71,43 @@ namespace TuringSimulatorDesktop.UI
 
         public void SetWindowPosition(int SetX, int SetY)
         {
-            X = SetX;
-            Y = SetY;
+            Port.X = SetX;
+            Port.Y = SetY;
 
-            RecalculateRenderData();
+            ViewResize(Width, Height);
         }
 
-        public void MoveWindowPosition(int SetX, int SetY)
+        public void MoveWindowPosition(int MoveX, int MoveY)
         {
-            X += SetX;
-            Y += SetY;
+            Port.X += MoveX;
+            Port.Y += MoveY;
 
-            RecalculateRenderData();
+            ViewResize(Width, Height);
         }
 
-        void RecalculateRenderData()
+        public override void Draw()
         {
-            Renderer.Effect.View = Matrix.CreateTranslation(X, Y, 0f);
+            GlobalMeshRenderer.Draw(Background, Port);
+            if (CurrentView != null) CurrentView.Draw();
+            GlobalMeshRenderer.Draw(BackgroundTab, Port);
+            GlobalMeshRenderer.Draw(RenderElements, Port);
+        }
 
-            Port.X = X;
-            Port.Y = Y;
-            Port.Width = Width;
-            Port.Height = Height;
+        //will have to manually move all ui elements
+        public override void ViewResize(int SetWindowWidth, int SetWindowHeight)
+        {
+            TabHeight = GlobalGraphicsData.WindowTabHeight;
+
+            Port.Width = SetWindowWidth;
+            Port.Height = SetWindowHeight;
+
+            BackgroundTab = Mesh.CreateRectangle(new Vector2(X, Y), Width, TabHeight, GlobalGraphicsData.AccentColor);
+            Background = Mesh.CreateRectangle(new Vector2(X, Y + TabHeight), Width, Height, GlobalGraphicsData.BackgroundColor);
 
             LastProjectionX = X;
             LastProjectionY = Y;
             LastProjectionWidth = Width;
             LastProjectionHeight = Height;
-            Renderer.RecalculateProjection(X, Y, Width, Height);
-        }
-
-        public override void Draw()
-        {
-            Viewport Original = GlobalGraphicsData.Device.Viewport;
-            GlobalGraphicsData.Device.Viewport = Port;
-            Renderer.Draw();
-            if (CurrentView != null) CurrentView.Draw();
-            GlobalGraphicsData.Device.Viewport = Original;
-        }
-
-        public override void ViewResize(int SetWindowWidth, int SetWindowHeight)
-        {
-            TabHeight = GlobalGraphicsData.TabHeight;
-
-            Width = SetWindowHeight;
-            Height = SetWindowHeight;
-
-            Renderer.DeleteMesh(BackgroundTab);
-            Renderer.DeleteMesh(BackgroundWindow);
-            BackgroundTab = Mesh.CreateRectangle(Vector2.Zero, Width, TabHeight, GlobalGraphicsData.AccentColor);
-            BackgroundWindow = Mesh.CreateRectangle(new Vector2(0f, TabHeight), Width, Height, GlobalGraphicsData.BackgroundColor);
-            Renderer.AddMesh(BackgroundWindow);
-            Renderer.AddMesh(BackgroundTab);
-
-            RecalculateRenderData();
 
             if (CurrentView != null) CurrentView.ViewResize(Width, Height);
         }
@@ -131,11 +115,10 @@ namespace TuringSimulatorDesktop.UI
         public void AddView(View NewView)
         {
             Views.Add(NewView);
-            Mesh M = Mesh.CreateRectangle(Vector2.Zero, 40f, 20f, GlobalGraphicsData.BackgroundColor);
-            Renderer.AddMesh(M);
-            Button NewButton = new Button(NextButtonPlacementPosition, M);
+            Button NewButton = new Button(NextButtonPlacementPosition, Mesh.CreateRectangle(Vector2.Zero, 40f, 20f, GlobalGraphicsData.BackgroundColor));
             NewButton.ClickEvent += (Button Sender) => { LoadView(Views.Count - 1); };
             ViewChangeButtons.Add(NewButton);
+            RenderElements.Add(NewButton);
         }
 
         //problem -> if view coutn changes
