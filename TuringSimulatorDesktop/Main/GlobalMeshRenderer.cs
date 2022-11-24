@@ -31,7 +31,7 @@ namespace TuringSimulatorDesktop
 
         public static void Draw(Mesh DrawMesh, Viewport Port)
         {
-            Draw(new List<Mesh>(1) { DrawMesh }, Port);
+            Draw(new List<IRenderable>(1) { DrawMesh }, Port);
         }
 
         public static void Draw(List<IRenderable> MeshList, Viewport Port)
@@ -59,36 +59,7 @@ namespace TuringSimulatorDesktop
                 foreach (EffectPass Pass in Effect.CurrentTechnique.Passes)
                 {
                     Pass.Apply();
-                    Device.DrawUserIndexedPrimitives<VertexPositionColor>(PrimitiveType.TriangleList, Data.Vertices, 0, Data.Vertices.Length, Data.Indices, 0, Data.Indices.Length / 3);
-                }
-            }
-
-            Device.Viewport = OriginalPort;
-        }
-        public static void Draw(List<Mesh> MeshList, Viewport Port)
-        {
-            Viewport OriginalPort = Device.Viewport;
-            Device.Viewport = Port;
-            RecalculateProjection(Port.X, Port.Y, Port.Width, Port.Height);
-
-            foreach (Mesh Data in MeshList)
-            {
-                if (Data.Texture != null)
-                {
-                    Effect.Texture = Data.Texture;
-                    Effect.TextureEnabled = true;
-                }
-                else
-                {
-                    Effect.Texture = null;
-                    Effect.TextureEnabled = false;
-                }
-                Effect.World = Data.MeshTransformations;
-
-                foreach (EffectPass Pass in Effect.CurrentTechnique.Passes)
-                {
-                    Pass.Apply();
-                    Device.DrawUserIndexedPrimitives<VertexPositionColor>(PrimitiveType.TriangleList, Data.Vertices, 0, Data.Vertices.Length, Data.Indices, 0, Data.Indices.Length / 3);
+                    Device.DrawUserIndexedPrimitives<VertexPositionColorTexture>(PrimitiveType.TriangleList, Data.Vertices, 0, Data.Vertices.Length, Data.Indices, 0, Data.Indices.Length / 3);
                 }
             }
 

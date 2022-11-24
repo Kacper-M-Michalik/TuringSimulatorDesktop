@@ -13,7 +13,7 @@ namespace TuringSimulatorDesktop
     {
         public Matrix MeshTransformations;
 
-        public VertexPositionColor[] Vertices;
+        public VertexPositionColorTexture[] Vertices;
         public int[] Indices;
 
         public Texture2D Texture;
@@ -22,7 +22,7 @@ namespace TuringSimulatorDesktop
         {
             MeshTransformations = Matrix.CreateWorld(Vector3.Zero, Vector3.Forward, Vector3.Up);
         }
-        public Mesh(VertexPositionColor[] SetVertices, int[] SetIndices, Texture2D SetTexture = null)
+        public Mesh(VertexPositionColorTexture[] SetVertices, int[] SetIndices, Texture2D SetTexture = null)
         {
             Vertices = SetVertices;
             Indices = SetIndices;
@@ -56,21 +56,16 @@ namespace TuringSimulatorDesktop
             return FurthestPoint;
         }
 
-        public void RasteriseTexture(string Text = "", Texture2D Sprite = null)
-        {
-
-        }
-
         public static Mesh CreateRectangle(Vector2 Offset, float Width, float Height, Color BackgroundColor)
         {
             Mesh Data = new Mesh();
 
-            Data.Vertices = new VertexPositionColor[]
+            Data.Vertices = new VertexPositionColorTexture[]
             {
-                new VertexPositionColor(new Vector3(Offset.X, Offset.Y + Height, 0f), BackgroundColor),
-                new VertexPositionColor(new Vector3(Offset.X, Offset.Y, 0f), BackgroundColor),
-                new VertexPositionColor(new Vector3(Offset.X + Width, Offset.Y, 0f), BackgroundColor),
-                new VertexPositionColor(new Vector3(Offset.X + Width, Offset.Y + Height, 0f), BackgroundColor),
+                new VertexPositionColorTexture(new Vector3(Offset.X, Offset.Y + Height, 0f), BackgroundColor, Vector2.Zero),
+                new VertexPositionColorTexture(new Vector3(Offset.X, Offset.Y, 0f), BackgroundColor, Vector2.UnitY),
+                new VertexPositionColorTexture(new Vector3(Offset.X + Width, Offset.Y, 0f), BackgroundColor, Vector2.One),
+                new VertexPositionColorTexture(new Vector3(Offset.X + Width, Offset.Y + Height, 0f), BackgroundColor, Vector2.UnitX),
             };
 
             Data.Indices = new int[]

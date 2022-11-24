@@ -48,6 +48,7 @@ namespace TuringSimulatorDesktop.UI
 
                 if (KState.GetPressedKeyCount() > 0)
                 {
+                    /*
                     StringBuilder Builder = new StringBuilder(Text);
 
                     foreach (Keys PressedKey in KState.GetPressedKeys())
@@ -56,7 +57,7 @@ namespace TuringSimulatorDesktop.UI
                     }
 
                     Text = Builder.ToString();
-
+                    */
                     EditEvent?.Invoke(this);
                 }
             }

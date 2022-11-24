@@ -102,7 +102,7 @@ namespace TuringSimulatorDesktop.UI
                 foreach (EffectPass Pass in Effect.CurrentTechnique.Passes)
                 {
                     Pass.Apply();
-                    Device.DrawUserIndexedPrimitives<VertexPositionColor>(PrimitiveType.TriangleList, Data.Vertices, 0, Data.Vertices.Length, Data.Indices, 0, Data.Indices.Length / 3);
+                    Device.DrawUserIndexedPrimitives<VertexPositionColorTexture>(PrimitiveType.TriangleList, Data.Vertices, 0, Data.Vertices.Length, Data.Indices, 0, Data.Indices.Length / 3);
                 }
             }
 

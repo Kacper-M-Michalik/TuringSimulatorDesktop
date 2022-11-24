@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using TuringSimulatorDesktop.Input;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Taskbar;
 
 namespace TuringSimulatorDesktop.UI
 {
@@ -21,6 +20,7 @@ namespace TuringSimulatorDesktop.UI
         //Button ExitProjectButton;
         //Button WindowAddDropDown;
         Button AddWindowButton;
+        TextLabel Label;
 
         List<WindowView> Windows;
         WindowView CurrentlyFocusedWindow;
@@ -37,6 +37,8 @@ namespace TuringSimulatorDesktop.UI
 
             ToolbarBackground = Mesh.CreateRectangle(Vector2.Zero, GlobalGraphicsData.Device.PresentationParameters.BackBufferWidth, GlobalGraphicsData.ToolbarHeight, GlobalGraphicsData.AccentColor);
             ScreenBackground = Mesh.CreateRectangle(Vector2.Zero, GlobalGraphicsData.Device.PresentationParameters.BackBufferWidth, GlobalGraphicsData.Device.PresentationParameters.BackBufferHeight, GlobalGraphicsData.BackgroundColor);
+
+            Label = new TextLabel("TEST ASDASSADSDAASD");
 
             AddWindowButton = new Button(new Vector2(20f, 20f), Mesh.CreateRectangle(Vector2.Zero, 40, 20, Color.Yellow), ElementCreateType.Persistent);
             AddWindowButton.ClickEvent += AddNewWindow;
@@ -120,6 +122,7 @@ namespace TuringSimulatorDesktop.UI
 
             GlobalMeshRenderer.Draw(ToolbarBackground, Port);
             GlobalMeshRenderer.Draw(RenderElements, Port);
+            GlobalMeshRenderer.Draw(Label.GetMesh(), Port);
         }
 
         public override void ViewResize(int NewWidth, int NewHeight)

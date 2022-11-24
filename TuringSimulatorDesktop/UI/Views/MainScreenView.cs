@@ -12,7 +12,6 @@ using System.IO;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
-using TuringSimulatorDesktop.Input;
 using System.Threading;
 
 namespace TuringSimulatorDesktop.UI
@@ -42,6 +41,7 @@ namespace TuringSimulatorDesktop.UI
             RenderElements.Add(NewProjectButton);
             RenderElements.Add(LoadProjectButton);
             RenderElements.Add(JoinProjectButton);
+        
         }
 
         public void SelectProjectLocation(Button Sender)
