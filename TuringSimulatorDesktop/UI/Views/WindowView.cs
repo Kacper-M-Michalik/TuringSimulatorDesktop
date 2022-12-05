@@ -11,24 +11,20 @@ namespace TuringSimulatorDesktop.UI
 {
     public class WindowView : View
     {
+        ProjectScreenView Parent;
+
         public int X { get { return Port.X; } }
         public int Y { get { return Port.Y; } }
         public int Width { get { return Port.Width; } }
         public int Height { get { return Port.Height; } }
 
         public Viewport Port;
-        public int TabHeight;
-
-        List<View> Views;
-        List<Button> ViewChangeButtons;
         public View CurrentView;
 
-        Mesh BackgroundTab;
+        Mesh Border;
         Mesh Background;
 
-        List<IRenderable> RenderElements;
-
-        Vector2 NextButtonPlacementPosition;
+        Button CloseButton;
 
         //DEBUG
         public int LastProjectionX;
@@ -37,24 +33,30 @@ namespace TuringSimulatorDesktop.UI
         public int LastProjectionHeight;
         //
 
-        public WindowView(int SetWidth, int SetHeight)
+        public WindowView(int SetWidth, int SetHeight, ProjectScreenView SetParent)
         {
+            Parent = SetParent;
+
             Port = new Viewport(0, 0, SetWidth, SetHeight);
-            RenderElements = new List<IRenderable>();
+            CloseButton = new Button(Vector2.Zero, Mesh.CreateRectangle(Vector2.Zero, 10, 10, GlobalGraphicsData.DebugColor), ElementCreateType.Persistent);
+            CloseButton.ClickEvent += CloseWindow;
 
-            TabHeight = GlobalGraphicsData.WindowTabHeight;
-
-            BackgroundTab = Mesh.CreateRectangle(Vector2.Zero, Width, TabHeight, GlobalGraphicsData.AccentColor);
-            Background = Mesh.CreateRectangle(Vector2.Zero, Width, Height, GlobalGraphicsData.BackgroundColor);
-
-            Views = new List<View>();
-            ViewChangeButtons = new List<Button>();
-
-            Button TestButton = new Button(Vector2.Zero, Mesh.CreateRectangle(Vector2.Zero, 100f, 40f, Color.Red));
-            ViewChangeButtons.Add(TestButton);
-            RenderElements.Add(TestButton);
+            UpdateElements();
 
             DebugManager.LastCreatedWindow = this;
+        }
+
+        public override void Draw()
+        {
+            GlobalMeshRenderer.Draw(Border, Port);
+            GlobalMeshRenderer.Draw(Background, Port);
+            GlobalMeshRenderer.Draw(CloseButton, Port);
+            if (CurrentView != null) CurrentView.Draw();
+        }
+
+        public void CloseWindow(Button Sender)
+        {
+            Parent.WindowClosing(this);
         }
 
         public bool IsMouseOverWindow()
@@ -65,67 +67,46 @@ namespace TuringSimulatorDesktop.UI
 
         public bool IsMouseOverTab()
         {
-            if (InputManager.MouseData.Y < (Y + TabHeight) && InputManager.MouseData.Y > Y && InputManager.MouseData.X < (X + Width) && InputManager.MouseData.X > X) return true;
+            if (InputManager.MouseData.Y < (Y + GlobalGraphicsData.WindowTabHeight) && InputManager.MouseData.Y > Y && InputManager.MouseData.X < (X + Width) && InputManager.MouseData.X > X) return true;
             return false;
         }
 
-        public void SetWindowPosition(int SetX, int SetY)
-        {
-            Port.X = SetX;
-            Port.Y = SetY;
-
-            ViewResize(Width, Height);
-        }
-
-        public void MoveWindowPosition(int MoveX, int MoveY)
-        {
-            Port.X += MoveX;
-            Port.Y += MoveY;
-
-            ViewResize(Width, Height);
-        }
-
-        public override void Draw()
-        {
-            GlobalMeshRenderer.Draw(Background, Port);
-            if (CurrentView != null) CurrentView.Draw();
-            GlobalMeshRenderer.Draw(BackgroundTab, Port);
-            GlobalMeshRenderer.Draw(RenderElements, Port);
-        }
-
-        //will have to manually move all ui elements
         public override void ViewResize(int SetWindowWidth, int SetWindowHeight)
-        {
-            TabHeight = GlobalGraphicsData.WindowTabHeight;
-
+        {            
             Port.Width = SetWindowWidth;
             Port.Height = SetWindowHeight;
 
-            BackgroundTab = Mesh.CreateRectangle(new Vector2(X, Y), Width, TabHeight, GlobalGraphicsData.AccentColor);
-            Background = Mesh.CreateRectangle(new Vector2(X, Y + TabHeight), Width, Height, GlobalGraphicsData.BackgroundColor);
+            UpdateElements();
 
             LastProjectionX = X;
             LastProjectionY = Y;
             LastProjectionWidth = Width;
             LastProjectionHeight = Height;
 
-            if (CurrentView != null) CurrentView.ViewResize(Width, Height);
+            CurrentView?.ViewResize(Width, Height);
         }
 
-        public void AddView(View NewView)
+        public override void ViewPositionSet(int X, int Y)
         {
-            Views.Add(NewView);
-            Button NewButton = new Button(NextButtonPlacementPosition, Mesh.CreateRectangle(Vector2.Zero, 40f, 20f, GlobalGraphicsData.BackgroundColor));
-            NewButton.ClickEvent += (Button Sender) => { LoadView(Views.Count - 1); };
-            ViewChangeButtons.Add(NewButton);
-            RenderElements.Add(NewButton);
+            Port.X = X;
+            Port.Y = Y;
+            UpdateElements();
         }
 
-        //problem -> if view coutn changes
-        public void LoadView(int ID)
+        public void ViewPositionMove(int X, int Y)
         {
-            CurrentView = Views[ID];
-            CurrentView.ViewResize(Width, Height);
+            Port.X += X;
+            Port.Y += Y;
+            UpdateElements();
+        }
+    
+        public void UpdateElements()
+        {
+            Border = Mesh.CreateRectangle(new Vector2(X, Y), Width, Height, GlobalGraphicsData.DebugColor);
+            Background = Mesh.CreateRectangle(new Vector2(X + 1, Y + 1), Width - 2, Height - 2, GlobalGraphicsData.BackgroundColor);
+            CloseButton.Position = new Vector2(X + Width - 15, Y + 5);
+            CurrentView?.ViewPositionSet(X, Y);
         }
     }
+
 }

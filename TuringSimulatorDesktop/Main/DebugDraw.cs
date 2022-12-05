@@ -15,11 +15,11 @@ namespace TuringSimulatorDesktop
         public static WindowView CurrentWindow;
         public static WindowView LastCreatedWindow;
 
-        public static void Draw(GraphicsDevice Device, SpriteBatch spriteBatch)
+        public static void Draw(GraphicsDevice Device, SpriteBatch spriteBatch, GameTime Time)
         {
             Device.SetRenderTarget(null);
 
-            spriteBatch.DrawString(GlobalGraphicsData.Font, "Cur Mouse Pos: " + InputManager.MouseData.X.ToString() + ", " + InputManager.MouseData.Y.ToString(), Vector2.One, GlobalGraphicsData.FontColor);
+            spriteBatch.DrawString(GlobalGraphicsData.Font, "Cur Mouse Pos: " + InputManager.MouseData.X.ToString() + ", " + InputManager.MouseData.Y.ToString(), new Vector2(6f * (float)Math.Cos(Time.TotalGameTime.TotalSeconds), 1), GlobalGraphicsData.FontColor);
             spriteBatch.DrawString(GlobalGraphicsData.Font, "ViewPort: Width: " + GlobalGraphicsData.Device.Viewport.Width.ToString() + ", Y: " + GlobalGraphicsData.Device.Viewport.Height.ToString(), new Vector2(1f, 20f), GlobalGraphicsData.FontColor);
             if (CurrentWindow != null)  spriteBatch.DrawString(GlobalGraphicsData.Font, "Window Data: Pos : " + CurrentWindow.X.ToString() + ", " + CurrentWindow.Y.ToString(), new Vector2(1f, 40f), GlobalGraphicsData.FontColor);
             else spriteBatch.DrawString(GlobalGraphicsData.Font, "Window Data: Null", new Vector2(1f, 40f), GlobalGraphicsData.FontColor);

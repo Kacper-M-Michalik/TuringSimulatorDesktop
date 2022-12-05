@@ -27,7 +27,7 @@ namespace TuringSimulatorDesktop
 
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
-            Window.IsBorderless = true;
+            //Window.IsBorderless = true;
 
             IsFixedTimeStep = false;
 
@@ -48,7 +48,7 @@ namespace TuringSimulatorDesktop
             Window.ClientSizeChanged += OnResize;
             
             //LOAD HERE
-            SpriteFont MainFont = Content.Load<SpriteFont>("BaseFont");
+            SpriteFont MainFont = Content.Load<SpriteFont>("Fonts/BaseFont");
             GlobalGraphicsData.TextureLookup.Add(TextureLookupKey.StateNodeBackground, Content.Load<Texture2D>("StateNodeBackgroundTest"));
 
             GlobalGraphicsData.BaseWindow = this;
@@ -88,7 +88,7 @@ namespace TuringSimulatorDesktop
                 CurrentView.Draw();
                 
                 ScreenBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, Matrix.Identity);
-                DebugManager.Draw(GraphicsDevice, ScreenBatch);
+                DebugManager.Draw(GraphicsDevice, ScreenBatch, gameTime);
                 ScreenBatch.End();
 
                 //GlobalGraphicsData.UIRequiresRedraw = false;

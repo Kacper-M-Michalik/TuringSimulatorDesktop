@@ -144,5 +144,10 @@ namespace TuringSimulatorDesktop.UI
             CurrentView = Views[ID];
             CurrentView.ViewResize(Width, Height);
         }
+
+        public override void ViewPositionSet(int X, int Y)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

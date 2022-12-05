@@ -56,6 +56,11 @@ namespace TuringSimulatorDesktop.UI
 
         }
 
+        public override void ViewPositionSet(int X, int Y)
+        {
+            throw new NotImplementedException();
+        }
+
         /*
         public override void Draw(SpriteBatch OwnerSpriteBatch, RenderTarget2D PreviousRenderTarget)
         {

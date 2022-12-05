@@ -12,5 +12,6 @@ namespace TuringSimulatorDesktop.UI
     {
         public abstract void Draw();
         public abstract void ViewResize(int NewWidth, int NewHeight);
+        public abstract void ViewPositionSet(int X, int Y);
     }
 }

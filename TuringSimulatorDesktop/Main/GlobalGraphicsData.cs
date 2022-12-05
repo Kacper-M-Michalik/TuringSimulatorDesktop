@@ -23,6 +23,7 @@ namespace TuringSimulatorDesktop
         public static int WindowTabHeight;
         public static Color BackgroundColor = Color.SlateGray;
         public static Color AccentColor = Color.Black;
+        public static Color DebugColor = Color.Yellow;
         public static Color FontColor = Color.White;
 
         public static Dictionary<TextureLookupKey, Texture2D> TextureLookup = new Dictionary<TextureLookupKey, Texture2D>();

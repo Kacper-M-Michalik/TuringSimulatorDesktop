@@ -15,6 +15,7 @@ namespace TuringSimulatorDesktop.UI
         public TextLabel(string Text = "")
         {
             if (Text != "") SetText(Text);
+            MeshData = Mesh.CreateRectangle(Vector2.Zero, 10, 10, Color.Purple);
         }
 
         public void SetText(string NewText)

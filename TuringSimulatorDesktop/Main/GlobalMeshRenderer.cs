@@ -34,6 +34,11 @@ namespace TuringSimulatorDesktop
             Draw(new List<IRenderable>(1) { DrawMesh }, Port);
         }
 
+        public static void Draw(IRenderable DrawMesh, Viewport Port)
+        {
+            Draw(new List<IRenderable>(1) { DrawMesh }, Port);
+        }
+
         public static void Draw(List<IRenderable> MeshList, Viewport Port)
         {
             Viewport OriginalPort = Device.Viewport;

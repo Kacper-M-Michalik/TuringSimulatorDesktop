@@ -93,5 +93,10 @@ namespace TuringSimulatorDesktop.UI
             Port.Width = NewWidth;
             Port.Height = NewHeight;
         }
+
+        public override void ViewPositionSet(int X, int Y)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
