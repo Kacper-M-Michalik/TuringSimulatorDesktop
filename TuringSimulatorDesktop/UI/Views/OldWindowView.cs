@@ -9,6 +9,7 @@ using TuringSimulatorDesktop.Input;
 
 namespace TuringSimulatorDesktop.UI
 {
+    /*
     public class OldWindowView : View
     {
         public int X { get; private set; }
@@ -150,4 +151,5 @@ namespace TuringSimulatorDesktop.UI
             throw new NotImplementedException();
         }
     }
+    */
 }

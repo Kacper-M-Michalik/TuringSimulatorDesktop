@@ -11,21 +11,8 @@ namespace TuringSimulatorDesktop.Input
 {
     public static class InputManager
     {
-        //will be probnlem in future -> clikc priority -> maybe group ui elements for click priorty?
-        //group would be index via an id, lets yuou move whoel iwndow priority at a time, also would support grou bounds -> means eeach ui elementdoesnt have to store a scissor area
-
-        static List<IClickable> ClickableObjects = new List<IClickable>();
+        static List<ActionGroup> ActionGroups = new List<ActionGroup>(); 
         static IClickable PreviouslyClickedObject;
-        static List<IPoll> PollableObjects = new List<IPoll>();
-
-        static List<IClickable> ClickableObjectsToAdd = new List<IClickable>();
-        static List<IPoll> PollableObjectsToAdd = new List<IPoll>();
-        static List<IClickable> ClickableObjectsToRemove = new List<IClickable>();
-        static List<IPoll> PollableObjectsToRemove = new List<IPoll>();
-        static List<IClickable> ClickableObjectsToAddPersistent = new List<IClickable>();
-        static List<IPoll> PollableObjectsToAddPersistent = new List<IPoll>();
-
-        static bool ClearOnQueue;
 
         public static MouseState MouseData;
 
@@ -43,10 +30,6 @@ namespace TuringSimulatorDesktop.Input
 
         public static int PreviousScrollWheel;
         public static int ScrollWheelDelta;
-
-        public static ButtonState VPWScrollInput;
-        public static float VPWZoomInput;
-        public static ButtonState VPWActionMenuInput;
 
         public static void Update()
         {
@@ -71,27 +54,27 @@ namespace TuringSimulatorDesktop.Input
             ScrollWheelDelta = MouseData.ScrollWheelValue - PreviousScrollWheel;
             PreviousScrollWheel = MouseData.ScrollWheelValue;
 
-            VPWScrollInput = MouseData.MiddleButton;
-            VPWActionMenuInput = MouseData.RightButton;
-
-            VPWZoomInput = (float)ScrollWheelDelta * 0.001f;
-
             if (LeftMousePressed)
             {
-                int i = ClickableObjects.Count-1;
+                int i = ActionGroups.Count-1;
                 bool RecepientFound = false;
                 while (i > -1 && !RecepientFound)
                 {
-                    if (ClickableObjects[i].IsMouseOver())
+                    if (ActionGroups[i].IsActive && ActionGroups[i].IsMouseInBounds())
                     {
-                        bool PassThrough = ClickableObjects[i].Clicked();
-
-                        if (!PassThrough)
+                        int j = ActionGroups[i].ClickableObjects.Count - 1;
+                        while (j > -1 && !RecepientFound)                            
                         {
-                            if (PreviouslyClickedObject != null && ClickableObjects[i] != PreviouslyClickedObject) PreviouslyClickedObject.ClickedAway();
+                            if (ActionGroups[i].ClickableObjects[j].IsMouseOver())
+                            {
+                                ActionGroups[i].ClickableObjects[j].Clicked();
+                                if (PreviouslyClickedObject != null && ActionGroups[i].ClickableObjects[j] != PreviouslyClickedObject) PreviouslyClickedObject.ClickedAway();
+                                PreviouslyClickedObject = ActionGroups[i].ClickableObjects[j];
+                                RecepientFound = true;                                
+                            }
 
-                            PreviouslyClickedObject = ClickableObjects[i];
-                            RecepientFound = true;
+                            j--;
+
                         }
                     }
 
@@ -99,110 +82,55 @@ namespace TuringSimulatorDesktop.Input
                 }
 
                 if (PreviouslyClickedObject != null && RecepientFound == false) PreviouslyClickedObject.ClickedAway();
-
             }
 
-            for (int i = 0; i < PollableObjects.Count; i++)
+            for (int i = 0; i < ActionGroups.Count; i++)
             {
-                PollableObjects[i].PollInput();                
-            }
-
-            if (!ClearOnQueue)
-            {
-                for (int i = 0; i < ClickableObjectsToRemove.Count; i++)
+                if (ActionGroups[i].IsActive)
                 {
-                    ClickableObjects.Remove(ClickableObjectsToRemove[i]);
-                }
-                for (int i = 0; i < PollableObjectsToRemove.Count; i++)
-                {
-                    PollableObjects.Remove(PollableObjectsToRemove[i]);
-                }
-
-                for (int i = 0; i < ClickableObjectsToAdd.Count; i++)
-                {
-                    ClickableObjects.Add(ClickableObjectsToAdd[i]);
-                }
-                for (int i = 0; i < PollableObjectsToAdd.Count; i++)
-                {
-                    PollableObjects.Add(PollableObjectsToAdd[i]);
-                }
-                ClickableObjectsToRemove.Clear();
-                PollableObjectsToRemove.Clear();
-                ClickableObjectsToAdd.Clear();
-                PollableObjectsToAdd.Clear();
-
+                    if (ActionGroups[i].IsMouseInBounds())
+                    {
+                        for (int j = 0; j < ActionGroups[i].PollableObjects.Count; j++)
+                        {
+                            ActionGroups[i].PollableObjects[j].PollInput(true);
+                        }
+                    }
+                    else
+                    {
+                        for (int j = 0; j < ActionGroups[i].PollableObjects.Count; j++)
+                        {
+                            ActionGroups[i].PollableObjects[j].PollInput(false);
+                        }
+                    }
+                }    
             }
-            else
+
+            for (int i = ActionGroups.Count - 1; i > -1; i--)
             {
-                ClickableObjects.Clear();
-                PollableObjects.Clear();
-                ClickableObjectsToRemove.Clear();
-                PollableObjectsToRemove.Clear();
-                ClickableObjectsToAdd.Clear();
-                PollableObjectsToAdd.Clear();
-                PreviouslyClickedObject = null;
-                ClearOnQueue = false;
+                if (ActionGroups[i].IsMarkedForDeletion) ActionGroups.RemoveAt(i);
             }
-
-            for (int i = 0; i < ClickableObjectsToAddPersistent.Count; i++)
-            {
-                ClickableObjects.Add(ClickableObjectsToAddPersistent[i]);
-            }
-            ClickableObjectsToAddPersistent.Clear();
-            for (int i = 0; i < PollableObjectsToAddPersistent.Count; i++)
-            {
-                PollableObjects.Add(PollableObjectsToAddPersistent[i]);
-            }
-            PollableObjectsToAddPersistent.Clear();
         }
 
-        public static void RegisterClickableObjectOnQueue(IClickable Object)
+        public static ActionGroup CreateActionGroup(int X, int Y, int Width, int Height)
         {
-            ClickableObjectsToAdd.Add(Object);
+            ActionGroup NewGroup = new ActionGroup(X, Y, Width, Height);
+            ActionGroups.Add(NewGroup);
+
+            return NewGroup;
         }
 
-        public static void RegisterPollableObjectOnQueue(IPoll Object)
+        public static ActionGroup CreateActionGroup()
         {
-            PollableObjectsToAdd.Add(Object);
+            ActionGroup NewGroup = new ActionGroup();
+            ActionGroups.Add(NewGroup);
+
+            return NewGroup;
         }
 
-        public static void RegisterClickableObjectOnQueuePersistent(IClickable Object)
+        public static void DeleteAllActionGroups()
         {
-            ClickableObjectsToAddPersistent.Add(Object);
-        }
-
-        public static void RegisterPollableObjectOnQueuePersistent(IPoll Object)
-        {
-            PollableObjectsToAddPersistent.Add(Object);
-        }
-
-
-        public static void RemoveAllListenersUnsafe()
-        {
-            ClickableObjects.Clear();
-            PollableObjects.Clear();
-            ClickableObjectsToRemove.Clear();
-            PollableObjectsToRemove.Clear();
-            ClickableObjectsToAdd.Clear();
-            PollableObjectsToAdd.Clear();
-
+            for (int i = 0; i < ActionGroups.Count; i++) ActionGroups[i].IsMarkedForDeletion = true;
             PreviouslyClickedObject = null;
         }
-
-        public static void RemoveAllListenersOnQueue()
-        {
-            ClearOnQueue = true;
-        }
-
-        public static void RemoveClickableObjectOnQueue(IClickable Object)
-        {
-            ClickableObjectsToRemove.Add(Object);
-        }
-
-        public static void RemovePollableObjectOnQueue(IPoll Object)
-        {
-            PollableObjectsToRemove.Add(Object);
-        }
-
     }
 }

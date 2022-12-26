@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TuringSimulatorDesktop.Input;
 using TuringSimulatorDesktop.UI;
+using FontStashSharp;
 
 namespace TuringSimulatorDesktop
 {
@@ -19,16 +20,16 @@ namespace TuringSimulatorDesktop
         {
             Device.SetRenderTarget(null);
 
-            spriteBatch.DrawString(GlobalGraphicsData.Font, "Cur Mouse Pos: " + InputManager.MouseData.X.ToString() + ", " + InputManager.MouseData.Y.ToString(), new Vector2(6f * (float)Math.Cos(Time.TotalGameTime.TotalSeconds), 1), GlobalGraphicsData.FontColor);
-            spriteBatch.DrawString(GlobalGraphicsData.Font, "ViewPort: Width: " + GlobalGraphicsData.Device.Viewport.Width.ToString() + ", Y: " + GlobalGraphicsData.Device.Viewport.Height.ToString(), new Vector2(1f, 20f), GlobalGraphicsData.FontColor);
-            if (CurrentWindow != null)  spriteBatch.DrawString(GlobalGraphicsData.Font, "Window Data: Pos : " + CurrentWindow.X.ToString() + ", " + CurrentWindow.Y.ToString(), new Vector2(1f, 40f), GlobalGraphicsData.FontColor);
-            else spriteBatch.DrawString(GlobalGraphicsData.Font, "Window Data: Null", new Vector2(1f, 40f), GlobalGraphicsData.FontColor);
-            if (CurrentWindow != null) spriteBatch.DrawString(GlobalGraphicsData.Font, "Window Data: Port X : " + CurrentWindow.Port.X.ToString() + ", Y: " + CurrentWindow.Port.Y.ToString() + "    Width: " + CurrentWindow.Port.Width.ToString() + ", Height: " + CurrentWindow.Port.Height.ToString(), new Vector2(1f, 60f), GlobalGraphicsData.FontColor);
-            else spriteBatch.DrawString(GlobalGraphicsData.Font, "Window Data: Null", new Vector2(1f, 60f), GlobalGraphicsData.FontColor);
-            if (CurrentWindow != null) spriteBatch.DrawString(GlobalGraphicsData.Font, "Window Data: Projection X : " + CurrentWindow.LastProjectionX.ToString() + ", Y: " + CurrentWindow.LastProjectionY.ToString() + "    Width: " + CurrentWindow.LastProjectionWidth.ToString() + ", Height: " + CurrentWindow.LastProjectionHeight.ToString(), new Vector2(1f, 80f), GlobalGraphicsData.FontColor);
-            else spriteBatch.DrawString(GlobalGraphicsData.Font, "Window Data: Null", new Vector2(1f, 80f), GlobalGraphicsData.FontColor);
-            if (LastCreatedWindow != null) spriteBatch.DrawString(GlobalGraphicsData.Font, "Last Window Data: Port X : " + LastCreatedWindow.Port.X.ToString() + ", Y: " + LastCreatedWindow.Port.Y.ToString() + "    Width: " + LastCreatedWindow.Port.Width.ToString() + ", Height: " + LastCreatedWindow.Port.Height.ToString(), new Vector2(1f, 100f), GlobalGraphicsData.FontColor);
-            if (LastCreatedWindow != null) spriteBatch.DrawString(GlobalGraphicsData.Font, "Last Window Data: Projection X : " + LastCreatedWindow.LastProjectionX.ToString() + ", Y: " + LastCreatedWindow.LastProjectionY.ToString() + "    Width: " + LastCreatedWindow.LastProjectionWidth.ToString() + ", Height: " + LastCreatedWindow.LastProjectionHeight.ToString(), new Vector2(1f, 120f), GlobalGraphicsData.FontColor);
+            spriteBatch.DrawString(GlobalInterfaceData.Fonts.GetFont(12), "Cur Mouse Pos: " + InputManager.MouseData.X.ToString() + ", " + InputManager.MouseData.Y.ToString(), new Vector2(6f * (float)Math.Cos(Time.TotalGameTime.TotalSeconds), 1), GlobalInterfaceData.FontColor);
+            spriteBatch.DrawString(GlobalInterfaceData.Fonts.GetFont(12), "ViewPort: Width: " + GlobalInterfaceData.Device.Viewport.Width.ToString() + ", Y: " + GlobalInterfaceData.Device.Viewport.Height.ToString(), new Vector2(1f, 20f), GlobalInterfaceData.FontColor);
+            if (CurrentWindow != null)  spriteBatch.DrawString(GlobalInterfaceData.Fonts.GetFont(12), "Window Data: Pos : " + CurrentWindow.X.ToString() + ", " + CurrentWindow.Y.ToString(), new Vector2(1f, 40f), GlobalInterfaceData.FontColor);
+            else spriteBatch.DrawString(GlobalInterfaceData.Fonts.GetFont(12), "Window Data: Null", new Vector2(1f, 40f), GlobalInterfaceData.FontColor);
+            if (CurrentWindow != null) spriteBatch.DrawString(GlobalInterfaceData.Fonts.GetFont(12), "Window Data: Port X : " + CurrentWindow.Port.X.ToString() + ", Y: " + CurrentWindow.Port.Y.ToString() + "    Width: " + CurrentWindow.Port.Width.ToString() + ", Height: " + CurrentWindow.Port.Height.ToString(), new Vector2(1f, 60f), GlobalInterfaceData.FontColor);
+            else spriteBatch.DrawString(GlobalInterfaceData.Fonts.GetFont(12), "Window Data: Null", new Vector2(1f, 60f), GlobalInterfaceData.FontColor);
+            if (CurrentWindow != null) spriteBatch.DrawString(GlobalInterfaceData.Fonts.GetFont(12), "Window Data: Projection X : " + CurrentWindow.LastProjectionX.ToString() + ", Y: " + CurrentWindow.LastProjectionY.ToString() + "    Width: " + CurrentWindow.LastProjectionWidth.ToString() + ", Height: " + CurrentWindow.LastProjectionHeight.ToString(), new Vector2(1f, 80f), GlobalInterfaceData.FontColor);
+            else spriteBatch.DrawString(GlobalInterfaceData.Fonts.GetFont(12), "Window Data: Null", new Vector2(1f, 80f), GlobalInterfaceData.FontColor);
+            if (LastCreatedWindow != null) spriteBatch.DrawString(GlobalInterfaceData.Fonts.GetFont(12), "Last Window Data: Port X : " + LastCreatedWindow.Port.X.ToString() + ", Y: " + LastCreatedWindow.Port.Y.ToString() + "    Width: " + LastCreatedWindow.Port.Width.ToString() + ", Height: " + LastCreatedWindow.Port.Height.ToString(), new Vector2(1f, 100f), GlobalInterfaceData.FontColor);
+            if (LastCreatedWindow != null) spriteBatch.DrawString(GlobalInterfaceData.Fonts.GetFont(12), "Last Window Data: Projection X : " + LastCreatedWindow.LastProjectionX.ToString() + ", Y: " + LastCreatedWindow.LastProjectionY.ToString() + "    Width: " + LastCreatedWindow.LastProjectionWidth.ToString() + ", Height: " + LastCreatedWindow.LastProjectionHeight.ToString(), new Vector2(1f, 120f), GlobalInterfaceData.FontColor);
         }
     }
 }

@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TuringSimulatorDesktop.Input;
 
 namespace TuringSimulatorDesktop
 {
-    public interface IRenderable
+    public interface IPollable
     {
-        public Mesh GetMesh();
+        public void PollInput(bool IsInActionGroupFrame);
     }
 }

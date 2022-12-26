@@ -5,8 +5,9 @@ using System.Collections.Generic;
 
 namespace TuringSimulatorDesktop.UI
 {
-    public class MeshRenderer : IDisposable
+    public class MeshRenderer //: IDisposable
     {
+        /*
         private bool IsDisposed;
         private GraphicsDevice Device;
         public BasicEffect Effect;
@@ -14,7 +15,7 @@ namespace TuringSimulatorDesktop.UI
         /*
         VertexPositionColor[] Vertices;
         int[] Indices;
-        */
+        
 
         List<Mesh> Meshes;
 
@@ -81,7 +82,7 @@ namespace TuringSimulatorDesktop.UI
                 Device.DrawUserIndexedPrimitives<VertexPositionColor>(PrimitiveType.TriangleList, Vertices, 0, Vertices.Length, Indices, 0, Indices.Length / 3);
             }
         }
-        */
+        
 
         public void Draw()
         {
@@ -102,7 +103,7 @@ namespace TuringSimulatorDesktop.UI
                 foreach (EffectPass Pass in Effect.CurrentTechnique.Passes)
                 {
                     Pass.Apply();
-                    Device.DrawUserIndexedPrimitives<VertexPositionColorTexture>(PrimitiveType.TriangleList, Data.Vertices, 0, Data.Vertices.Length, Data.Indices, 0, Data.Indices.Length / 3);
+                    Device.DrawUserIndexedPrimitives<VertexPositionTexture>(PrimitiveType.TriangleList, Data.Vertices, 0, Data.Vertices.Length, Data.Indices, 0, Data.Indices.Length / 3);
                 }
             }
 
@@ -116,6 +117,6 @@ namespace TuringSimulatorDesktop.UI
             Meshes.Clear();
             IsDisposed = true;
         }
-
+        */
     }
 }

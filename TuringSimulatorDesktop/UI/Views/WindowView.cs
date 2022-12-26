@@ -11,7 +11,6 @@ namespace TuringSimulatorDesktop.UI
 {
     public class WindowView : View
     {
-        ProjectScreenView Parent;
 
         public int X { get { return Port.X; } }
         public int Y { get { return Port.Y; } }
@@ -19,12 +18,16 @@ namespace TuringSimulatorDesktop.UI
         public int Height { get { return Port.Height; } }
 
         public Viewport Port;
+        public bool IsMarkedForDeletion;
+        ActionGroup Group;
+
         public View CurrentView;
+        UIMesh Border;
+        UIMesh Background;
+        OldButton CloseButton;
 
-        Mesh Border;
-        Mesh Background;
-
-        Button CloseButton;
+       // WindowGroupData ParentWindowGroup;
+       // WindowGroupConnection ResizeConnection;
 
         //DEBUG
         public int LastProjectionX;
@@ -33,14 +36,14 @@ namespace TuringSimulatorDesktop.UI
         public int LastProjectionHeight;
         //
 
-        public WindowView(int SetWidth, int SetHeight, ProjectScreenView SetParent)
+        public WindowView(int SetWidth, int SetHeight, ProjectScreenView SetParent)//, WindowGroupData SetParentWindowGroup)
         {
-            Parent = SetParent;
-
             Port = new Viewport(0, 0, SetWidth, SetHeight);
-            CloseButton = new Button(Vector2.Zero, Mesh.CreateRectangle(Vector2.Zero, 10, 10, GlobalGraphicsData.DebugColor), ElementCreateType.Persistent);
-            CloseButton.ClickEvent += CloseWindow;
+            Group = InputManager.CreateActionGroup(0, 0, Port.Width, Port.Height);       
 
+            CloseButton = new OldButton(Vector2.Zero, UIMesh.CreateRectangle(Vector2.Zero, 10, 10, GlobalInterfaceData.DebugColor), Group);
+            CloseButton.ClickEvent += CloseWindow;    
+            
             UpdateElements();
 
             DebugManager.LastCreatedWindow = this;
@@ -48,15 +51,15 @@ namespace TuringSimulatorDesktop.UI
 
         public override void Draw()
         {
-            GlobalMeshRenderer.Draw(Border, Port);
-            GlobalMeshRenderer.Draw(Background, Port);
-            GlobalMeshRenderer.Draw(CloseButton, Port);
+            //GlobalMeshRenderer.Draw(Border, Port);
+            //GlobalMeshRenderer.Draw(Background, Port);
+            //GlobalMeshRenderer.Draw(CloseButton, Port);
             if (CurrentView != null) CurrentView.Draw();
         }
 
-        public void CloseWindow(Button Sender)
+        public void CloseWindow(OldButton Sender)
         {
-            Parent.WindowClosing(this);
+            IsMarkedForDeletion = true;
         }
 
         public bool IsMouseOverWindow()
@@ -67,7 +70,7 @@ namespace TuringSimulatorDesktop.UI
 
         public bool IsMouseOverTab()
         {
-            if (InputManager.MouseData.Y < (Y + GlobalGraphicsData.WindowTabHeight) && InputManager.MouseData.Y > Y && InputManager.MouseData.X < (X + Width) && InputManager.MouseData.X > X) return true;
+            if (InputManager.MouseData.Y < (Y + GlobalInterfaceData.WindowTabHeight) && InputManager.MouseData.Y > Y && InputManager.MouseData.X < (X + Width) && InputManager.MouseData.X > X) return true;
             return false;
         }
 
@@ -102,9 +105,13 @@ namespace TuringSimulatorDesktop.UI
     
         public void UpdateElements()
         {
-            Border = Mesh.CreateRectangle(new Vector2(X, Y), Width, Height, GlobalGraphicsData.DebugColor);
-            Background = Mesh.CreateRectangle(new Vector2(X + 1, Y + 1), Width - 2, Height - 2, GlobalGraphicsData.BackgroundColor);
+            Border = UIMesh.CreateRectangle(new Vector2(X, Y), Width, Height, GlobalInterfaceData.DebugColor);
+            Background = UIMesh.CreateRectangle(new Vector2(X + 1, Y + 1), Width - 2, Height - 2, GlobalInterfaceData.BackgroundColor);
             CloseButton.Position = new Vector2(X + Width - 15, Y + 5);
+            Group.X = X;
+            Group.Y = Y;
+            Group.Width = Width;
+            Group.Height = Height;
             CurrentView?.ViewPositionSet(X, Y);
         }
     }

@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TuringSimulatorDesktop.Input;
 
-namespace TuringSimulatorDesktop.UI
+namespace TuringSimulatorDesktop.UI.New_Base_Elements
 {
-    public interface IPoll
+    internal class NDropDown
     {
-        public void PollInput();
     }
 }

@@ -9,17 +9,19 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace TuringSimulatorDesktop.UI
 {
-    public class ProjectScreenView : View, IPoll
+    public class ProjectScreenView : View, IPollable
     {
-        List<IRenderable> RenderElements;
-        Viewport Port;
+        ActionGroup Group;
 
-        Mesh ScreenBackground;
-        Mesh ToolbarBackground;
+        UIMesh ScreenBackground;
+        UIMesh ToolbarBackground;
 
         //Button ExitProjectButton;
         //Button WindowAddDropDown;
         TextLabel ProjectTitle;
+
+        WindowGroupData BaseGroup;
+        WindowGroupConnection Connections;
 
         List<WindowView> Windows;
         WindowView CurrentlyFocusedWindow;
@@ -31,49 +33,59 @@ namespace TuringSimulatorDesktop.UI
 
         public ProjectScreenView()
         {
-            Port = new Viewport(0, 0, GlobalGraphicsData.Device.PresentationParameters.BackBufferWidth, GlobalGraphicsData.Device.PresentationParameters.BackBufferHeight);
-            RenderElements = new List<IRenderable>();
+            Group = InputManager.CreateActionGroup();
+            ViewResize(GlobalInterfaceData.Device.PresentationParameters.BackBufferWidth, GlobalInterfaceData.Device.PresentationParameters.BackBufferHeight);
 
-            ToolbarBackground = Mesh.CreateRectangle(Vector2.Zero, GlobalGraphicsData.Device.PresentationParameters.BackBufferWidth, GlobalGraphicsData.ToolbarHeight, GlobalGraphicsData.AccentColor);
-            ScreenBackground = Mesh.CreateRectangle(Vector2.Zero, GlobalGraphicsData.Device.PresentationParameters.BackBufferWidth, GlobalGraphicsData.Device.PresentationParameters.BackBufferHeight, GlobalGraphicsData.BackgroundColor);
+            ToolbarBackground = UIMesh.CreateRectangle(Vector2.Zero, GlobalInterfaceData.Device.PresentationParameters.BackBufferWidth, GlobalInterfaceData.ToolbarHeight, GlobalInterfaceData.AccentColor);
+            ScreenBackground = UIMesh.CreateRectangle(Vector2.Zero, GlobalInterfaceData.Device.PresentationParameters.BackBufferWidth, GlobalInterfaceData.Device.PresentationParameters.BackBufferHeight, GlobalInterfaceData.BackgroundColor);
 
-            ProjectTitle = new TextLabel("TEST ASDASSADSDAASD");
+            ProjectTitle = new TextLabel(Vector2.One, 8, "LOREM ipsum wubbalubbadub dub");
 
             Windows = new List<WindowView>();
 
-            WindowView Win1 = new WindowView(200, 200, this);
+            CreateWindow();
+            CreateWindow();
+
+            /*
+            WindowView Win1 = new WindowView(200, 200, this, BaseGroup);
             Win1.ViewPositionSet(300, 0);
             Windows.Add(Win1);
             DebugWindow = Win1;
 
-            WindowView Win2 = new WindowView(100, 400, this);
+            WindowView Win2 = new WindowView(100, 400, this, BaseGroup);
             Win2.ViewPositionSet(0, 25);
             Windows.Add(Win2);
+            */
 
-            InputManager.RegisterPollableObjectOnQueuePersistent(this);
+            Group.PollableObjects.Add(this);
         }
 
-        public void PollInput()
+        public void PollInput(bool IsInActionFrameGroup)
         {
-            int i = Windows.Count - 1;
+            for (int i = Windows.Count - 1; i > -1; i--)
+            {
+                if (Windows[i].IsMarkedForDeletion) Windows.RemoveAt(i);
+            }
+
+            int j = Windows.Count - 1;
             bool AssignedFocus = false;
             if (!IsDragging)
             {
-                while (!AssignedFocus && i > -1)
+                while (!AssignedFocus && j > -1)
                 {
-                    if (Windows[i].IsMouseOverWindow())
+                    if (Windows[j].IsMouseOverWindow())
                     {
                         AssignedFocus = true;
-                        CurrentlyFocusedWindow = Windows[i];
+                        CurrentlyFocusedWindow = Windows[j];
                         DebugManager.CurrentWindow = CurrentlyFocusedWindow;
 
                         if (InputManager.LeftMousePressed)
                         {
-                            Windows.RemoveAt(i);
+                            Windows.RemoveAt(j);
                             Windows.Add(CurrentlyFocusedWindow);
                         }
                     }
-                    i--;
+                    j--;
                 }
                 if (!AssignedFocus) DebugManager.CurrentWindow = null;
             }
@@ -97,28 +109,38 @@ namespace TuringSimulatorDesktop.UI
 
         public override void Draw()
         {
-            GlobalMeshRenderer.Draw(ScreenBackground, Port);
-            GlobalMeshRenderer.Draw(ToolbarBackground, Port);
-            GlobalMeshRenderer.Draw(RenderElements, Port);
-            GlobalMeshRenderer.Draw(ProjectTitle, Port);
+            GlobalUIRenderer.Draw(ScreenBackground);
+            GlobalUIRenderer.Draw(ToolbarBackground);
+            //GlobalMeshRenderer.Draw(ProjectTitle, Port);
             for (int i = 0; i < Windows.Count; i++)
             {
                 Windows[i].Draw();
             }
         }
 
-        public void WindowClosing(WindowView Child)
+        public void CreateWindow()
         {
-            Windows.Remove(Child);
+            WindowGroupData NewBaseGroup = new WindowGroupData();
+                
+            WindowGroupData NewWindowGroup = new WindowGroupData();
+            WindowView NewWindow = new WindowView(100, 100, this);
+            NewWindowGroup.ChildWindow = NewWindow;
+
+            if (BaseGroup != null) NewBaseGroup.SubGroups.Add(BaseGroup);
+            NewBaseGroup.SubGroups.Add(NewWindowGroup);
+
+            BaseGroup = NewBaseGroup;
+
+            Windows.Add(NewWindow);
         }
 
         public override void ViewResize(int NewWidth, int NewHeight)
         {
-            ToolbarBackground = Mesh.CreateRectangle(Vector2.Zero, GlobalGraphicsData.Device.PresentationParameters.BackBufferWidth, GlobalGraphicsData.ToolbarHeight, GlobalGraphicsData.AccentColor);
-            ScreenBackground = Mesh.CreateRectangle(Vector2.Zero, GlobalGraphicsData.Device.PresentationParameters.BackBufferWidth, GlobalGraphicsData.Device.PresentationParameters.BackBufferHeight, GlobalGraphicsData.BackgroundColor);
+            Group.Width = NewWidth;
+            Group.Height = NewHeight;
 
-            Port.Width = NewWidth;
-            Port.Height = NewHeight;
+            ToolbarBackground = UIMesh.CreateRectangle(Vector2.Zero, NewWidth, GlobalInterfaceData.ToolbarHeight, GlobalInterfaceData.AccentColor);
+            ScreenBackground = UIMesh.CreateRectangle(Vector2.Zero, NewWidth, NewHeight, GlobalInterfaceData.BackgroundColor); 
         }
 
         public override void ViewPositionSet(int X, int Y)

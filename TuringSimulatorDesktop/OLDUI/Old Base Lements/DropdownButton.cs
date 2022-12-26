@@ -6,13 +6,9 @@ using System.Threading.Tasks;
 
 namespace TuringSimulatorDesktop.UI
 {
-    public class DropdownButton : UIElement, IPoll, IClickable
+    public class DropdownButton : UIElement, IPollable, IClickable
     {
-        public override int GetBoundX => throw new NotImplementedException();
-
-        public override int GetBoundY => throw new NotImplementedException();
-
-        public bool Clicked()
+        public void Clicked()
         {
             throw new NotImplementedException();
         }
@@ -27,7 +23,7 @@ namespace TuringSimulatorDesktop.UI
             throw new NotImplementedException();
         }
 
-        public void PollInput()
+        public void PollInput(bool IsInActionFrameGroup)
         {
             throw new NotImplementedException();
         }

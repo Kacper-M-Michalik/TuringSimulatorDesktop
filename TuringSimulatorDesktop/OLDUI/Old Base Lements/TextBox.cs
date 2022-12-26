@@ -7,27 +7,26 @@ using System.Text;
 using System.Threading.Tasks;
 using TuringSimulatorDesktop.Input;
 using TuringSimulatorDesktop;
+using Microsoft.Xna.Framework;
 
 namespace TuringSimulatorDesktop.UI
 {
-    public delegate void OnEditTextBox(TextBox Sender);
+   // public delegate void OnEditTextBox(TextBox Sender);
 
-    public class TextBox : TextLabel, IPoll, IClickable
+    public class OldTextBox : TextLabel, IPollable, IClickable
     {
         public bool Pollable;
-        public event OnEditTextBox EditEvent;
+       // public event OnEditTextBox EditEvent;
 
-        public TextBox(string SetString = "") : base(SetString)
+        public OldTextBox(Vector2 SetPosition, ActionGroup Group, int SetFontSize = 12, string SetString = "") : base(SetPosition, SetFontSize, SetString)
         {
-            InputManager.RegisterClickableObjectOnQueue(this);
-            InputManager.RegisterPollableObjectOnQueue(this);
+            Group.ClickableObjects.Add(this);
+            Group.PollableObjects.Add(this);
         }
 
-        bool IClickable.Clicked()
+        void IClickable.Clicked()
         {
             Pollable = true;
-
-            return false;
         }
 
         void IClickable.ClickedAway()
@@ -40,7 +39,7 @@ namespace TuringSimulatorDesktop.UI
             return (InputManager.LeftMousePressed && InputManager.MouseData.X >= Position.X - 0 && InputManager.MouseData.X <= Position.X + 30 && InputManager.MouseData.Y >= Position.Y - 0 && InputManager.MouseData.Y <= Position.Y + 20);
         }
 
-        public void PollInput()
+        public void PollInput(bool IsInActionFrameGroup)
         {
             if (Pollable)
             {
@@ -58,7 +57,7 @@ namespace TuringSimulatorDesktop.UI
 
                     Text = Builder.ToString();
                     */
-                    EditEvent?.Invoke(this);
+                  //  EditEvent?.Invoke(this);
                 }
             }
         }

@@ -2,62 +2,96 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Security.Policy;
-using System.Text;
-using System.Threading.Tasks;
 using TuringSimulatorDesktop.Input;
 
 namespace TuringSimulatorDesktop.UI
 {
     public delegate void OnClick(Button Sender);
-    public enum ElementCreateType {Persistent, Regular}
 
-    public class Button : UIElement, IClickable
+    public class Button : IVisualElement, IClickable, IPollable
     {
-        public string Text;
+        //add resizing and editing later
 
-        public int BoundRight;
-        public int BoundDown;
+        public int Width, Height;
+        public bool IsActive = true;
 
+        public bool HighlightOnMouseOver = true;
+        public Texture2D BaseTexture;
+        public Texture2D HighlightTexture;
 
-        public event OnClick ClickEvent;
+        public UIMesh Background;
 
-        public Button(Vector2 SetPosition, Mesh SetMeshData, ElementCreateType Type = ElementCreateType.Regular, string SetText = "")
+        Vector2 position;
+        public Vector2 Position { get => position; set { position = value; Background.MeshTransformations = Matrix.CreateWorld(new Vector3(position.X, position.Y, 0), Vector3.Forward, Vector3.Up); } }
+        public Vector2 GetBounds { get => new Vector2(Width, Height); }
+
+        public event OnClick OnClickedEvent;
+
+        public Button(int width, int height, Vector2 position, ActionGroup group)
         {
-            Position = SetPosition;
+#if DEBUG
+            Background = UIMesh.CreateRectangle(Vector2.Zero, width, height, GlobalInterfaceData.UIOverlayDebugColor);
+#else
+            MeshData = UIMesh.CreateRectangle(Vector2.Zero, width, height, Color.Transparent);
+#endif
+            Width = width;
+            Height = height;
+            Position = position;
 
-            MeshData = SetMeshData;
-
-            Text = SetText;
-
-            BoundRight = Convert.ToInt32(MathF.Round(MeshData.GetFurthestRightVertexPoint(), MidpointRounding.AwayFromZero));
-
-            BoundDown = Convert.ToInt32(MathF.Round(MeshData.GetFurthestDownVertexPoint(), MidpointRounding.AwayFromZero)); ;
-
-            if (Type == ElementCreateType.Regular) InputManager.RegisterClickableObjectOnQueue(this);
-            else InputManager.RegisterClickableObjectOnQueuePersistent(this);
+            group.ClickableObjects.Add(this);
+            group.PollableObjects.Add(this);
         }
 
-        public override int GetBoundX { get { return BoundRight; } }
-
-        public override int GetBoundY { get { return BoundDown; } }
-
-        bool IClickable.Clicked()
+        public void Clicked()
         {
-            ClickEvent?.Invoke(this);
-            return false;
+            OnClickedEvent?.Invoke(this);
         }
 
-        void IClickable.ClickedAway()
+        public void ClickedAway()
         {
 
         }
 
         public bool IsMouseOver()
         {
-            return (InputManager.LeftMousePressed && InputManager.MouseData.X >= Position.X && InputManager.MouseData.X <= Position.X + BoundRight && InputManager.MouseData.Y >= Position.Y && InputManager.MouseData.Y <= Position.Y + BoundDown);
+            return (IsActive && InputManager.MouseData.X >= Position.X && InputManager.MouseData.X <= Position.X + Width && InputManager.MouseData.Y >= Position.Y && InputManager.MouseData.Y <= Position.Y + Height);
         }
 
+        public void PollInput(bool IsInActionGroupFrame)
+        {
+            if (IsInActionGroupFrame && IsMouseOver())
+            {
+#if DEBUG
+                if (HighlightTexture == null) Background.OverlayColor = GlobalInterfaceData.UIOverlayDebugColorHighlight;
+                else Background.Texture = HighlightTexture;
+#else
+                MeshData.Texture = HighlightTexture;
+#endif
+            }
+            else
+            {
+#if DEBUG
+                if (BaseTexture == null) Background.OverlayColor = GlobalInterfaceData.UIOverlayDebugColor;
+                else Background.Texture = BaseTexture;
+#else
+                MeshData.Texture = BaseTexture;
+#endif
+            }
+        }
+
+        public void Draw(Viewport BoundPort = default)
+        {
+            if (IsActive)
+            {
+                if (UIUtils.IsDefaultViewport(BoundPort))
+                {
+                    GlobalUIRenderer.Draw(Background);
+                }
+                else
+                {
+                    GlobalUIRenderer.Draw(Background, BoundPort);
+                }
+            }
+        }
     }
 }

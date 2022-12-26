@@ -5,13 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using TuringSimulatorDesktop.Input;
 
-namespace TuringSimulatorDesktop.UI
+namespace TuringSimulatorDesktop
 {
     public interface IClickable
     {
-        //bool indicates if PassThrough Allowed -> True == Click is allowed to pass through, False == Click is terminated
-        //Passthrough enabled object are not eligble for Click away
-        public bool Clicked();
+        public void Clicked();
         public void ClickedAway();
         public bool IsMouseOver();
     }

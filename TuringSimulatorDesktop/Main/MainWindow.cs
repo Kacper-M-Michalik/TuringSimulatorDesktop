@@ -7,14 +7,30 @@ using TuringCore;
 using TuringServer;
 using TuringSimulatorDesktop.Input;
 using TuringSimulatorDesktop.UI;
+using FontStashSharp;
+using System.IO;
 
 namespace TuringSimulatorDesktop
 {
+    public static class Program
+    {
+        /// <summary>
+        /// The main entry point for the application.
+        /// </summary>
+        [STAThread]
+        static void Main()
+        {
+            using var game = new TuringSimulatorDesktop.MainWindow();
+            game.Run();
+        }
+    }
+
     public class MainWindow : Game
     {
         public GraphicsDeviceManager GraphicsManager;
-        SpriteBatch ScreenBatch;
         public View CurrentView;
+
+        SpriteBatch ScreenBatch;
 
         public MainWindow()
         {
@@ -27,10 +43,11 @@ namespace TuringSimulatorDesktop
 
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
-            //Window.IsBorderless = true;
+            Window.IsBorderless = false;
+            Window.AllowUserResizing = true;
+            Window.ClientSizeChanged += OnResize;
 
             IsFixedTimeStep = false;
-
         }
 
         protected override void Initialize()
@@ -43,25 +60,21 @@ namespace TuringSimulatorDesktop
         protected override void LoadContent()
         {
             ScreenBatch = new SpriteBatch(GraphicsDevice);
+            GraphicsDevice.BlendState = BlendState.AlphaBlend;
 
-            Window.AllowUserResizing = true;
-            Window.ClientSizeChanged += OnResize;
+            GlobalInterfaceData.BaseWindow = this;
+            GlobalInterfaceData.FullscreenViewport = GraphicsDevice.Viewport;
+
+            GlobalInterfaceData.Device = GraphicsDevice;
+            GlobalInterfaceData.UIEffect = Content.Load<Effect>("UIShader");
+
+            GlobalInterfaceData.Fonts = new FontSystem();
+            //GlobalGraphicsData.Fonts.AddFont(File.ReadAllBytes(@"Fonts/Roboto-Regular.ttf"));
+            GlobalInterfaceData.Fonts.AddFont(File.ReadAllBytes(@"C:/Windows/Fonts/arial.ttf"));
             
-            //LOAD HERE
-            SpriteFont MainFont = Content.Load<SpriteFont>("Fonts/BaseFont");
-            GlobalGraphicsData.TextureLookup.Add(TextureLookupKey.StateNodeBackground, Content.Load<Texture2D>("StateNodeBackgroundTest"));
+            GlobalUIRenderer.Setup(GlobalInterfaceData.Device);
 
-            GlobalGraphicsData.BaseWindow = this;
-
-            GlobalGraphicsData.Device = GraphicsDevice;
-            GlobalGraphicsData.Font = MainFont;
-
-            GlobalGraphicsData.ToolbarHeight = 35;
-            GlobalGraphicsData.WindowTabHeight = 25;
-
-            GlobalMeshRenderer.Setup(GlobalGraphicsData.Device, GraphicsDevice.PresentationParameters.BackBufferWidth, GraphicsDevice.PresentationParameters.BackBufferHeight);
-
-            CurrentView = new MainScreenView(GraphicsDevice.PresentationParameters.BackBufferWidth, GraphicsDevice.PresentationParameters.BackBufferHeight);
+            CurrentView = new MainScreenView();
         }
 
         protected override void Update(GameTime gameTime)
@@ -76,22 +89,23 @@ namespace TuringSimulatorDesktop
                 Exit();
             }
 
-            GlobalGraphicsData.Time = gameTime;
+            GlobalInterfaceData.Time = gameTime;
 
             InputManager.Update();
 
-            if (GlobalGraphicsData.UIRequiresRedraw)
+            if (GlobalInterfaceData.UIRequiresRedraw)
             {
                 GraphicsDevice.SetRenderTarget(null);
                 GraphicsDevice.Clear(Color.CornflowerBlue);
 
                 CurrentView.Draw();
                 
+                /*
                 ScreenBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, Matrix.Identity);
                 DebugManager.Draw(GraphicsDevice, ScreenBatch, gameTime);
                 ScreenBatch.End();
-
-                //GlobalGraphicsData.UIRequiresRedraw = false;
+                GlobalGraphicsData.UIRequiresRedraw = false;
+                */
             }
             else
             {
@@ -102,6 +116,7 @@ namespace TuringSimulatorDesktop
 
         public void OnResize(object Sender, EventArgs Args)
         {
+            GlobalInterfaceData.FullscreenViewport = new Viewport(0, 0, GraphicsDevice.PresentationParameters.BackBufferWidth, GraphicsDevice.PresentationParameters.BackBufferHeight);
             /*
             for (int i = 0; i < GlobalGraphicsData.BackBufferListeners.Count; i++)
             {

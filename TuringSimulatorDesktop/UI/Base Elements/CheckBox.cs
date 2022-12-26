@@ -6,13 +6,7 @@ using System.Threading.Tasks;
 
 namespace TuringSimulatorDesktop.UI
 {
-    public class WindowSnapData
+    public class CheckBox
     {
-        //Hitbox
-        int X, Y;
-        int Width, Height;
-
-        //Anchor point
-        float SnapX, SnapY;
     }
 }

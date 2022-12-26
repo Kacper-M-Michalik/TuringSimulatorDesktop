@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 using TuringSimulatorDesktop.UI;
 using TuringCore;
 using TuringServer;
@@ -13,90 +12,81 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using System.Threading;
+using FontStashSharp;
 
 namespace TuringSimulatorDesktop.UI
 {
     public class MainScreenView : View
     {
-        List<IRenderable> RenderElements;
-        Viewport Port;
+        ActionGroup Group;
 
-        public Button NewProjectButton;
-        public Button LoadProjectButton;
-        public Button JoinProjectButton;
+        Label Title;
+        //Icon TuringIcon;
+        Button NewProjectButton;
+        Button LoadProjectButton;
+        Button JoinProjectButton;
+        InputBox TestInput;
 
-        public OpenFileDialog Dialog;
+        UIMesh Background;
 
-        public MainScreenView(int Width, int Height)
+        public MainScreenView()
         {
-            Port = new Viewport(0, 0, Width, Height);
-            RenderElements = new List<IRenderable>();
+            Group = InputManager.CreateActionGroup();
+            ViewResize(GlobalInterfaceData.Device.PresentationParameters.BackBufferWidth, GlobalInterfaceData.Device.PresentationParameters.BackBufferHeight);
+            
+            Title = new Label(100, 200, new Vector2(50f, 50f));
+            Title.Text = "Turing Simulator - Dekstop";
+            Title.FontSize = 48;
+            Title.AutoSizeMesh = true;
+            Title.UpdateTexture();
+            //TuringIcon = new Icon():
 
-            NewProjectButton = new Button(new Vector2(100f,100f), Mesh.CreateRectangle(Vector2.Zero, 100f, 30f, Color.White), ElementCreateType.Persistent);
-            LoadProjectButton = new Button(new Vector2(100f, 150f), Mesh.CreateRectangle(Vector2.Zero, 100f, 30f, Color.Red), ElementCreateType.Persistent);
-            LoadProjectButton.ClickEvent += SelectProjectLocation;
+            TestInput = new InputBox(100, 100, new Vector2(300, 0), Group);
+            TestInput.OutputLabel.FontSize = 20;
+            TestInput.OutputLabel.AutoSizeMesh = false;
 
-            JoinProjectButton = new Button(new Vector2(100f, 200f), Mesh.CreateRectangle(Vector2.Zero, 100f, 30f, Color.Blue), ElementCreateType.Persistent);
-
-            RenderElements.Add(NewProjectButton);
-            RenderElements.Add(LoadProjectButton);
-            RenderElements.Add(JoinProjectButton);
-        
+            NewProjectButton = new Button(100, 30, new Vector2(100f,100f), Group);
+            LoadProjectButton = new Button(100, 30, new Vector2(100f, 150f), Group);
+            LoadProjectButton.OnClickedEvent += SelectProjectLocation;
+            JoinProjectButton = new Button(100, 30, new Vector2(100f, 200f), Group);
         }
 
         public void SelectProjectLocation(Button Sender)
         {
-            /*
-            Dialog = new OpenFileDialog
-            {
-                InitialDirectory = @"C:\",
-                Title = "Browse Turing Project Files",
-
-                CheckFileExists = true,
-                CheckPathExists = true,
-
-                DefaultExt = "tproj",
-                Filter = "tproj files (*.tproj)|*.tproj",
-                FilterIndex = 2,
-                RestoreDirectory = true,
-
-                ReadOnlyChecked = true,
-                ShowReadOnly = true
-            };
-            Dialog.ShowDialog();
-                /*
-            if (Dialog.ShowDialog() == DialogResult.OK)
-            {
-                ProjectInstance.StartProjectServer(Dialog.FileName, 1, 28104);
-                //conenct client here
-
-                GlobalGraphicsData.BaseWindow.CurrentView = new ProjectScreenView();
-            }
-                */
-            // "E:\\Professional Programming\\MAIN\\TestLocation"
-
             BackendInterface.StartProjectServer(1, 28104);
             //conenct client here
 
-            InputManager.RemoveAllListenersOnQueue();    
-            GlobalGraphicsData.BaseWindow.CurrentView = new ProjectScreenView();
-
+            InputManager.DeleteAllActionGroups();    
+            GlobalInterfaceData.BaseWindow.CurrentView = new ProjectScreenView();
         }
 
         public override void Draw()
         {
-            GlobalMeshRenderer.Draw(RenderElements, Port);
+            GlobalUIRenderer.Draw(Background);
+            NewProjectButton.Draw();
+            LoadProjectButton.Draw();
+            JoinProjectButton.Draw();
+            Title.Draw();
+            TestInput.Draw();
+
+            //GlobalMeshRenderer.Draw(Background, Port);
+            //GlobalMeshRenderer.Draw(NewProjectButton, Port);
+            //GlobalMeshRenderer.Draw(LoadProjectButton, Port);
+            //GlobalMeshRenderer.Draw(JoinProjectButton, Port);
+            //GlobalMeshRenderer.Draw(TuringIcon, Port);
+            //GlobalMeshRenderer.Draw(Title, Port);
         }
 
         public override void ViewResize(int NewWidth, int NewHeight)
         {
-            Port.Width = NewWidth;
-            Port.Height = NewHeight;
+            Group.Width = NewWidth;
+            Group.Height = NewHeight;
+
+            Background = UIMesh.CreateRectangle(Vector2.Zero, NewWidth, NewHeight, Color.CornflowerBlue);
         }
 
         public override void ViewPositionSet(int X, int Y)
         {
-            throw new NotImplementedException();
         }
     }
 }

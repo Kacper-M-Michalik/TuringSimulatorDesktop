@@ -11,16 +11,14 @@ namespace TuringSimulatorDesktop.UI
 {    
     public class TextProgrammingView : View
     {
-        Button SaveButton;
-        Button CompileButton;
-
-        TilerElement Tiler;
+        OldButton SaveButton;
+        OldButton CompileButton;
 
         List<StateTransitionPrefab> TransitionList;
 
         public TextProgrammingView()
         {
-            Tiler = new TilerElement();
+
         }
 
         public void SaveFile()
@@ -35,10 +33,10 @@ namespace TuringSimulatorDesktop.UI
 
         public void AddTransition()
         {
-            StateTransitionPrefab Transition = new StateTransitionPrefab();
-            TransitionList.Add(Transition);
-            Tiler.Elements.Add(Transition);
-            Tiler.Tile();
+            //StateTransitionPrefab Transition = new StateTransitionPrefab();
+            //TransitionList.Add(Transition);
+            //Tiler.Elements.Add(Transition);
+            //Tiler.Tile();
         }
 
         public void RemoveTransition()
