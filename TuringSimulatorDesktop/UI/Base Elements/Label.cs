@@ -22,11 +22,13 @@ namespace TuringSimulatorDesktop.UI
 
         public UIMesh MeshData;
         public RenderTarget2D RenderTexture;
+        SpriteBatch Batch;
 
         public Label(int width, int height, Vector2 position)
         {
             MeshData = UIMesh.CreateRectangle(Vector2.Zero, width, height, Color.Transparent);
             RenderTexture = new RenderTarget2D(GlobalInterfaceData.Device, width, height);
+            Batch = new SpriteBatch(GlobalInterfaceData.Device);
 
             Width = width;
             Height = height;
@@ -66,7 +68,6 @@ namespace TuringSimulatorDesktop.UI
             GlobalInterfaceData.Device.SetRenderTarget(RenderTexture);
             GlobalInterfaceData.Device.Clear(Color.Transparent);
 
-            SpriteBatch Batch = new SpriteBatch(GlobalInterfaceData.Device);
             Batch.Begin();
             Batch.DrawString(Font, Text, Vector2.Zero, GlobalInterfaceData.FontColor);
             Batch.End();

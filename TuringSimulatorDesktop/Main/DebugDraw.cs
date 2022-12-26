@@ -20,7 +20,7 @@ namespace TuringSimulatorDesktop
         {
             Device.SetRenderTarget(null);
 
-            spriteBatch.DrawString(GlobalInterfaceData.Fonts.GetFont(12), "Cur Mouse Pos: " + InputManager.MouseData.X.ToString() + ", " + InputManager.MouseData.Y.ToString(), new Vector2(6f * (float)Math.Cos(Time.TotalGameTime.TotalSeconds), 1), GlobalInterfaceData.FontColor);
+            spriteBatch.DrawString(GlobalInterfaceData.Fonts.GetFont(12), "Cur Mouse Pos: " + InputManager.MouseData.X.ToString() + ", " + InputManager.MouseData.Y.ToString(), Vector2.Zero, GlobalInterfaceData.FontColor);
             spriteBatch.DrawString(GlobalInterfaceData.Fonts.GetFont(12), "ViewPort: Width: " + GlobalInterfaceData.Device.Viewport.Width.ToString() + ", Y: " + GlobalInterfaceData.Device.Viewport.Height.ToString(), new Vector2(1f, 20f), GlobalInterfaceData.FontColor);
             if (CurrentWindow != null)  spriteBatch.DrawString(GlobalInterfaceData.Fonts.GetFont(12), "Window Data: Pos : " + CurrentWindow.X.ToString() + ", " + CurrentWindow.Y.ToString(), new Vector2(1f, 40f), GlobalInterfaceData.FontColor);
             else spriteBatch.DrawString(GlobalInterfaceData.Fonts.GetFont(12), "Window Data: Null", new Vector2(1f, 40f), GlobalInterfaceData.FontColor);

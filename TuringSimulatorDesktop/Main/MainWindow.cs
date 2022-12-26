@@ -69,7 +69,7 @@ namespace TuringSimulatorDesktop
             GlobalInterfaceData.UIEffect = Content.Load<Effect>("UIShader");
 
             GlobalInterfaceData.Fonts = new FontSystem();
-            //GlobalGraphicsData.Fonts.AddFont(File.ReadAllBytes(@"Fonts/Roboto-Regular.ttf"));
+            //GlobalInterfaceData.Fonts.AddFont(File.ReadAllBytes(@"Fonts/Roboto-Regular.ttf"));
             GlobalInterfaceData.Fonts.AddFont(File.ReadAllBytes(@"C:/Windows/Fonts/arial.ttf"));
             
             GlobalUIRenderer.Setup(GlobalInterfaceData.Device);
@@ -98,14 +98,13 @@ namespace TuringSimulatorDesktop
                 GraphicsDevice.SetRenderTarget(null);
                 GraphicsDevice.Clear(Color.CornflowerBlue);
 
-                CurrentView.Draw();
+                CurrentView.Draw();                
                 
-                /*
-                ScreenBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, Matrix.Identity);
+                ScreenBatch.Begin();
                 DebugManager.Draw(GraphicsDevice, ScreenBatch, gameTime);
                 ScreenBatch.End();
-                GlobalGraphicsData.UIRequiresRedraw = false;
-                */
+                //GlobalInterfaceData.UIRequiresRedraw = false;
+                
             }
             else
             {
