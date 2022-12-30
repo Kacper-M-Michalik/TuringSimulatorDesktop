@@ -6,40 +6,57 @@ using TuringSimulatorDesktop.Input;
 
 namespace TuringSimulatorDesktop.UI
 {
-    public delegate void OnClick(Button Sender);
+    public delegate void OnButtonClick(Button Sender);
 
     public class Button : IVisualElement, IClickable, IPollable
     {
-        //add resizing and editing later
-
-        public int Width, Height;
+        public int Width { get; private set; }
+        public int Height { get; private set; }
         public bool IsActive = true;
 
-        public bool HighlightOnMouseOver = true;
+        public bool HighlightOnMouseOver;
         public Texture2D BaseTexture;
         public Texture2D HighlightTexture;
 
-        public UIMesh Background;
+        public UIMesh Background { get; private set; }
 
         Vector2 position;
-        public Vector2 Position { get => position; set { position = value; Background.MeshTransformations = Matrix.CreateWorld(new Vector3(position.X, position.Y, 0), Vector3.Forward, Vector3.Up); } }
+        public Vector2 Position { get => position; set { position = value; Background.MeshTransformations = Matrix.CreateWorld(new Vector3(position, 0), Vector3.Forward, Vector3.Up); } }
         public Vector2 GetBounds { get => new Vector2(Width, Height); }
 
-        public event OnClick OnClickedEvent;
+        public event OnButtonClick OnClickedEvent;
+        public ActionGroup Group { get; private set; }
 
-        public Button(int width, int height, Vector2 position, ActionGroup group)
+        Button(int width, int height, Vector2 position, ActionGroup group)
         {
-#if DEBUG
-            Background = UIMesh.CreateRectangle(Vector2.Zero, width, height, GlobalInterfaceData.UIOverlayDebugColor);
-#else
-            MeshData = UIMesh.CreateRectangle(Vector2.Zero, width, height, Color.Transparent);
-#endif
+            Background = UIMesh.CreateRectangle(Vector2.Zero, width, height);
+
             Width = width;
             Height = height;
             Position = position;
 
+            Group = group;
             group.ClickableObjects.Add(this);
             group.PollableObjects.Add(this);
+        }
+
+        public Button(int width, int height, UILookupKey BaseKey, Vector2 position, ActionGroup group) : this(width, height, position, group)
+        {
+            BaseTexture = GlobalInterfaceData.TextureLookup[BaseKey];
+        }
+
+        public Button(int width, int height, UILookupKey BaseKey, UILookupKey HighlightKey, Vector2 position, ActionGroup group) : this(width, height, position, group)
+        {
+            BaseTexture = GlobalInterfaceData.TextureLookup[BaseKey];
+            HighlightTexture = GlobalInterfaceData.TextureLookup[HighlightKey];
+            HighlightOnMouseOver = true;
+        }
+
+        public void UpdateSize(int SetWidth, int SetHeight)
+        {
+            Width = SetWidth;
+            Height = SetHeight;
+            Background.UpdateMesh(UIMesh.CreateRectangle(Vector2.Zero, Width, Height));
         }
 
         public void Clicked()
@@ -59,23 +76,17 @@ namespace TuringSimulatorDesktop.UI
 
         public void PollInput(bool IsInActionGroupFrame)
         {
-            if (IsInActionGroupFrame && IsMouseOver())
+            if (IsInActionGroupFrame && HighlightOnMouseOver && IsMouseOver())
             {
-#if DEBUG
-                if (HighlightTexture == null) Background.OverlayColor = GlobalInterfaceData.UIOverlayDebugColorHighlight;
-                else Background.Texture = HighlightTexture;
-#else
-                MeshData.Texture = HighlightTexture;
-#endif
+                //if (HighlightTexture == null) Background.OverlayColor = GlobalInterfaceData.UIOverlayDebugColor2;
+                //else Background.Texture = HighlightTexture;
+                if (HighlightTexture != null) Background.Texture = HighlightTexture;
             }
             else
             {
-#if DEBUG
-                if (BaseTexture == null) Background.OverlayColor = GlobalInterfaceData.UIOverlayDebugColor;
-                else Background.Texture = BaseTexture;
-#else
-                MeshData.Texture = BaseTexture;
-#endif
+                if (BaseTexture != null) Background.Texture = BaseTexture;
+                //if (BaseTexture == null) Background.OverlayColor = GlobalInterfaceData.UIOverlayDebugColor1;
+                // else Background.Texture = BaseTexture;
             }
         }
 

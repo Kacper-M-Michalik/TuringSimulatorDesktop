@@ -77,6 +77,16 @@ namespace TuringSimulatorDesktop
             }
         }
 
+
+        public static void Draw(Mesh DrawMesh, Matrix Transforamtions, Texture2D DrawTexture)
+        {
+            
+        }
+        public static void Draw(Mesh DrawMesh, Matrix Transforamtions, Color DrawColor)
+        {
+            
+        }
+
         /*
         public Texture2D RasteriseText()
         {

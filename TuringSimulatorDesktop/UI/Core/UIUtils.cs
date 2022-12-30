@@ -1,9 +1,8 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework;
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Collections.Generic; 
 using System.Text;
-using System.Threading.Tasks;
 
 namespace TuringSimulatorDesktop.UI
 {
@@ -28,7 +27,6 @@ namespace TuringSimulatorDesktop.UI
         {
             return (Port.X == 0 && Port.Y == 0 && Port.Width == 0 && Port.Height == 0);
         }
-
     }
 
 }

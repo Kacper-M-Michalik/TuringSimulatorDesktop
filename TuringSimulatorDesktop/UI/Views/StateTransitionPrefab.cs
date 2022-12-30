@@ -11,7 +11,7 @@ namespace TuringSimulatorDesktop.UI
     {
         //( CurrentState , TapeValue ) => ( NewState , New Value, Move Dir  )
 
-        public TextLabel BackgroundLabel;
+        //public TextLabel BackgroundLabel;
 
         public InputBox CurrentStateTextBox;
         public InputBox TapeValueTextBox;

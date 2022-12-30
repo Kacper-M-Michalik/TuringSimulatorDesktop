@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using FontStashSharp;
+using FontStashSharp.RichText;
 
 namespace TuringSimulatorDesktop.UI
 {
@@ -11,9 +12,11 @@ namespace TuringSimulatorDesktop.UI
         //add resizing and editing later
         public int Width, Height;
         public bool IsActive = true;
-        
-        public string Text = "";
-        public float FontSize = 12;
+
+        RichTextLayout RichText;
+        public FontSystem Font;
+        public string Text { get => RichText.Text; set { RichText.Text = value; UpdateTexture(); } }
+        public float FontSize = 12f;
         public bool AutoSizeMesh = false;
         
         Vector2 position;
@@ -22,16 +25,32 @@ namespace TuringSimulatorDesktop.UI
 
         public UIMesh MeshData;
         public RenderTarget2D RenderTexture;
-        SpriteBatch Batch;
 
-        public Label(int width, int height, Vector2 position)
+        public Label(int width, int height, Vector2 position, FontSystem font)
         {
-            MeshData = UIMesh.CreateRectangle(Vector2.Zero, width, height, Color.Transparent);
-            RenderTexture = new RenderTarget2D(GlobalInterfaceData.Device, width, height);
-            Batch = new SpriteBatch(GlobalInterfaceData.Device);
-
             Width = width;
-            Height = height;
+            Height = height;            
+
+            RichText = new RichTextLayout();
+            Font = font;
+
+            MeshData = UIMesh.CreateRectangle(Vector2.Zero, Width, Height, Color.Transparent);
+            UpdateRenderTexture();
+
+            Position = position;
+        }
+        public Label(Vector2 position, FontSystem font)
+        {
+            AutoSizeMesh = true;
+            Width = 0;
+            Height = 0;
+
+            RichText = new RichTextLayout();
+            Font = font;
+
+            MeshData = UIMesh.CreateRectangle(Vector2.Zero, Width, Height, Color.Transparent);
+            UpdateRenderTexture();
+
             Position = position;
         }
 
@@ -50,32 +69,43 @@ namespace TuringSimulatorDesktop.UI
             }
         }
         
-        //i think we could just rewwrite with direct draw call
         public void UpdateTexture()
         {
-            SpriteFontBase Font = GlobalInterfaceData.Fonts.GetFont(FontSize);
-
+            RichText.Font = Font.GetFont(FontSize);
+            
             if (AutoSizeMesh)
             {
-                Vector2 Size = Font.MeasureString(Text);
-                Width = UIUtils.ConvertFloatToInt(Size.X);
-                Height = UIUtils.ConvertFloatToInt(Size.Y);
+                Width = UIUtils.ConvertFloatToInt(RichText.Size.X);
+                Height = UIUtils.ConvertFloatToInt(RichText.Size.Y);
                 MeshData.UpdateMesh(UIMesh.CreateRectangle(Vector2.Zero, Width, Height));
-                RenderTexture.Dispose();
-                RenderTexture = new RenderTarget2D(GlobalInterfaceData.Device, Width, Height);
-            }
 
+                if (!UpdateRenderTexture()) return;                
+            }
+            
             GlobalInterfaceData.Device.SetRenderTarget(RenderTexture);
             GlobalInterfaceData.Device.Clear(Color.Transparent);
 
-            Batch.Begin();
-            Batch.DrawString(Font, Text, Vector2.Zero, GlobalInterfaceData.FontColor);
-            Batch.End();
+            GlobalInterfaceData.TextBatch.Begin();
+            RichText.Draw(GlobalInterfaceData.TextBatch, Vector2.Zero, GlobalInterfaceData.FontColor);
+            GlobalInterfaceData.TextBatch.End();
 
             GlobalInterfaceData.Device.SetRenderTarget(null);
 
             MeshData.Texture = RenderTexture;
         }
         
+        public bool UpdateRenderTexture()
+        {
+            RenderTexture?.Dispose();
+            if (Width == 0 || Height == 0)
+            {
+                return false;
+            }
+            else
+            {
+                RenderTexture = new RenderTarget2D(GlobalInterfaceData.Device, Width, Height);
+                return true;
+            }
+        }
     }
 }

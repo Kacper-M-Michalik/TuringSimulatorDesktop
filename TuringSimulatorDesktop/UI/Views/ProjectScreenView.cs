@@ -18,7 +18,7 @@ namespace TuringSimulatorDesktop.UI
 
         //Button ExitProjectButton;
         //Button WindowAddDropDown;
-        TextLabel ProjectTitle;
+        //TextLabel ProjectTitle;
 
         WindowGroupData BaseGroup;
         WindowGroupConnection Connections;
@@ -36,10 +36,10 @@ namespace TuringSimulatorDesktop.UI
             Group = InputManager.CreateActionGroup();
             ViewResize(GlobalInterfaceData.Device.PresentationParameters.BackBufferWidth, GlobalInterfaceData.Device.PresentationParameters.BackBufferHeight);
 
-            ToolbarBackground = UIMesh.CreateRectangle(Vector2.Zero, GlobalInterfaceData.Device.PresentationParameters.BackBufferWidth, GlobalInterfaceData.ToolbarHeight, GlobalInterfaceData.AccentColor);
+            ToolbarBackground = UIMesh.CreateRectangle(Vector2.Zero, GlobalInterfaceData.Device.PresentationParameters.BackBufferWidth, GlobalInterfaceData.ToolbarHeight, GlobalInterfaceData.HeaderColor);
             ScreenBackground = UIMesh.CreateRectangle(Vector2.Zero, GlobalInterfaceData.Device.PresentationParameters.BackBufferWidth, GlobalInterfaceData.Device.PresentationParameters.BackBufferHeight, GlobalInterfaceData.BackgroundColor);
 
-            ProjectTitle = new TextLabel(Vector2.One, 8, "LOREM ipsum wubbalubbadub dub");
+            //ProjectTitle = new TextLabel(Vector2.One, 8, "LOREM ipsum wubbalubbadub dub");
 
             Windows = new List<WindowView>();
 
@@ -139,7 +139,7 @@ namespace TuringSimulatorDesktop.UI
             Group.Width = NewWidth;
             Group.Height = NewHeight;
 
-            ToolbarBackground = UIMesh.CreateRectangle(Vector2.Zero, NewWidth, GlobalInterfaceData.ToolbarHeight, GlobalInterfaceData.AccentColor);
+            ToolbarBackground = UIMesh.CreateRectangle(Vector2.Zero, NewWidth, GlobalInterfaceData.ToolbarHeight, GlobalInterfaceData.HeaderColor);
             ScreenBackground = UIMesh.CreateRectangle(Vector2.Zero, NewWidth, NewHeight, GlobalInterfaceData.BackgroundColor); 
         }
 

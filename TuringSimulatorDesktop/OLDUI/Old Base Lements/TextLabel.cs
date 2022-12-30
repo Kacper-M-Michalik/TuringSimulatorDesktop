@@ -33,7 +33,7 @@ namespace TuringSimulatorDesktop.UI
 
         public void UpdateTexture()
         {
-            SpriteFontBase Font = GlobalInterfaceData.Fonts.GetFont(FontSize);
+            SpriteFontBase Font = GlobalInterfaceData.StandardRegularFont.GetFont(FontSize);
 
             Size = Font.MeasureString(Text);
             MeshData = UIMesh.CreateRectangle(Vector2.Zero, Size.X, Size.Y, Color.Purple);

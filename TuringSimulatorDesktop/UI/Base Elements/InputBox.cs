@@ -12,16 +12,21 @@ namespace TuringSimulatorDesktop.UI
 {
     public delegate void OnEditInputBox(InputBox Sender);
 
-    public class InputBox : IVisualElement, IClickable, IPollable
+    public class InputBox : IVisualElement, IClickable
     {
         public int Width { get => OutputLabel.Width; set { OutputLabel.Width = value; } }
         public int Height { get => OutputLabel.Height; set { OutputLabel.Height = value; } }
         public bool IsActive { get => OutputLabel.IsActive; set { OutputLabel.IsActive = value; } }
 
+        //not in use right now
+        KeyboardModifiers Modifiers = new KeyboardModifiers();
+
+        StringBuilder Builder = new StringBuilder();
+
         public bool IsFocused;
         public event OnEditInputBox EditEvent;
-        public double TimeSinceLastPoll;
 
+        public string Text { get => OutputLabel.Text; set => OutputLabel.Text = value; }
         public Label OutputLabel;
         public UIMesh Background;
 
@@ -30,19 +35,20 @@ namespace TuringSimulatorDesktop.UI
 
         public InputBox(int width, int height, Vector2 position, ActionGroup group)
         {
-            OutputLabel = new Label(width, height, position);
+            OutputLabel = new Label(width, height, position, GlobalInterfaceData.StandardRegularFont);
             Background = UIMesh.CreateRectangle(Vector2.Zero, width, height, GlobalInterfaceData.DebugColor);
             Position = position;
 
+            GlobalInterfaceData.OSWindow.TextInput += TextInput;
+
             group.ClickableObjects.Add(this);
-            group.PollableObjects.Add(this);
         }
 
         public void Clicked()
         {
-#if DEBUG
-            Background.OverlayColor = GlobalInterfaceData.UIOverlayDebugColorHighlight;
-#endif
+//#if DEBUG
+            //Background.OverlayColor = GlobalInterfaceData.UIOverlayDebugColor2;
+//#endif
             IsFocused = true;
         }
 
@@ -59,39 +65,42 @@ namespace TuringSimulatorDesktop.UI
             return (IsActive && InputManager.MouseData.X >= Position.X && InputManager.MouseData.X <= Position.X + Width && InputManager.MouseData.Y >= Position.Y && InputManager.MouseData.Y <= Position.Y + Height);
         }
 
-        public void PollInput(bool IsInActionFrameGroup)
-        {
-            TimeSinceLastPoll -= GlobalInterfaceData.Time.ElapsedGameTime.TotalMilliseconds;
-
-            if (TimeSinceLastPoll < -100000000) TimeSinceLastPoll = 0;
-
-            if (IsActive && IsFocused)
-            {
-                KeyboardState KState = Keyboard.GetState();
-
-                if (KState.GetPressedKeyCount() > 0 && TimeSinceLastPoll <= 0)
-                {                    
-                    StringBuilder Builder = new StringBuilder(OutputLabel.Text);
-
-                    foreach (Keys PressedKey in KState.GetPressedKeys())
-                    {
-                        Builder.Append(PressedKey.ToString());
-                    }
-
-                    OutputLabel.Text = Builder.ToString();
-                    OutputLabel.UpdateTexture();
-
-                    TimeSinceLastPoll = GlobalInterfaceData.TypeWaitTimeMiliseconds;
-
-                    EditEvent?.Invoke(this);
-                }
-            }
-        }
-
         public void Draw(Viewport BoundPort = default)
         {
             GlobalUIRenderer.Draw(Background);
             OutputLabel.Draw();
         }
+
+        public void TextInput(object Sender, TextInputEventArgs Args)
+        {
+            if (IsActive && IsFocused)
+            {
+                switch (Args.Key)
+                {
+                    case Keys.Tab:
+                        Builder.Append("    ");
+                        break;
+                    case Keys.Enter:
+                        Builder.Append("/n");
+                        break;
+                    case Keys.Back:
+                        if (Builder.Length > 0)
+                        {
+                            if (Builder[Builder.Length - 1] == 'n' && Builder[Builder.Length - 2] == '/') Builder.Remove(Builder.Length - 2, 2);
+                            else Builder.Remove(Builder.Length - 1, 1);
+                        }
+                        break;
+                    default:
+                        Builder.Append(Args.Character);
+                        break;
+                }
+
+                OutputLabel.Text = Builder.ToString();
+
+                EditEvent?.Invoke(this);            
+            }
+           
+        }
+
     }
 }

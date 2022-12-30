@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TuringSimulatorDesktop.UI
 {
-    public class DropdownButton : UIElement, IPollable, IClickable
+    class DropdownButton : UIElement, IPollable, IClickable
     {
         public void Clicked()
         {

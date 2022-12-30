@@ -44,11 +44,11 @@ VertexShaderOutput MainVS(VertexShaderInput input)
 
 float4 MainPS(VertexShaderOutput input) : SV_Target
 {
-	float4 Result = float4(OverlayColor.rgb * OverlayColor.a, OverlayColor.a);
+	float4 Result = OverlayColor;
 	if (HasBaseTexture == true)
 	{
 		float4 Sample1 = SAMPLE_TEXTURE(BaseTexture, input.TexCoord);
-		Result += float4(Sample1.rgb * Sample1.a, Sample1.a);
+		Result = float4(Sample1.rgb + Result.rgb * Result.a, Sample1.a);
 	}
 	/*
 	if (HasOverlayTexture == true)

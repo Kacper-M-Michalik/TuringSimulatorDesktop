@@ -68,7 +68,7 @@ namespace TuringServer
             }
             catch (Exception E)
             {
-                CustomConsole.Log("File Manager Error - Load Project - " + E.ToString());
+                CustomLogging.Log("File Manager Error - Load Project - " + E.ToString());
                 return null;
             }
 
@@ -149,7 +149,7 @@ namespace TuringServer
                     }
                     catch (Exception E)
                     {
-                        CustomConsole.Log("File Manager Error: LoadFileIntoCache - " + E.ToString());
+                        CustomLogging.Log("File Manager Error: LoadFileIntoCache - " + E.ToString());
                     }
                 }       
             }
@@ -165,7 +165,7 @@ namespace TuringServer
             }
             catch (Exception E)
             {
-                CustomConsole.Log("File Manager Error: DeleteFile - " + E.ToString());
+                CustomLogging.Log("File Manager Error: DeleteFile - " + E.ToString());
                 return false;
             }
 
@@ -185,7 +185,7 @@ namespace TuringServer
             catch (Exception E)
             {
                 if (File.Exists(ProjectPath)) DeleteFileByPath(ProjectPath);
-                CustomConsole.Log("File Manager Error: CreateProject - " + E.ToString());
+                CustomLogging.Log("File Manager Error: CreateProject - " + E.ToString());
                 return false;
             }
             return true;
@@ -199,11 +199,11 @@ namespace TuringServer
 
             try
             {
-                File.WriteAllBytes(Server.LoadedProject.ProjectFilePath, Encoding.ASCII.GetBytes(SaveJson));
+                File.WriteAllBytes(Server.LoadedProject.ProjectFilePath, Encoding.Unicode.GetBytes(SaveJson));
             }            
             catch (Exception E)
             {
-                CustomConsole.Log("File Manager Error: SaveProject - " + E.ToString());
+                CustomLogging.Log("File Manager Error: SaveProject - " + E.ToString());
                 return false;
             }
             return true;

@@ -1,0 +1,44 @@
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace TuringSimulatorDesktop
+{
+    public class Mesh
+    {
+        public VertexPositionTexture[] Vertices;
+        public int[] Indices;
+
+        public Mesh()
+        {
+        }
+        public Mesh(VertexPositionTexture[] vertices, int[] indices)
+        {
+            
+            Vertices = vertices;
+            Indices = indices;
+        }
+
+        public static Mesh CreateRectangle(Vector2 Offset, float Width, float Height)
+        {
+            return new Mesh
+            (
+                new VertexPositionTexture[]
+                {
+                     new VertexPositionTexture(new Vector3(Offset.X, Offset.Y + Height, 0f), Vector2.UnitY),
+                     new VertexPositionTexture(new Vector3(Offset.X, Offset.Y, 0f), Vector2.Zero),
+                     new VertexPositionTexture(new Vector3(Offset.X + Width, Offset.Y, 0f), Vector2.UnitX),
+                     new VertexPositionTexture(new Vector3(Offset.X + Width, Offset.Y + Height, 0f), Vector2.One),
+                },
+                new int[]
+                {
+                     0, 1, 2, 0, 2, 3
+                }
+            );
+        }
+    }
+}

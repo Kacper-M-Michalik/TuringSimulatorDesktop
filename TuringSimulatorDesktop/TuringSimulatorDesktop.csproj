@@ -1,8 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
-    <UseWindowsForms>true</UseWindowsForms>
+    <TargetFramework>net6.0</TargetFramework>    
     <RollForward>Major</RollForward>
     <PublishReadyToRun>false</PublishReadyToRun>
     <TieredCompilation>false</TieredCompilation>
@@ -11,7 +10,13 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
     <StartupObject>TuringSimulatorDesktop.Program</StartupObject>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="OLDUI\**" />
+    <EmbeddedResource Remove="OLDUI\**" />
+    <None Remove="OLDUI\**" />
+  </ItemGroup>
   <ItemGroup>
     <None Remove="Icon.ico" />
     <None Remove="Icon.bmp" />
@@ -22,54 +27,85 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FontStashSharp.MonoGame" Version="1.2.8" />
+    <PackageReference Include="FontStashSharp.Rasterizers.FreeType" Version="1.1.8" />
     <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.1.303" />
     <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.1.303" />
+    <PackageReference Include="Svg" Version="3.4.4" />
+    <PackageReference Include="System.Text.Json" Version="7.0.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TuringCore\TuringCore.csproj" />
     <ProjectReference Include="..\TuringServer\TuringServer.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Assets\SVG\" />
     <Folder Include="Content\bin\DesktopGL\Content\" />
   </ItemGroup>
   <ItemGroup>
-    <None Update="Fonts\LICENSE.txt">
+    <None Update="Assets\Fonts\LICENSE.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Fonts\Roboto-Black.ttf">
+    <None Update="Assets\Fonts\Roboto-Black.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Fonts\Roboto-BlackItalic.ttf">
+    <None Update="Assets\Fonts\Roboto-BlackItalic.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Fonts\Roboto-Bold.ttf">
+    <None Update="Assets\Fonts\Roboto-Bold.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Fonts\Roboto-BoldItalic.ttf">
+    <None Update="Assets\Fonts\Roboto-BoldItalic.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Fonts\Roboto-Italic.ttf">
+    <None Update="Assets\Fonts\Roboto-Italic.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Fonts\Roboto-Light.ttf">
+    <None Update="Assets\Fonts\Roboto-Light.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Fonts\Roboto-LightItalic.ttf">
+    <None Update="Assets\Fonts\Roboto-LightItalic.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Fonts\Roboto-Medium.ttf">
+    <None Update="Assets\Fonts\Roboto-Medium.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Fonts\Roboto-MediumItalic.ttf">
+    <None Update="Assets\Fonts\Roboto-MediumItalic.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Fonts\Roboto-Regular.ttf">
+    <None Update="Assets\Fonts\Roboto-Regular.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Fonts\Roboto-Thin.ttf">
+    <None Update="Assets\Fonts\Roboto-Thin.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Fonts\Roboto-ThinItalic.ttf">
+    <None Update="Assets\Fonts\Roboto-ThinItalic.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\SVG\AlphabetIcon.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\SVG\FolderIcon.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\SVG\HostProjectButton.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\SVG\JoinProjectButton.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\SVG\LoadProjectButton.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\SVG\NewProjectButton.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\SVG\SlateFileTCIcon.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\SVG\SlateFileTICIcon.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\SVG\TransitionTableIcon.svg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

@@ -35,7 +35,7 @@ namespace TuringServer
             MaxClients = SetMaxPlayers;
             Port = SetPort;
 
-            CustomConsole.Log("THREAD NOTIF SERVER: SERVER INIT ON THREAD " + Thread.CurrentThread.ManagedThreadId.ToString());
+            CustomLogging.Log("THREAD NOTIF SERVER: SERVER INIT ON THREAD " + Thread.CurrentThread.ManagedThreadId.ToString());
 
             IsServerOn = true;
             MarkForClosing = false;
@@ -50,7 +50,7 @@ namespace TuringServer
             ServerTcpListener = new TcpListener(IPAddress.Any, Port);
             ServerTcpListener.Start();
 
-            CustomConsole.Log("SERVER: Server Started on port: " + Port.ToString());
+            CustomLogging.Log("SERVER: Server Started on port: " + Port.ToString());
 
             ServerTcpListener.BeginAcceptTcpClient(new AsyncCallback(NewTCPClientConnectedCallback), null);
 
@@ -113,7 +113,7 @@ namespace TuringServer
                         }
                         else
                         {
-                            CustomConsole.Log("SERVER: Invalid Packet recieved");
+                            CustomLogging.Log("SERVER: Invalid Packet recieved");
                         }
                         Data.Dispose();
                     }
@@ -157,7 +157,7 @@ namespace TuringServer
         {
             if (!IsServerOn) return;
 
-            CustomConsole.Log("SERVER: Server dealing with new connection on thread " + Thread.CurrentThread.ManagedThreadId.ToString());
+            CustomLogging.Log("SERVER: Server dealing with new connection on thread " + Thread.CurrentThread.ManagedThreadId.ToString());
 
             TcpClient NewClient = ServerTcpListener.EndAcceptTcpClient(Result);
 
@@ -172,7 +172,7 @@ namespace TuringServer
                 }
             }
 
-            CustomConsole.Log("SERVER: " + NewClient.Client.RemoteEndPoint.ToString() + " failed to connect: Server Full!");
+            CustomLogging.Log("SERVER: " + NewClient.Client.RemoteEndPoint.ToString() + " failed to connect: Server Full!");
 
             NewClient.Close();
         }
@@ -187,7 +187,7 @@ namespace TuringServer
             PacketsBeingProcessed = null;
             LoadedProject = null;
 
-            CustomConsole.Log("SERVER: Server Closed");
+            CustomLogging.Log("SERVER: Server Closed");
         }
     }
 
@@ -232,7 +232,7 @@ namespace TuringServer
 
                 DataStream.BeginRead(ReceiveDataBuffer, 0, DataBufferSize, OnReceiveDataFromClient, null);
 
-                CustomConsole.Log("SERVER: Client at " + ConnectionSocket.Client.RemoteEndPoint.ToString() + " has been connected to server!");
+                CustomLogging.Log("SERVER: Client at " + ConnectionSocket.Client.RemoteEndPoint.ToString() + " has been connected to server!");
             }
 
             public void SendDataToClient(Packet Data)
@@ -246,7 +246,7 @@ namespace TuringServer
                 }
                 catch (Exception E)
                 {
-                    CustomConsole.Log("SERVER: Error Sending Data To Client " + ID.ToString() + ":  " + E.ToString());
+                    CustomLogging.Log("SERVER: Error Sending Data To Client " + ID.ToString() + ":  " + E.ToString());
                 }
             }
 
@@ -256,16 +256,16 @@ namespace TuringServer
                 {
                     if (ConnectionSocket == null) return;
 
-                    CustomConsole.Log("THREAD NOTIF SERVER: Server dealing with incoming data on thread " + Thread.CurrentThread.ManagedThreadId.ToString());
+                    CustomLogging.Log("THREAD NOTIF SERVER: Server dealing with incoming data on thread " + Thread.CurrentThread.ManagedThreadId.ToString());
                     int IncomingDataLength = DataStream.EndRead(Result);
 
                     //warning -> if ther are packets that are intended for this client after disconnect, shit will hit the fan, possible bug with customconsole, as changing logclientid on seperate thread than variable is used on
                     if (IncomingDataLength == 0)
                     {
                         TCPInternalDisconnect();
-                        CustomConsole.Log("SERVER: Client " + ID.ToString() + " has disconnected!");
+                        CustomLogging.Log("SERVER: Client " + ID.ToString() + " has disconnected!");
 
-                        if (CustomConsole.LogClientID == ID) CustomConsole.LogClientID = -1;
+                        if (CustomLogging.LogClientID == ID) CustomLogging.LogClientID = -1;
 
                         return;
                     }
@@ -273,7 +273,7 @@ namespace TuringServer
                     byte[] UsefuldataBuffer = new byte[IncomingDataLength];
                     Array.Copy(ReceiveDataBuffer, UsefuldataBuffer, IncomingDataLength);
 
-                    CustomConsole.Log("SERVER: Server is receiving data from client " + ID.ToString() + "!");
+                    CustomLogging.Log("SERVER: Server is receiving data from client " + ID.ToString() + "!");
 
                     PacketCurrentlyBeingRebuilt.Write(UsefuldataBuffer, false);
                     PacketCurrentlyBeingRebuilt.SaveTemporaryBufferToPernamentReadBuffer();
@@ -305,7 +305,7 @@ namespace TuringServer
                 }
                 catch (Exception E)
                 {
-                    CustomConsole.Log(E.ToString());
+                    CustomLogging.Log(E.ToString());
                 }
             }
 
@@ -322,7 +322,7 @@ namespace TuringServer
 
         public void DisconnectClientFromServer()
         {
-            CustomConsole.Log("SERVER: " + TCP.ConnectionSocket.Client.RemoteEndPoint.ToString() + " aka. Client N:" + ClientId.ToString() + " has been disconnected from the server!");
+            CustomLogging.Log("SERVER: " + TCP.ConnectionSocket.Client.RemoteEndPoint.ToString() + " aka. Client N:" + ClientId.ToString() + " has been disconnected from the server!");
 
             TCP.TCPInternalDisconnect();
         }

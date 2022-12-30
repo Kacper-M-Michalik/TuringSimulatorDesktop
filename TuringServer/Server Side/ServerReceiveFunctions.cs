@@ -46,7 +46,7 @@ namespace TuringServer
             }
             catch
             {
-                CustomConsole.Log("ServerReceive Error: Invalid request Load Project packet recieved from client: " + SenderClientID.ToString());
+                CustomLogging.Log("ServerReceive Error: Invalid request Load Project packet recieved from client: " + SenderClientID.ToString());
                 return;
             }
 
@@ -68,7 +68,7 @@ namespace TuringServer
          */
         public static void UserRequestedLogReceieverStatus(int SenderClientID, Packet Data)
         {
-            CustomConsole.LogClientID = SenderClientID;
+            CustomLogging.LogClientID = SenderClientID;
         }
 
         /* -PACKET LAYOUT-
@@ -91,7 +91,7 @@ namespace TuringServer
             }
             catch
             {
-                CustomConsole.Log("ServerReceive Error: Invalid request folder packet recieved from client: " + SenderClientID.ToString());
+                CustomLogging.Log("ServerReceive Error: Invalid request folder packet recieved from client: " + SenderClientID.ToString());
                 return;
             }
 
@@ -110,7 +110,7 @@ namespace TuringServer
          */
         public static void UserRequestedFile(int SenderClientID, Packet Data)
         {
-            CustomConsole.Log("SERVER INSTRUCTION: User requested file.");
+            CustomLogging.Log("SERVER INSTRUCTION: User requested file.");
 
             int FileID;
             bool SubscribeToUpdates;
@@ -122,7 +122,7 @@ namespace TuringServer
             }
             catch
             {
-                CustomConsole.Log("ServerReceive Error: Invalid request file packet recieved from client: " + SenderClientID.ToString());
+                CustomLogging.Log("ServerReceive Error: Invalid request file packet recieved from client: " + SenderClientID.ToString());
                 return;
             }
            
@@ -144,7 +144,7 @@ namespace TuringServer
          */
         public static void UserCreatedNewFile(int SenderClientID, Packet Data)
         {
-            CustomConsole.Log("SERVER INSTRUCTION: User created file.");
+            CustomLogging.Log("SERVER INSTRUCTION: User created file.");
 
             int FolderID;
             string FileName;
@@ -155,7 +155,7 @@ namespace TuringServer
             }
             catch
             {
-                CustomConsole.Log("ServerReceive Error: Invalid create file packet recieved from client: " + SenderClientID.ToString());
+                CustomLogging.Log("ServerReceive Error: Invalid create file packet recieved from client: " + SenderClientID.ToString());
                 return;
             }
 
@@ -186,7 +186,7 @@ namespace TuringServer
             }
             catch (Exception E)
             {
-                CustomConsole.Log("ServerRecieve Error: UserCreatedNewFile - " + E.ToString());
+                CustomLogging.Log("ServerRecieve Error: UserCreatedNewFile - " + E.ToString());
                 ServerSendFunctions.SendTCPData(SenderClientID, ServerSendFunctions.ErrorNotification("Failed to create file - Server failed to create it."));
             }
 
@@ -204,7 +204,7 @@ namespace TuringServer
          */
         public static void UserUpdatedFile(int SenderClientID, Packet Data)
         {
-            CustomConsole.Log("SERVER INSTRUCTION: User updated file.");
+            CustomLogging.Log("SERVER INSTRUCTION: User updated file.");
 
             int FileID;
             int FileVersion;
@@ -218,7 +218,7 @@ namespace TuringServer
             }
             catch
             {
-                CustomConsole.Log("ServerReceive Error: Invalid update file packet recieved from client: " + SenderClientID.ToString());
+                CustomLogging.Log("ServerReceive Error: Invalid update file packet recieved from client: " + SenderClientID.ToString());
                 return;
             }
 
@@ -244,7 +244,7 @@ namespace TuringServer
             }
             catch (Exception E)
             {
-                CustomConsole.Log("ServerRecieve Error: UserUpdatedFile - " + E.ToString());
+                CustomLogging.Log("ServerRecieve Error: UserUpdatedFile - " + E.ToString());
                 ServerSendFunctions.SendTCPData(SenderClientID, ServerSendFunctions.ErrorNotification("Failed to update file - Server failed to write to file."));
                 return;
             }
@@ -282,7 +282,7 @@ namespace TuringServer
          */
         public static void UserRenamedFile(int SenderClientID, Packet Data)
         {
-            CustomConsole.Log("SERVER INSTRUCTION: User renamed file.");
+            CustomLogging.Log("SERVER INSTRUCTION: User renamed file.");
 
             int FileID;
             string NewFileName;
@@ -294,7 +294,7 @@ namespace TuringServer
             }
             catch
             {
-                CustomConsole.Log("ServerReceive Error: Invalid rename file packet recieved from client: " + SenderClientID.ToString());
+                CustomLogging.Log("ServerReceive Error: Invalid rename file packet recieved from client: " + SenderClientID.ToString());
                 return;
             }
 
@@ -330,7 +330,7 @@ namespace TuringServer
             }
             catch (Exception E)
             {
-                CustomConsole.Log("ServerRecieveError: UserRenameFile - " + E.ToString());
+                CustomLogging.Log("ServerRecieveError: UserRenameFile - " + E.ToString());
                 ServerSendFunctions.SendTCPData(SenderClientID, ServerSendFunctions.ErrorNotification("Failed to rename file - Server failed to save the renamed/moved file."));
                 return;
             }
@@ -353,7 +353,7 @@ namespace TuringServer
          */
         public static void UserMovedFile(int SenderClientID, Packet Data)
         {
-            CustomConsole.Log("SERVER INSTRUCTION: User moved file.");
+            CustomLogging.Log("SERVER INSTRUCTION: User moved file.");
 
             int FileID;
             int NewFolderID;
@@ -365,7 +365,7 @@ namespace TuringServer
             }
             catch
             {
-                CustomConsole.Log("ServerReceive Error: Invalid move file packet recieved from client: " + SenderClientID.ToString());
+                CustomLogging.Log("ServerReceive Error: Invalid move file packet recieved from client: " + SenderClientID.ToString());
                 return;
             }
 
@@ -401,7 +401,7 @@ namespace TuringServer
             }
             catch (Exception E)
             {
-                CustomConsole.Log("ServerRecieveError: UserMoveFile - " + E.ToString());
+                CustomLogging.Log("ServerRecieveError: UserMoveFile - " + E.ToString());
                 ServerSendFunctions.SendTCPData(SenderClientID, ServerSendFunctions.ErrorNotification("Failed to move file - Server failed to save the renamed/moved file."));
                 return;
             }
@@ -424,7 +424,7 @@ namespace TuringServer
          */
         public static void UserDeletedFile(int SenderClientID, Packet Data)
         {
-            CustomConsole.Log("SERVER INSTRUCTION: User deleted file.");
+            CustomLogging.Log("SERVER INSTRUCTION: User deleted file.");
 
             int FileID;
 
@@ -434,7 +434,7 @@ namespace TuringServer
             }
             catch
             {
-                CustomConsole.Log("ServerReceive Error: Invalid delete file packet recieved from client: " + SenderClientID.ToString());
+                CustomLogging.Log("ServerReceive Error: Invalid delete file packet recieved from client: " + SenderClientID.ToString());
                 return;
             }
 
@@ -461,7 +461,7 @@ namespace TuringServer
          */
         public static void UserUnsubscribedFromFileUpdates(int SenderClientID, Packet Data)
         {
-            CustomConsole.Log("SERVER INSTRUCTION: User unsubed from file.");
+            CustomLogging.Log("SERVER INSTRUCTION: User unsubed from file.");
 
             int FileID;
 
@@ -471,7 +471,7 @@ namespace TuringServer
             }
             catch
             {
-                CustomConsole.Log("ServerReceive Error: Invalid unsubscribe file packet recieved from client: " + SenderClientID.ToString());
+                CustomLogging.Log("ServerReceive Error: Invalid unsubscribe file packet recieved from client: " + SenderClientID.ToString());
                 return;
             }
 
@@ -481,7 +481,7 @@ namespace TuringServer
                 return;
             }
 
-            CustomConsole.Log("SERVER INSTRUCTION: User "+SenderClientID.ToString()+" no longer recieiving updates to file "+ FileID.ToString()+".");
+            CustomLogging.Log("SERVER INSTRUCTION: User "+SenderClientID.ToString()+" no longer recieiving updates to file "+ FileID.ToString()+".");
 
             Server.LoadedProject.FileDataLookup[FileID].SubscriberIDs.Remove(SenderClientID);
             //ServerSendFunctions.SendFileUnsubscribed(FileID);
@@ -496,7 +496,7 @@ namespace TuringServer
          */
         public static void UserCreatedFolder(int SenderClientID, Packet Data)
         {
-            CustomConsole.Log("SERVER INSTRUCTION: User created folder.");
+            CustomLogging.Log("SERVER INSTRUCTION: User created folder.");
 
             int ParentFolderID;
             string NewFolderName;
@@ -508,7 +508,7 @@ namespace TuringServer
             }
             catch
             {
-                CustomConsole.Log("ServerReceive Error: Invalid create folder packet recieved from client: " + SenderClientID.ToString());
+                CustomLogging.Log("ServerReceive Error: Invalid create folder packet recieved from client: " + SenderClientID.ToString());
                 return;
             }
 
@@ -540,7 +540,7 @@ namespace TuringServer
             }
             catch (Exception E)
             {
-                CustomConsole.Log("ServerRecieve Error: UserCreatedFolder - " + E.ToString());
+                CustomLogging.Log("ServerRecieve Error: UserCreatedFolder - " + E.ToString());
                 ServerSendFunctions.SendTCPData(SenderClientID, ServerSendFunctions.ErrorNotification("Failed to create folder - Server failed to create the folder locally."));
                 return;
             }
@@ -559,7 +559,7 @@ namespace TuringServer
          */
         public static void UserRenamedFolder(int SenderClientID, Packet Data)
         {
-            CustomConsole.Log("SERVER INSTRUCTION: User renamed folder.");
+            CustomLogging.Log("SERVER INSTRUCTION: User renamed folder.");
 
             int FolderID;
             string NewFolderName;
@@ -571,7 +571,7 @@ namespace TuringServer
             }
             catch
             {
-                CustomConsole.Log("ServerReceive Error: Invalid rename folder packet recieved from client: " + SenderClientID.ToString());
+                CustomLogging.Log("ServerReceive Error: Invalid rename folder packet recieved from client: " + SenderClientID.ToString());
                 return;
             }
 
@@ -608,7 +608,7 @@ namespace TuringServer
             }
             catch (Exception E)
             {
-                CustomConsole.Log("ServerRecieve Error: UserRenamedFolder - " + E.ToString());
+                CustomLogging.Log("ServerRecieve Error: UserRenamedFolder - " + E.ToString());
                 ServerSendFunctions.SendTCPData(SenderClientID, ServerSendFunctions.ErrorNotification("Failed to rename folder - Server failed to rename the folder locally."));
                 return;
             }
@@ -638,7 +638,7 @@ namespace TuringServer
          */
         public static void UserMovedFolder(int SenderClientID, Packet Data)
         {
-            CustomConsole.Log("SERVER INSTRUCTION: User moved folder.");
+            CustomLogging.Log("SERVER INSTRUCTION: User moved folder.");
 
             int FolderID;
             int TargetFolderID;
@@ -650,7 +650,7 @@ namespace TuringServer
             }
             catch
             {
-                CustomConsole.Log("ServerReceive Error: Invalid move folder packet recieved from client: " + SenderClientID.ToString());
+                CustomLogging.Log("ServerReceive Error: Invalid move folder packet recieved from client: " + SenderClientID.ToString());
                 return;
             }
 
@@ -689,7 +689,7 @@ namespace TuringServer
             }
             catch (Exception E)
             {
-                CustomConsole.Log("ServerRecieve Error: UserMovedFolder - " + E.ToString());
+                CustomLogging.Log("ServerRecieve Error: UserMovedFolder - " + E.ToString());
                 ServerSendFunctions.SendTCPData(SenderClientID, ServerSendFunctions.ErrorNotification("Failed to move folder - Server failed to move the folder locally."));
                 return;
             }
@@ -720,7 +720,7 @@ namespace TuringServer
          */
         public static void UserDeletedFolder(int SenderClientID, Packet Data)
         {
-            CustomConsole.Log("SERVER INSTRUCTION: User deleted folder.");
+            CustomLogging.Log("SERVER INSTRUCTION: User deleted folder.");
 
             int FolderID;
 
@@ -730,7 +730,7 @@ namespace TuringServer
             }
             catch
             {
-                CustomConsole.Log("ServerReceive Error: Invalid delete folder packet recieved from client: " + SenderClientID.ToString());
+                CustomLogging.Log("ServerReceive Error: Invalid delete folder packet recieved from client: " + SenderClientID.ToString());
                 return;
             }
 
@@ -754,7 +754,7 @@ namespace TuringServer
             }
             catch (Exception E)
             {
-                CustomConsole.Log("ServerRecieve Error: UserDeletedFolder - " + E.ToString());
+                CustomLogging.Log("ServerRecieve Error: UserDeletedFolder - " + E.ToString());
             }
 
             FolderData.ParentFolder.SubFolders.Remove(FolderData);

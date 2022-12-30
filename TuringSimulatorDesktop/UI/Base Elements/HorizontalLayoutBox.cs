@@ -11,12 +11,15 @@ namespace TuringSimulatorDesktop.UI
     public class HorizontalLayoutBox : IVisualElement
     {
         public int Width, Height;
+        public bool IsActive = true;
 
         List<IVisualElement> Elements;
         public float Spacing;
         public bool UniformAreas;
         public bool UniformAreaAutoSize;
         public float UniformAreaSize;
+
+        public bool DrawBounded = true;
 
         Vector2 position;
         public Vector2 Position { get => position; set => position = value; }
@@ -55,7 +58,7 @@ namespace TuringSimulatorDesktop.UI
                     for (int i = 0; i < Elements.Count; i++)
                     {
                         Elements[i].Position = PlacementPosition;
-                        PlacementPosition = new Vector2(PlacementPosition.X + GreatestBound, PlacementPosition.Y);
+                        PlacementPosition = new Vector2(PlacementPosition.X + GreatestBound + Spacing, PlacementPosition.Y);
                     }
                 }
                 else
@@ -63,7 +66,7 @@ namespace TuringSimulatorDesktop.UI
                     for (int i = 0; i < Elements.Count; i++)
                     {
                         Elements[i].Position = PlacementPosition;
-                        PlacementPosition = new Vector2(PlacementPosition.X + UniformAreaSize, PlacementPosition.Y);
+                        PlacementPosition = new Vector2(PlacementPosition.X + UniformAreaSize + Spacing, PlacementPosition.Y);
                     }
                 }
             }
@@ -71,7 +74,39 @@ namespace TuringSimulatorDesktop.UI
 
         public void Draw(Viewport BoundPort)
         {
+            if (IsActive)
+            {
+                if (DrawBounded)
+                {
+                    Viewport Port = new Viewport(UIUtils.ConvertFloatToInt(Position.X), UIUtils.ConvertFloatToInt(Position.Y), Width, Height);
+                    if (!UIUtils.IsDefaultViewport(BoundPort))
+                    {
+                        Port = UIUtils.CalculateOverlapPort(Port, BoundPort);
+                    }
 
+                    for (int i = 0; i < Elements.Count; i++)
+                    {
+                        Elements[i].Draw(Port);
+                    }
+                }
+                else
+                {
+                    if (UIUtils.IsDefaultViewport(BoundPort))
+                    {
+                        for (int i = 0; i < Elements.Count; i++)
+                        {
+                            Elements[i].Draw();
+                        }
+                    }
+                    else
+                    {
+                        for (int i = 0; i < Elements.Count; i++)
+                        {
+                            Elements[i].Draw(BoundPort);
+                        }
+                    }
+                } 
+            }
         }
     }
 }

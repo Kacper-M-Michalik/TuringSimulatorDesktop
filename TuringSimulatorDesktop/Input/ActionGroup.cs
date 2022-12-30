@@ -9,28 +9,20 @@ namespace TuringSimulatorDesktop.Input
 {
     public class ActionGroup
     {
-        public bool IsActive;
+        public bool IsActive = true;
         public bool IsMarkedForDeletion;
+        public bool IsPersistant;
 
         public int X, Y, Width, Height;
         
-        public List<IPollable> PollableObjects;
-        public List<IClickable> ClickableObjects;
+        public List<IPollable> PollableObjects = new List<IPollable>();
+        public List<IClickable> ClickableObjects = new List<IClickable>();
 
         public ActionGroup()
         {
-            IsActive = true;
-
-            PollableObjects = new List<IPollable>();
-            ClickableObjects = new List<IClickable>();
         }
         public ActionGroup(int SetX, int SetY, int SetWidth, int SetHeight)
         {
-            IsActive = true;
-
-            PollableObjects = new List<IPollable>();
-            ClickableObjects = new List<IClickable>();
-
             X = SetX;
             Y = SetY;
             Width = SetWidth;
