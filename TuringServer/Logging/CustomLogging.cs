@@ -19,8 +19,8 @@ namespace TuringServer.Logging
 
         static CustomLogging()
         {
-            LogPointer = delegate (string Message) { if (LogClientID != -1) { ServerSendFunctions.SendTCPData(LogClientID, ServerSendFunctions.LogData(Message)); Debug.WriteLine(Message); } };
-            WritePointer = delegate (string Message) { if (LogClientID != -1) { ServerSendFunctions.SendTCPData(LogClientID, ServerSendFunctions.LogData(Message)); Debug.Write(Message); } };
+            LogPointer = delegate (string Message) { if (LogClientID != -1) { Server.SendTCPData(LogClientID, ServerSendPacketFunctions.LogData(Message)); Debug.WriteLine(Message); } };
+            WritePointer = delegate (string Message) { if (LogClientID != -1) { Server.SendTCPData(LogClientID, ServerSendPacketFunctions.LogData(Message)); Debug.Write(Message); } };
 
             /*
             #if DEBUG

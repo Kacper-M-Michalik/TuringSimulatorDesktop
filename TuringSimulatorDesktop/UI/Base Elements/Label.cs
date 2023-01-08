@@ -9,103 +9,146 @@ namespace TuringSimulatorDesktop.UI
 {
     public class Label : IVisualElement
     {
-        //add resizing and editing later
-        public int Width, Height;
+        Vector2 position;
+        public Vector2 Position
+        {
+            get => position;
+            set
+            {
+                position = value;
+                Background.Position = position;
+            }
+        }
+
+        Point bounds;
+        public Point Bounds
+        {
+            get => bounds;
+            set
+            {
+                bounds = value;
+                Background.Bounds = bounds;
+                UpdateRenderTexture();
+                DrawTextToTexture();
+            }
+        }
+
         public bool IsActive = true;
 
         RichTextLayout RichText;
+        RenderTarget2D RenderTexture;
         public FontSystem Font;
-        public string Text { get => RichText.Text; set { RichText.Text = value; UpdateTexture(); } }
+        public string Text 
+        { 
+            get => RichText.Text; 
+            set 
+            { 
+                RichText.Text = value; 
+                UpdateLabel();
+            } 
+        }
         public float FontSize = 12f;
         public bool AutoSizeMesh = false;
-        
-        Vector2 position;
-        public Vector2 Position { get => position; set { position = value; MeshData.MeshTransformations = Matrix.CreateWorld(new Vector3(position.X, position.Y, 0), Vector3.Forward, Vector3.Up); } }
-        public Vector2 GetBounds { get => new Vector2(Width, Height); }
 
-        public UIMesh MeshData;
-        public RenderTarget2D RenderTexture;
+        public Icon Background;
 
-        public Label(int width, int height, Vector2 position, FontSystem font)
+        public Label(int width, int height)
         {
-            Width = width;
-            Height = height;            
+            Background = new Icon();
+            RichText = new RichTextLayout();
+            Font = GlobalRenderingData.StandardRegularFont;
 
+            Bounds = new Point(width, height);
+            Position = Vector2.Zero;
+        }
+        public Label(int width, int height, FontSystem font)
+        {
+            Background = new Icon();
             RichText = new RichTextLayout();
             Font = font;
 
-            MeshData = UIMesh.CreateRectangle(Vector2.Zero, Width, Height, Color.Transparent);
-            UpdateRenderTexture();
+            Bounds = new Point(width, height);
+            Position = Vector2.Zero;
+        }public Label(int width, int height, Vector2 position, FontSystem font)
+        {
+            Background = new Icon();
+            RichText = new RichTextLayout();
+            Font = font;
 
+            Bounds = new Point(width, height);
+            Position = position;
+        } public Label(int width, int height, Vector2 position)
+        {
+            Background = new Icon();
+            RichText = new RichTextLayout();
+            Font = GlobalRenderingData.StandardRegularFont;
+
+            Bounds = new Point(width, height);
             Position = position;
         }
-        public Label(Vector2 position, FontSystem font)
+        public Label() : this(0, 0)
         {
             AutoSizeMesh = true;
-            Width = 0;
-            Height = 0;
-
-            RichText = new RichTextLayout();
-            Font = font;
-
-            MeshData = UIMesh.CreateRectangle(Vector2.Zero, Width, Height, Color.Transparent);
-            UpdateRenderTexture();
-
-            Position = position;
+        }
+        public Label(FontSystem font) : this(0, 0, font)
+        {
+            AutoSizeMesh = true;
+        }      
+        public Label(Vector2 position) : this(0, 0, position)
+        {
+            AutoSizeMesh = true;
+        }
+        public Label(Vector2 position, FontSystem font) : this(0, 0, position, font)
+        {
+            AutoSizeMesh = true;
         }
 
-        public void Draw(Viewport BoundPort = default)
+        public void UpdateLabel()
         {
-            if (IsActive)
-            {
-                if (UIUtils.IsDefaultViewport(BoundPort))
-                {
-                    GlobalUIRenderer.Draw(MeshData);
-                }
-                else
-                {
-                    GlobalUIRenderer.Draw(MeshData, BoundPort);
-                }
-            }
-        }
-        
-        public void UpdateTexture()
-        {
-            RichText.Font = Font.GetFont(FontSize);
-            
+            RichText.Font = Font.GetFont(FontSize);            
             if (AutoSizeMesh)
             {
-                Width = UIUtils.ConvertFloatToInt(RichText.Size.X);
-                Height = UIUtils.ConvertFloatToInt(RichText.Size.Y);
-                MeshData.UpdateMesh(UIMesh.CreateRectangle(Vector2.Zero, Width, Height));
-
+                Bounds = new Point(UIUtils.ConvertFloatToInt(RichText.Size.X), UIUtils.ConvertFloatToInt(RichText.Size.Y));    
                 if (!UpdateRenderTexture()) return;                
             }
-            
-            GlobalInterfaceData.Device.SetRenderTarget(RenderTexture);
-            GlobalInterfaceData.Device.Clear(Color.Transparent);
+            DrawTextToTexture();
+        }
 
-            GlobalInterfaceData.TextBatch.Begin();
-            RichText.Draw(GlobalInterfaceData.TextBatch, Vector2.Zero, GlobalInterfaceData.FontColor);
-            GlobalInterfaceData.TextBatch.End();
+        public void DrawTextToTexture()
+        {
+            GlobalRenderingData.Device.SetRenderTarget(RenderTexture);
+            GlobalRenderingData.Device.Clear(Color.Transparent);
 
-            GlobalInterfaceData.Device.SetRenderTarget(null);
+            GlobalRenderingData.TextBatch.Begin();
+            RichText.Draw(GlobalRenderingData.TextBatch, Vector2.Zero, GlobalRenderingData.FontColor);
+            GlobalRenderingData.TextBatch.End();
 
-            MeshData.Texture = RenderTexture;
+            GlobalRenderingData.Device.SetRenderTarget(null);
+
+            Background.DrawTexture = RenderTexture;
         }
         
         public bool UpdateRenderTexture()
         {
             RenderTexture?.Dispose();
-            if (Width == 0 || Height == 0)
+            if (bounds.X == 0 || bounds.Y == 0)
             {
                 return false;
             }
             else
             {
-                RenderTexture = new RenderTarget2D(GlobalInterfaceData.Device, Width, Height);
+                RenderTexture = new RenderTarget2D(GlobalRenderingData.Device, bounds.X, bounds.Y);
                 return true;
             }
         }
+
+        public void Draw(Viewport? BoundPort = null)
+        {
+            if (IsActive)
+            {
+                Background.Draw(BoundPort);          
+            }
+        }
+        
     }
 }

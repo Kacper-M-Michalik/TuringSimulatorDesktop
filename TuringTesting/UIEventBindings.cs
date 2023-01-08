@@ -9,11 +9,13 @@ namespace TuringTesting
 {
     public delegate void ReceivedDataCallback(Packet Data);
 
-    public static class UIEventBindings
+    public static class UIEventManager
     {
-        public static EventHandler ClientSuccessConnecting;
-        public static EventHandler ClientFailedConnecting;
-        public static EventHandler RecievedErrorNotification;
+        public static bool ClientSuccessConnecting;
+        public static EventHandler ClientSuccessConnectingDelegate;
+        public static bool ClientFailedConnecting;
+        public static EventHandler ClientFailedConnectingDelegate;
+        public static bool RecievedErrorNotification;
 
         public static EventHandler UpdateFileBrowser;
 

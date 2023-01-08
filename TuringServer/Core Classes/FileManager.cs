@@ -11,8 +11,15 @@ namespace TuringServer
 {
     public static class FileManager
     {
+        static readonly JsonSerializerOptions Options = new JsonSerializerOptions() { WriteIndented = true };
+        
         public static bool IsValidFileName(string FileName)
         {
+            for (int i = 0; i < FileName.Length; i++)
+            {
+                if (!char.IsAscii(FileName[i])) return false;
+            }
+
             //Maybe rewrite using regex?
             //https://docs.microsoft.com/en-gb/windows/win32/fileio/naming-a-file?redirectedfrom=MSDN for seeing banned characters
             if (FileName.Contains("<") || FileName.Contains(">") || FileName.Contains(":") || FileName.Contains("\"") || FileName.Contains("/") || FileName.Contains("\\") || FileName.Contains("|") || FileName.Contains("?") || FileName.Contains("*"))
@@ -175,11 +182,10 @@ namespace TuringServer
         public static bool CreateProject(string Name, string ProjectDirectory, TuringProjectType RuleType)
         {
             JsonSerializerOptions Options = new JsonSerializerOptions() { WriteIndented = true };
-            string SaveJson = JsonSerializer.Serialize(new ProjectSaveFile(Name, Name + "Data", RuleType), Options);
             string ProjectPath = ProjectDirectory + Path.DirectorySeparatorChar + Name + ".tproj";
             try
             {
-                File.WriteAllBytes(ProjectPath, Encoding.ASCII.GetBytes(SaveJson));
+                File.WriteAllBytes(ProjectPath, JsonSerializer.SerializeToUtf8Bytes(new ProjectSaveFile(Name, Name + "Data", RuleType), Options));
                 Directory.CreateDirectory(ProjectDirectory + Path.DirectorySeparatorChar + Name + "Data");
             }
             catch (Exception E)
@@ -194,12 +200,11 @@ namespace TuringServer
         //is there a point of this?
         public static bool SaveProject()
         {
-            JsonSerializerOptions Options = new JsonSerializerOptions() { WriteIndented = true };
-            string SaveJson = JsonSerializer.Serialize(new ProjectSaveFile(Server.LoadedProject.ProjectName, Server.LoadedProject.BaseDirectoryFolder.Name, Server.LoadedProject.TuringTypeRule), Options);
+            //string SaveJson = JsonSerializer.Serialize(new ProjectSaveFile(Server.LoadedProject.ProjectName, Server.LoadedProject.BaseDirectoryFolder.Name, Server.LoadedProject.TuringTypeRule), Options);
 
             try
             {
-                File.WriteAllBytes(Server.LoadedProject.ProjectFilePath, Encoding.Unicode.GetBytes(SaveJson));
+                File.WriteAllBytes(Server.LoadedProject.ProjectFilePath, JsonSerializer.SerializeToUtf8Bytes(new ProjectSaveFile(Server.LoadedProject.ProjectName, Server.LoadedProject.BaseDirectoryFolder.Name, Server.LoadedProject.TuringTypeRule), Options));
             }            
             catch (Exception E)
             {

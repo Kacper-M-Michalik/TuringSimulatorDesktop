@@ -9,28 +9,26 @@ namespace TuringTesting
 {
     public static class Client
     {
-        public static bool IsConnected 
-        { 
+        public static bool IsConnected
+        {
             get
             {
                 return TCP.ConnectionSocket != null ? TCP.ConnectionSocket.Connected : false;
             }
         }
-        public static TCPInterface TCP { get; private set; } = new TCPInterface();
+        public static bool IsConnecting;
+
+        static TCPInterface TCP = new TCPInterface();
         static int DataBufferSize = 4096;
 
-        static IPAddress TargetIP;
-        static int TargetPort;
-        static int Timeout = 1000;   
-
-        public class TCPInterface
+        class TCPInterface
         {
             public TcpClient ConnectionSocket;
             private NetworkStream DataStream;
             private byte[] ReceiveDataBuffer;
             private Packet PacketCurrentlyBeingRebuilt;
 
-            public void Connect()
+            public void Connect(IPAddress TargetIP, int Port, int Timeout)
             {
                 try
                 {
@@ -40,28 +38,32 @@ namespace TuringTesting
 
                     ReceiveDataBuffer = new byte[DataBufferSize];
 
-                    ConnectionSocket.BeginConnect(TargetIP, TargetPort, OnConnectCallBack, ConnectionSocket);
-                    Thread.Sleep(Timeout);                  
-                    
+                    ConnectionSocket.BeginConnect(TargetIP, Port, OnConnectCallBack, ConnectionSocket);
+                    Thread.Sleep(Timeout);
+
+                    IsConnecting = false;
+
                     if (!IsConnected)
                     {
                         CustomLogging.Log("CLIENT: Connection timed out.");
                         TCPInternalDisconnect();
-                        UIEventBindings.ClientFailedConnecting?.Invoke(this, new EventArgs());
-                    }                                    
+                        UIEventManager.ClientFailedConnecting = true;
+                    }
 
                 }
                 catch (Exception E)
                 {
                     CustomLogging.Log("CLIENT: Connection attempt failure! " + E.ToString());
+                    UIEventManager.ClientFailedConnecting = true;
                     TCPInternalDisconnect();
                 }
             }
 
-            public void OnConnectCallBack(IAsyncResult Result)            
+            public void OnConnectCallBack(IAsyncResult Result)
             {
                 try
                 {
+                    //whats point of this?
                     if (ConnectionSocket == null) return;
 
                     CustomLogging.Log("CLIENT: Connect callback called.");
@@ -70,7 +72,7 @@ namespace TuringTesting
                     DataStream = ConnectionSocket.GetStream();
                     PacketCurrentlyBeingRebuilt = new Packet();
 
-                    UIEventBindings.ClientSuccessConnecting?.Invoke(this, new EventArgs());
+                    UIEventManager.ClientSuccessConnecting = true;
 
                     DataStream.BeginRead(ReceiveDataBuffer, 0, DataBufferSize, OnReceiveDataFromServer, null);
                 }
@@ -147,9 +149,9 @@ namespace TuringTesting
                     CustomLogging.Log(E.ToString());
                 }
             }
-            
+
             public void TCPInternalDisconnect()
-            {                
+            {
                 ConnectionSocket?.Close();
                 ConnectionSocket = null;
                 DataStream = null;
@@ -158,10 +160,10 @@ namespace TuringTesting
             }
         }
 
-        private static Queue<Packet> PacketProcessingQueue = new Queue<Packet>();
-        private static Queue<Packet> PacketsBeingProcessed;
-        
-        public static void AddPacketToProcessOnMainThread(Packet PacketToAdd)
+        static Queue<Packet> PacketProcessingQueue = new Queue<Packet>();
+        static Queue<Packet> PacketsBeingProcessed;
+
+        static void AddPacketToProcessOnMainThread(Packet PacketToAdd)
         {
             lock (PacketProcessingQueue)
             {
@@ -170,7 +172,7 @@ namespace TuringTesting
         }
 
         public static void ProcessPackets()
-        {     
+        {
             if (PacketProcessingQueue.Count > 0)
             {
                 lock (PacketProcessingQueue)
@@ -194,15 +196,21 @@ namespace TuringTesting
                 }
 
             }
-            
         }
 
         public static void ConnectToServer(IPAddress IP, int Port)
         {
-            TargetIP = IP;
-            TargetPort = Port;
-            Thread ConnectThread = new Thread(TCP.Connect);
+            if (IsConnecting || IsConnected) return;
+
+            IsConnecting = true;
+            Thread ConnectThread = new Thread(() => TCP.Connect(IP, Port, 1000));
             ConnectThread.Start();
+        }
+
+        public static void SendTCPData(Packet Data)
+        {
+            TCP.SendDataToServer(Data);
+            Data.Dispose();
         }
 
         public static void Disconnect()

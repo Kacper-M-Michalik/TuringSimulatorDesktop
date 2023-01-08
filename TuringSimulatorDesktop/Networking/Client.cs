@@ -19,19 +19,17 @@ namespace TuringSimulatorDesktop
         }
         public static bool IsConnecting;
 
-        public static TCPInterface TCP { get; private set; } = new TCPInterface();
+        static TCPInterface TCP = new TCPInterface();
         static int DataBufferSize = 4096;
 
-        static int Timeout = 1000;   
-
-        public class TCPInterface
+        class TCPInterface
         {
             public TcpClient ConnectionSocket;
             private NetworkStream DataStream;
             private byte[] ReceiveDataBuffer;
             private Packet PacketCurrentlyBeingRebuilt;
 
-            public void Connect(IPAddress TargetIP, int Port)
+            public void Connect(IPAddress TargetIP, int Port, int Timeout)
             {
                 try
                 {
@@ -50,13 +48,14 @@ namespace TuringSimulatorDesktop
                     {
                         CustomLogging.Log("CLIENT: Connection timed out.");
                         TCPInternalDisconnect();
-                        //UIEventBindings.ClientFailedConnecting?.Invoke(this, new EventArgs());
+                        UIEventManager.ClientFailedConnecting = true;
                     }                                    
 
                 }
                 catch (Exception E)
                 {
                     CustomLogging.Log("CLIENT: Connection attempt failure! " + E.ToString());
+                    UIEventManager.ClientFailedConnecting = true;
                     TCPInternalDisconnect();
                 }
             }
@@ -74,7 +73,7 @@ namespace TuringSimulatorDesktop
                     DataStream = ConnectionSocket.GetStream();
                     PacketCurrentlyBeingRebuilt = new Packet();
 
-                    //UIEventBindings.ClientSuccessConnecting?.Invoke(this, new EventArgs());
+                    UIEventManager.ClientSuccessConnecting = true;
 
                     DataStream.BeginRead(ReceiveDataBuffer, 0, DataBufferSize, OnReceiveDataFromServer, null);
                 }
@@ -162,10 +161,10 @@ namespace TuringSimulatorDesktop
             }
         }
 
-        private static Queue<Packet> PacketProcessingQueue = new Queue<Packet>();
-        private static Queue<Packet> PacketsBeingProcessed;
+        static Queue<Packet> PacketProcessingQueue = new Queue<Packet>();
+        static Queue<Packet> PacketsBeingProcessed;
         
-        public static void AddPacketToProcessOnMainThread(Packet PacketToAdd)
+        static void AddPacketToProcessOnMainThread(Packet PacketToAdd)
         {
             lock (PacketProcessingQueue)
             {
@@ -202,11 +201,17 @@ namespace TuringSimulatorDesktop
 
         public static void ConnectToServer(IPAddress IP, int Port)
         {
-            if (IsConnecting) return;
+            if (IsConnecting || IsConnected) return;
 
             IsConnecting = true;
-            Thread ConnectThread = new Thread(() => TCP.Connect(IP, Port));
+            Thread ConnectThread = new Thread(() => TCP.Connect(IP, Port, 1000));
             ConnectThread.Start();
+        }
+
+        public static void SendTCPData(Packet Data)
+        {
+            TCP.SendDataToServer(Data);
+            Data.Dispose();
         }
 
         public static void Disconnect()

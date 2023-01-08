@@ -7,14 +7,16 @@ namespace TuringSimulatorDesktop
 {
     public static class GlobalUIRenderer
     {
-        public static GraphicsDevice Device;
-        public static Effect Effect;
+        static GraphicsDevice Device;
+        static Effect Effect;
         static Matrix Projection;
 
-        public static void Setup(GraphicsDevice SetDevice)
+        public static Texture2D GlobalTexture;
+
+        public static void Setup()
         {
-            Device = SetDevice;
-            Effect = GlobalInterfaceData.UIEffect;
+            Device = GlobalRenderingData.Device;
+            Effect = GlobalRenderingData.UIEffect;
         }
 
         public static void RecalculateProjection(int X, int Y, int Width, int Height)
@@ -22,25 +24,20 @@ namespace TuringSimulatorDesktop
             Projection = Matrix.CreateOrthographicOffCenter(X, X + Width, Y + Height, Y, 0f, 1f);
         }
 
-        public static void Draw(UIMesh DrawMesh)
-        {
-            Draw(new List<UIMesh>(1) { DrawMesh }, GlobalInterfaceData.FullscreenViewport);
-        }
-
-        public static void Draw(UIMesh DrawMesh, Viewport Port)
+        /*
+        public static void Draw(UIMesh DrawMesh, Viewport? Port = null)
         {
             Draw(new List<UIMesh>(1) { DrawMesh }, Port);
         }
 
-        public static void Draw(List<UIMesh> MeshList)
+        public static void Draw(List<UIMesh> MeshList, Viewport? Port = null)
         {
-            Draw(MeshList, GlobalInterfaceData.FullscreenViewport);
-        }
+            Viewport port;
+            if (Port == null) port = GlobalRenderingData.FullscreenViewport;
+            else port = Port.Value;
 
-        public static void Draw(List<UIMesh> MeshList, Viewport Port)
-        {
-            Device.Viewport = Port;
-            RecalculateProjection(Port.X, Port.Y, Port.Width, Port.Height);
+            Device.Viewport = port;
+            RecalculateProjection(port.X, port.Y, port.Width, port.Height);
 
             foreach (UIMesh RenderObject in MeshList)
             {         
@@ -64,7 +61,7 @@ namespace TuringSimulatorDesktop
                 {
                     Effect.Parameters["HasOverlayTexture"].SetValue(false);
                 }
-                */
+                
 
                 Effect.Parameters["OverlayColor"].SetValue(RenderObject.OverlayColor.ToVector4());
                 Effect.Parameters["Projection"].SetValue(RenderObject.MeshTransformations * Projection);
@@ -76,22 +73,68 @@ namespace TuringSimulatorDesktop
                 }
             }
         }
-
-
-        public static void Draw(Mesh DrawMesh, Matrix Transforamtions, Texture2D DrawTexture)
-        {
-            
-        }
-        public static void Draw(Mesh DrawMesh, Matrix Transforamtions, Color DrawColor)
-        {
-            
-        }
-
-        /*
-        public Texture2D RasteriseText()
-        {
-
-        }
         */
+
+
+        //Not in use yet
+        public static void Draw(MeshBuffer Buffer, Viewport Port)
+        {
+            Device.Viewport = Port;
+            RecalculateProjection(Port.X, Port.Y, Port.Width, Port.Height);
+
+            Effect.Parameters["HasBaseTexture"].SetValue(true);
+            Effect.Parameters["BaseTextureSampler+BaseTexture"].SetValue(GlobalTexture);
+            Effect.Parameters["OverlayColor"].SetValue(Vector4.Zero);
+            Effect.Parameters["Projection"].SetValue(Projection);
+
+            Mesh DrawMesh = Buffer.Finalise();
+
+            foreach (EffectPass Pass in Effect.CurrentTechnique.Passes)
+            {
+                Pass.Apply();
+                Device.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, DrawMesh.Vertices, 0, DrawMesh.Vertices.Length, DrawMesh.Indices, 0, DrawMesh.Indices.Length / 3);
+            }
+        }
+
+        public static void Draw(Mesh DrawMesh, Matrix Transformations, Texture2D DrawTexture, Viewport? Port = null)
+        {
+            Viewport port;
+            if (Port == null) port = GlobalRenderingData.FullscreenViewport;
+            else port = Port.Value;
+
+            Device.Viewport = port;
+            RecalculateProjection(port.X, port.Y, port.Width, port.Height);
+
+            Effect.Parameters["HasBaseTexture"].SetValue(true);
+            Effect.Parameters["BaseTextureSampler+BaseTexture"].SetValue(DrawTexture);
+            Effect.Parameters["OverlayColor"].SetValue(Vector4.Zero);
+            Effect.Parameters["Projection"].SetValue(Transformations * Projection);
+
+            foreach (EffectPass Pass in Effect.CurrentTechnique.Passes)
+            {
+                Pass.Apply();
+                Device.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, DrawMesh.Vertices, 0, DrawMesh.Vertices.Length, DrawMesh.Indices, 0, DrawMesh.Indices.Length / 3);
+            }
+        }
+
+        public static void Draw(Mesh DrawMesh, Matrix Transformations, Color DrawColor, Viewport? Port = null)
+        {
+            Viewport port;
+            if (Port == null) port = GlobalRenderingData.FullscreenViewport;
+            else port = Port.Value;
+
+            Device.Viewport = port;
+            RecalculateProjection(port.X, port.Y, port.Width, port.Height);
+
+            Effect.Parameters["HasBaseTexture"].SetValue(false);
+            Effect.Parameters["OverlayColor"].SetValue(DrawColor.ToVector4());
+            Effect.Parameters["Projection"].SetValue(Transformations * Projection);
+
+            foreach (EffectPass Pass in Effect.CurrentTechnique.Passes)
+            {
+                Pass.Apply();
+                Device.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, DrawMesh.Vertices, 0, DrawMesh.Vertices.Length, DrawMesh.Indices, 0, DrawMesh.Indices.Length / 3);
+            }
+        }
     }
 }

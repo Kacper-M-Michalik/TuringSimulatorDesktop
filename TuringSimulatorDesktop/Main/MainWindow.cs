@@ -23,7 +23,7 @@ namespace TuringSimulatorDesktop
         [STAThread]
         static void Main()
         {
-            using var game = new TuringSimulatorDesktop.MainWindow();
+            using var game = new MainWindow();
             game.Run();
         }
     }
@@ -33,6 +33,7 @@ namespace TuringSimulatorDesktop
         public GraphicsDeviceManager GraphicsManager;
         public View CurrentView;
         SpriteBatch ScreenBatch;
+        int BoundTop;
 
         [DllImport("SDL2.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void SDL_MaximizeWindow(IntPtr window);
@@ -44,6 +45,8 @@ namespace TuringSimulatorDesktop
         public static extern void SDL_SetWindowBordered(IntPtr window, byte Bool);
         [DllImport("SDL2.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void SDL_GetWindowBordersSize(IntPtr window, out int top, out int left, out int bottom, out int right);
+        [DllImport("SDL2.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void SDL_SetWindowResizable(IntPtr window, byte Bool);
 
         UInt32 Flags =  0x00000001U | 0x00001000U;
 
@@ -59,7 +62,7 @@ namespace TuringSimulatorDesktop
             IsMouseVisible = true;
 
             Window.IsBorderless = true;
-            Window.AllowUserResizing = true;
+            Window.AllowUserResizing = false;
             Window.ClientSizeChanged += OnResize;
             Window.AllowAltF4 = true;
 
@@ -75,33 +78,37 @@ namespace TuringSimulatorDesktop
         protected override void LoadContent()
         {
             //SDL_SetWindowFullscreen(Window.Handle, 0);
-            SDL_SetWindowBordered(Window.Handle, (byte)1U);
-            SDL_MaximizeWindow(Window.Handle);
+            //SDL_SetWindowBordered(Window.Handle, (byte)1U);
+            // SDL_MaximizeWindow(Window.Handle);
             //MaximiseWindow();
+            GraphicsManager.PreferredBackBufferWidth = GlobalRenderingData.MainMenuWidth;
+            GraphicsManager.PreferredBackBufferHeight = GlobalRenderingData.MainMenuHeight;
+            GraphicsManager.ApplyChanges();
+
             ScreenBatch = new SpriteBatch(GraphicsDevice);
             GraphicsDevice.BlendState = BlendState.AlphaBlend;
 
-            GlobalInterfaceData.OSWindow = Window;
-            GlobalInterfaceData.MainWindow = this;
-            GlobalInterfaceData.FullscreenViewport = GraphicsDevice.Viewport;
+            GlobalRenderingData.OSWindow = Window;
+            GlobalRenderingData.MainWindow = this;
+            GlobalRenderingData.FullscreenViewport = GraphicsDevice.Viewport;
 
-            GlobalInterfaceData.Device = GraphicsDevice;
-            GlobalInterfaceData.UIEffect = Content.Load<Effect>("UIShader");
+            GlobalRenderingData.Device = GraphicsDevice;
+            GlobalRenderingData.UIEffect = Content.Load<Effect>("UIShader");
 
-            FontSystemDefaults.FontLoader = new FreeTypeLoader();
-            FontSystemDefaults.FontResolutionFactor = 2.0f;
-            FontSystemDefaults.KernelWidth = 2;
-            FontSystemDefaults.KernelHeight = 2;
+            FontSystemDefaults.FontResolutionFactor = 1.0f;
+            FontSystemDefaults.KernelWidth = 1;
+            FontSystemDefaults.KernelHeight = 1;
             FontSystemDefaults.PremultiplyAlpha = true;
-            GlobalInterfaceData.TextBatch = new SpriteBatch(GraphicsDevice);
-            GlobalInterfaceData.StandardRegularFont = new FontSystem();
-            GlobalInterfaceData.StandardRegularFont.AddFont(File.ReadAllBytes(@"Assets/Fonts/Roboto-Regular.ttf"));
-            GlobalInterfaceData.MediumRegularFont = new FontSystem();
-            GlobalInterfaceData.MediumRegularFont.AddFont(File.ReadAllBytes(@"Assets/Fonts/Roboto-Medium.ttf"));
+            FontSystemDefaults.FontLoader = new FreeTypeLoader();
+            GlobalRenderingData.TextBatch = new SpriteBatch(GraphicsDevice);
+            GlobalRenderingData.StandardRegularFont = new FontSystem();
+            GlobalRenderingData.StandardRegularFont.AddFont(File.ReadAllBytes(@"Assets/Fonts/Roboto-Regular.ttf"));
+            GlobalRenderingData.MediumRegularFont = new FontSystem();
+            GlobalRenderingData.MediumRegularFont.AddFont(File.ReadAllBytes(@"Assets/Fonts/Roboto-Medium.ttf"));
 
-            GlobalInterfaceData.BakeTextures();
-            GlobalUIRenderer.Setup(GlobalInterfaceData.Device);
-
+            DateTime Start = DateTime.UtcNow;
+            GlobalRenderingData.BakeTextures();
+            GlobalUIRenderer.Setup();
 
             DirectoryInfo Info = Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + Path.DirectorySeparatorChar + "Turing Machine - Desktop");
             string DataPath = Info.FullName + Path.DirectorySeparatorChar + "LocalUserData.txt";
@@ -123,6 +130,8 @@ namespace TuringSimulatorDesktop
 
             GlobalProjectAndUserData.LoadUserData(DataPath);
 
+            CustomLogging.Log("Load Time: " + (DateTime.UtcNow-Start).TotalSeconds.ToString());
+
             CurrentView = new MainScreenView();
         }
 
@@ -138,60 +147,76 @@ namespace TuringSimulatorDesktop
                 Exit();
             }
 
-            GlobalInterfaceData.Time = gameTime;
+            UIEventManager.WindowRequiresNextFrameResizeStep = UIEventManager.WindowRequiresNextFrameResize;
+
+            GlobalRenderingData.Time = gameTime;
 
             InputManager.Update();
 
-            if (GlobalInterfaceData.UIRequiresRedraw)
+            Client.ProcessPackets();
+
+            //Process interrupts
+            if (UIEventManager.ClientSuccessConnecting) UIEventManager.ClientSuccessConnectingDelegate?.Invoke(this, new EventArgs());
+            if (UIEventManager.ClientFailedConnecting) UIEventManager.ClientFailedConnectingDelegate?.Invoke(this, new EventArgs());
+
+            if (GlobalRenderingData.UIRequiresRedraw)
             {
                 GraphicsDevice.SetRenderTarget(null);
                 GraphicsDevice.Clear(Color.CornflowerBlue);
 
-                CurrentView.Draw();                
-                
+                CurrentView.Draw();       
+
                 ScreenBatch.Begin();
                 //DebugManager.Draw(GraphicsDevice, ScreenBatch, gameTime);
                 ScreenBatch.End();
                 //GlobalInterfaceData.UIRequiresRedraw = false;
                 
             }
-            else
+
+            if (UIEventManager.WindowRequiresNextFrameResizeStep)
             {
-                //only redraw debug menu
+                GraphicsManager.PreferredBackBufferWidth = GraphicsDevice.PresentationParameters.BackBufferWidth;
+                GraphicsManager.PreferredBackBufferHeight = GraphicsDevice.PresentationParameters.BackBufferHeight + BoundTop;
+                GraphicsManager.ApplyChanges();
+                UIEventManager.WindowRequiresNextFrameResize = false;
+                UIEventManager.WindowRequiresNextFrameResizeStep = false;
+                OnResize(this, null);
             }
+
             base.Draw(gameTime);
+        }
+
+        public void LeaveMainMenu()
+        {
+            SDL_SetWindowResizable(Window.Handle, (byte)1U);
+            MaximiseWindow(); 
         }
 
         public void MinimiseWindow()
         {
             SDL_SetWindowBordered(Window.Handle, (byte)1U);
-            //SDL_MinimizeWindow(Window.Handle);
+            SDL_MinimizeWindow(Window.Handle);
         }
 
         public void MaximiseWindow()
         {
             SDL_SetWindowBordered(Window.Handle, (byte)1U);
             SDL_MaximizeWindow(Window.Handle);
-            int Y = Window.Position.Y - Window.ClientBounds.Top;
+            BoundTop = Window.ClientBounds.Top;
+            int Y = Window.Position.Y - BoundTop;
             SDL_SetWindowBordered(Window.Handle, (byte)0U);
             Window.Position = new Point(Window.Position.X, Y);
-           // Window. = new Point(Window.Position.X, Y);
+            UIEventManager.WindowRequiresNextFrameResize = true;
         }
 
         public void OnResize(object Sender, EventArgs Args)
         {
-            if (GraphicsDevice.PresentationParameters.BackBufferWidth < GlobalInterfaceData.MinimumApplicationWindowWidth) GraphicsManager.PreferredBackBufferWidth = GlobalInterfaceData.MinimumApplicationWindowWidth;
-            if (GraphicsDevice.PresentationParameters.BackBufferHeight < GlobalInterfaceData.MinimumApplicationWindowHeight) GraphicsManager.PreferredBackBufferHeight = GlobalInterfaceData.MinimumApplicationWindowHeight;
+            if (GraphicsDevice.PresentationParameters.BackBufferWidth < GlobalRenderingData.MinimumApplicationWindowWidth) GraphicsManager.PreferredBackBufferWidth = GlobalRenderingData.MinimumApplicationWindowWidth;
+            if (GraphicsDevice.PresentationParameters.BackBufferHeight < GlobalRenderingData.MinimumApplicationWindowHeight) GraphicsManager.PreferredBackBufferHeight = GlobalRenderingData.MinimumApplicationWindowHeight;
             GraphicsManager.ApplyChanges();
 
-            GlobalInterfaceData.FullscreenViewport = new Viewport(0, 0, GraphicsDevice.PresentationParameters.BackBufferWidth, GraphicsDevice.PresentationParameters.BackBufferHeight);
-            /*
-            for (int i = 0; i < GlobalGraphicsData.BackBufferListeners.Count; i++)
-            {
-                GlobalGraphicsData.BackBufferListeners[i].BackBufferResized(GraphicsDevice.PresentationParameters.BackBufferWidth, GraphicsDevice.PresentationParameters.BackBufferHeight);
-            }
-            */
-            CurrentView.ViewResize(GraphicsDevice.PresentationParameters.BackBufferWidth, GraphicsDevice.PresentationParameters.BackBufferHeight);            
+            GlobalRenderingData.FullscreenViewport = new Viewport(0, 0, GraphicsManager.PreferredBackBufferWidth, GraphicsManager.PreferredBackBufferHeight);
+            CurrentView.ViewResize(GraphicsManager.PreferredBackBufferWidth, GraphicsManager.PreferredBackBufferHeight);            
         }
 
         protected override void OnExiting(Object sender, EventArgs args)

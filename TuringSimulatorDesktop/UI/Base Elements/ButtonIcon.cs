@@ -2,16 +2,11 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TuringSimulatorDesktop.Input;
 
 namespace TuringSimulatorDesktop.UI
 {
-    public delegate void OnCheckBoxClick(CheckBox Sender);
-
-    public class CheckBox : IVisualElement, IClickable, IPollable
+    public class ButtonIcon : Button, IVisualElement, IClickable, IPollable
     {
         Vector2 position;
         public Vector2 Position
@@ -37,26 +32,23 @@ namespace TuringSimulatorDesktop.UI
 
         public bool IsActive = true;
 
-        public event OnCheckBoxClick OnClickedEvent;
+        public event OnButtonClick OnClickedEvent;
         public ActionGroup Group { get; private set; }
-        public bool Checked;
 
-        public bool HighlightOnMouseOver = true;
-        public Texture2D BaseUncheckedTexture;
-        public Texture2D BaseCheckedTexture;
-        public Texture2D HighlightUncheckedTexture;
-        public Texture2D HighlightCheckedTexture;
+        public bool HighlightOnMouseOver;
+        public Texture2D BaseTexture;
+        public Texture2D HighlightTexture;
 
         Icon Background;
 
-        public CheckBox(ActionGroup group)
+        public ButtonIcon(ActionGroup group)
         {
             Background = new Icon();
             Group = group;
             group.ClickableObjects.Add(this);
             group.PollableObjects.Add(this);
         }
-        public CheckBox(int width, int height, ActionGroup group)
+        public ButtonIcon(int width, int height, ActionGroup group)
         {
             Background = new Icon();
             Bounds = new Point(width, height);
@@ -66,7 +58,7 @@ namespace TuringSimulatorDesktop.UI
             group.ClickableObjects.Add(this);
             group.PollableObjects.Add(this);
         }
-        public CheckBox(int width, int height, Vector2 position, ActionGroup group)
+        public ButtonIcon(int width, int height, Vector2 position, ActionGroup group)
         {
             Background = new Icon();
             Bounds = new Point(width, height);
@@ -76,14 +68,36 @@ namespace TuringSimulatorDesktop.UI
             group.ClickableObjects.Add(this);
             group.PollableObjects.Add(this);
         }
-
-        public void Clicked()
+        public ButtonIcon(int width, int height, UILookupKey BaseKey, ActionGroup group) : this(width, height, group)
         {
-            Checked = !Checked;
+            BaseTexture = GlobalRenderingData.TextureLookup[BaseKey];
+        }
+
+        public ButtonIcon(int width, int height, UILookupKey BaseKey, UILookupKey HighlightKey, ActionGroup group) : this(width, height, group)
+        {
+            BaseTexture = GlobalRenderingData.TextureLookup[BaseKey];
+            HighlightTexture = GlobalRenderingData.TextureLookup[HighlightKey];
+            HighlightOnMouseOver = true;
+        }
+
+        public ButtonIcon(int width, int height, UILookupKey BaseKey, Vector2 position, ActionGroup group) : this(width, height, position, group)
+        {
+            BaseTexture = GlobalRenderingData.TextureLookup[BaseKey];
+        }
+
+        public ButtonIcon(int width, int height, UILookupKey BaseKey, UILookupKey HighlightKey, Vector2 position, ActionGroup group) : this(width, height, position, group)
+        {
+            BaseTexture = GlobalRenderingData.TextureLookup[BaseKey];
+            HighlightTexture = GlobalRenderingData.TextureLookup[HighlightKey];
+            HighlightOnMouseOver = true;
+        }
+
+        void IClickable.Clicked()
+        {
             OnClickedEvent?.Invoke(this);
         }
 
-        public void ClickedAway()
+        void IClickable.ClickedAway()
         {
 
         }
@@ -96,31 +110,12 @@ namespace TuringSimulatorDesktop.UI
         public void PollInput(bool IsInActionGroupFrame)
         {
             if (IsInActionGroupFrame && HighlightOnMouseOver && IsMouseOver())
-            {      
-                if (Checked)
-                {
-                   // if (HighlightCheckedTexture == null) Background.OverlayColor = GlobalInterfaceData.UIOverlayDebugColor4;
-                   Background.DrawTexture = HighlightCheckedTexture;
-                }
-                else
-                {
-                    // if (HighlightUncheckedTexture == null) Background.OverlayColor = GlobalInterfaceData.UIOverlayDebugColor2;
-                    Background.DrawTexture = HighlightUncheckedTexture;
-                }
-                
+            {
+                if (HighlightTexture != null) Background.DrawTexture = HighlightTexture;
             }
             else
             {
-                if (Checked)
-                {
-                    //if (BaseCheckedTexture == null) Background.OverlayColor = GlobalInterfaceData.UIOverlayDebugColor3;
-                    Background.DrawTexture = BaseCheckedTexture;
-                }
-                else
-                {
-                    //if (BaseUncheckedTexture == null) Background.OverlayColor = GlobalInterfaceData.UIOverlayDebugColor1;
-                    Background.DrawTexture = BaseUncheckedTexture;
-                }
+                if (BaseTexture != null) Background.DrawTexture = BaseTexture;
             }
         }
 

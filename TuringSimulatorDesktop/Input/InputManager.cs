@@ -141,6 +141,7 @@ namespace TuringSimulatorDesktop.Input
         }
 
         //Depracted
+        /*
         public static char? KeyToChar(Keys Key, KeyboardModifiers Modifiers, bool Shift, bool Control, bool Alt)
         {
             //TODO integrate allows charcter and numbers and symbols parts
@@ -344,5 +345,6 @@ namespace TuringSimulatorDesktop.Input
             }
             return null;
         }
+        */
     }
 }

@@ -53,7 +53,7 @@ namespace TuringServer
             ProjectData NewProjectData = FileManager.LoadProjectFile(Location);
             if (NewProjectData == null)
             {
-                ServerSendFunctions.SendTCPData(SenderClientID, ServerSendFunctions.ErrorNotification("Failed to load project - Project doesn't exist."));
+                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to load project - Project doesn't exist."));
                 return;
             }
 
@@ -75,7 +75,7 @@ namespace TuringServer
          */
         public static void UserRequestedProjectData(int SenderClientID, Packet Data)
         {
-            ServerSendFunctions.SendTCPData(SenderClientID, ServerSendFunctions.ProjectData());
+            Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ProjectData());
         }
 
         /* -PACKET LAYOUT-
@@ -97,11 +97,11 @@ namespace TuringServer
 
             if (!Server.LoadedProject.FolderDataLookup.ContainsKey(FolderID))
             {
-                ServerSendFunctions.SendTCPData(SenderClientID, ServerSendFunctions.ErrorNotification("Failed to request folder - Folder doesn't exist."));
+                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to request folder - Folder doesn't exist."));
                 return;
             }
 
-            ServerSendFunctions.SendTCPData(SenderClientID, ServerSendFunctions.FolderData(FolderID));
+            Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.FolderData(FolderID));
         }
 
         /* -PACKET LAYOUT-
@@ -128,14 +128,14 @@ namespace TuringServer
            
             if (!FileManager.LoadFileIntoCache(FileID))
             {
-                ServerSendFunctions.SendTCPData(SenderClientID, ServerSendFunctions.ErrorNotification("Failed to retreive file - Server failed to load it."));
+                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to retreive file - Server failed to load it."));
                 return;
             }             
             
             if (SubscribeToUpdates) Server.LoadedProject.FileDataLookup[FileID].SubscriberIDs.Add(SenderClientID);
 
             Server.LoadedProject.CacheDataLookup[FileID].ResetExpiryTimer();
-            ServerSendFunctions.SendTCPData(SenderClientID, ServerSendFunctions.FileData(FileID));
+            Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.FileData(FileID));
         }
 
         /* -PACKET LAYOUT-
@@ -161,12 +161,12 @@ namespace TuringServer
 
             if (!FileManager.IsValidFileName(FileName))
             {
-                ServerSendFunctions.SendTCPData(SenderClientID, ServerSendFunctions.ErrorNotification("Failed to create file - File name uses invalid characters."));
+                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to create file - File name uses invalid characters."));
                 return;
             }
             if (!Server.LoadedProject.FolderDataLookup.ContainsKey(FolderID))
             {
-                ServerSendFunctions.SendTCPData(SenderClientID, ServerSendFunctions.ErrorNotification("Failed to create file - Folder doesnt exist."));
+                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to create file - Folder doesnt exist."));
                 return;
             }
 
@@ -175,7 +175,7 @@ namespace TuringServer
 
             if (File.Exists(NewFileLocation))
             {
-                ServerSendFunctions.SendTCPData(SenderClientID, ServerSendFunctions.ErrorNotification("Failed to create file - File already exists."));
+                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to create file - File already exists."));
                 return;
             }
 
@@ -187,7 +187,7 @@ namespace TuringServer
             catch (Exception E)
             {
                 CustomLogging.Log("ServerRecieve Error: UserCreatedNewFile - " + E.ToString());
-                ServerSendFunctions.SendTCPData(SenderClientID, ServerSendFunctions.ErrorNotification("Failed to create file - Server failed to create it."));
+                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to create file - Server failed to create it."));
             }
 
             int NewID = FileManager.GetNewFileID();
@@ -226,14 +226,14 @@ namespace TuringServer
 
             if (!Server.LoadedProject.FileDataLookup.ContainsKey(FileID))
             {
-                ServerSendFunctions.SendTCPData(SenderClientID, ServerSendFunctions.ErrorNotification("Failed to update file - File doesn't exist."));
+                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to update file - File doesn't exist."));
                 return;
             }
 
             DirectoryFile FileData = Server.LoadedProject.FileDataLookup[FileID];
             if (FileData.Version != FileVersion)
             {
-                ServerSendFunctions.SendTCPData(SenderClientID, ServerSendFunctions.ErrorNotification("Failed to update file - You updated an older version of the file."));
+                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to update file - You updated an older version of the file."));
                 return;
             }
 
@@ -245,7 +245,7 @@ namespace TuringServer
             catch (Exception E)
             {
                 CustomLogging.Log("ServerRecieve Error: UserUpdatedFile - " + E.ToString());
-                ServerSendFunctions.SendTCPData(SenderClientID, ServerSendFunctions.ErrorNotification("Failed to update file - Server failed to write to file."));
+                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to update file - Server failed to write to file."));
                 return;
             }
 
@@ -253,7 +253,7 @@ namespace TuringServer
             {
                 if (!FileManager.LoadFileIntoCache(FileID))
                 {
-                    ServerSendFunctions.SendTCPData(SenderClientID, ServerSendFunctions.ErrorNotification("Failed to update file - Server failed to load it."));
+                    Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to update file - Server failed to load it."));
                     return;
                 }
             }
@@ -266,11 +266,11 @@ namespace TuringServer
 
             Server.LoadedProject.CacheDataLookup[FileID].ResetExpiryTimer();
 
-            Packet SendPacket = ServerSendFunctions.FileData(FileID);
+            Packet SendPacket = ServerSendPacketFunctions.FileData(FileID);
 
             foreach (int Client in FileData.SubscriberIDs)
             {
-                ServerSendFunctions.SendTCPData(Client, SendPacket);
+                Server.SendTCPData(Client, SendPacket);
 
                 //ServerSendFunctions.SendFileUpdate(Client, FileID);
             }            
@@ -300,7 +300,7 @@ namespace TuringServer
 
             if (!FileManager.IsValidFileName(NewFileName))
             {
-                ServerSendFunctions.SendTCPData(SenderClientID, ServerSendFunctions.ErrorNotification("Failed to rename file - File name uses invalid characters."));
+                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to rename file - File name uses invalid characters."));
                 return;
             }
 
@@ -308,7 +308,7 @@ namespace TuringServer
             {
                 if (!FileManager.LoadFileIntoCache(FileID))
                 {
-                    ServerSendFunctions.SendTCPData(SenderClientID, ServerSendFunctions.ErrorNotification("Failed to rename file - Server failed to load it."));
+                    Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to rename file - Server failed to load it."));
                     return;
                 }
             }
@@ -319,7 +319,7 @@ namespace TuringServer
 
             if (File.Exists(NewFileLocation))
             {
-                ServerSendFunctions.SendTCPData(SenderClientID, ServerSendFunctions.ErrorNotification("Failed to rename file - File with this name already exists."));
+                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to rename file - File with this name already exists."));
                 return;
             }
 
@@ -331,20 +331,20 @@ namespace TuringServer
             catch (Exception E)
             {
                 CustomLogging.Log("ServerRecieveError: UserRenameFile - " + E.ToString());
-                ServerSendFunctions.SendTCPData(SenderClientID, ServerSendFunctions.ErrorNotification("Failed to rename file - Server failed to save the renamed/moved file."));
+                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to rename file - Server failed to save the renamed/moved file."));
                 return;
             }
 
             if (!FileManager.DeleteFileByPath(Server.LoadedProject.BasePath + FileData.GetLocalPath())) 
             {
-                ServerSendFunctions.SendTCPData(SenderClientID, ServerSendFunctions.ErrorNotification("Failed to rename file - Server failed to clean old file."));
+                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to rename file - Server failed to clean old file."));
                 FileManager.DeleteFileByPath(NewFileLocation);
                 return;
             }
 
             FileData.Name = NewFileName;
 
-            ServerSendFunctions.SendTCPToAllClients(ServerSendFunctions.FileRenamed(FileID));
+            Server.SendTCPToAllClients(ServerSendPacketFunctions.FileRenamed(FileID));
         }
 
         /* -PACKET LAYOUT-
@@ -371,7 +371,7 @@ namespace TuringServer
 
             if (!Server.LoadedProject.FolderDataLookup.ContainsKey(NewFolderID))
             {
-                ServerSendFunctions.SendTCPData(SenderClientID, ServerSendFunctions.ErrorNotification("Failed to move file - Target folder doesn't exist."));
+                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to move file - Target folder doesn't exist."));
                 return;
             }
 
@@ -379,7 +379,7 @@ namespace TuringServer
             {
                 if (!FileManager.LoadFileIntoCache(FileID))
                 {
-                    ServerSendFunctions.SendTCPData(SenderClientID, ServerSendFunctions.ErrorNotification("Failed to move file - Server failed to load it."));
+                    Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to move file - Server failed to load it."));
                     return;
                 }
             }
@@ -390,7 +390,7 @@ namespace TuringServer
 
             if (File.Exists(NewFileLocation))
             {
-                ServerSendFunctions.SendTCPData(SenderClientID, ServerSendFunctions.ErrorNotification("Failed to move file - File with this name already exists."));
+                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to move file - File with this name already exists."));
                 return;
             }
 
@@ -402,13 +402,13 @@ namespace TuringServer
             catch (Exception E)
             {
                 CustomLogging.Log("ServerRecieveError: UserMoveFile - " + E.ToString());
-                ServerSendFunctions.SendTCPData(SenderClientID, ServerSendFunctions.ErrorNotification("Failed to move file - Server failed to save the renamed/moved file."));
+                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to move file - Server failed to save the renamed/moved file."));
                 return;
             }
 
             if (!FileManager.DeleteFileByPath(Server.LoadedProject.BasePath + FileData.GetLocalPath()))
             {
-                ServerSendFunctions.SendTCPData(SenderClientID, ServerSendFunctions.ErrorNotification("Failed to move file - Server failed to clean old file."));
+                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to move file - Server failed to clean old file."));
                 FileManager.DeleteFileByPath(NewFileLocation);
                 return;
             }
@@ -416,7 +416,7 @@ namespace TuringServer
             FileData.ParentFolder.SubFiles.Remove(FileData);
             FileData.ParentFolder = FolderData;
 
-            ServerSendFunctions.SendTCPToAllClients(ServerSendFunctions.FileMoved(FileID));
+            Server.SendTCPToAllClients(ServerSendPacketFunctions.FileMoved(FileID));
         }
 
         /* -PACKET LAYOUT-
@@ -440,7 +440,7 @@ namespace TuringServer
 
             if (!Server.LoadedProject.FileDataLookup.ContainsKey(FileID))
             {
-                ServerSendFunctions.SendTCPData(SenderClientID, ServerSendFunctions.ErrorNotification("Failed to delete file - File doesn't exist."));
+                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to delete file - File doesn't exist."));
                 return;
             }
 
@@ -453,7 +453,7 @@ namespace TuringServer
             Server.LoadedProject.CacheDataLookup.Remove(FileID);
             Server.LoadedProject.FileDataLookup.Remove(FileID);
 
-            ServerSendFunctions.SendTCPToAllClients(ServerSendFunctions.FileDeleted(FileID));
+            Server.SendTCPToAllClients(ServerSendPacketFunctions.FileDeleted(FileID));
         }
 
         /* -PACKET LAYOUT-
@@ -477,7 +477,7 @@ namespace TuringServer
 
             if (!Server.LoadedProject.FileDataLookup.ContainsKey(FileID))
             {
-                ServerSendFunctions.SendTCPData(SenderClientID, ServerSendFunctions.ErrorNotification("Failed to unsubscribe from file - File doesn't exist."));
+                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to unsubscribe from file - File doesn't exist."));
                 return;
             }
 
@@ -514,13 +514,13 @@ namespace TuringServer
 
             if (!FileManager.IsValidFileName(NewFolderName))
             {
-                ServerSendFunctions.SendTCPData(SenderClientID, ServerSendFunctions.ErrorNotification("Failed to create folder - New folder name invalid."));
+                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to create folder - New folder name invalid."));
                 return;
             }
 
             if (!Server.LoadedProject.FolderDataLookup.ContainsKey(ParentFolderID))
             {
-                ServerSendFunctions.SendTCPData(SenderClientID, ServerSendFunctions.ErrorNotification("Failed to create folder - Root folder doesn't exist."));
+                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to create folder - Root folder doesn't exist."));
                 return;
             }
 
@@ -530,7 +530,7 @@ namespace TuringServer
 
             if (Directory.Exists(NewFolderDirectory))
             {
-                ServerSendFunctions.SendTCPData(SenderClientID, ServerSendFunctions.ErrorNotification("Failed to create folder - Folder with this name already exists."));
+                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to create folder - Folder with this name already exists."));
                 return;     
             }
 
@@ -541,7 +541,7 @@ namespace TuringServer
             catch (Exception E)
             {
                 CustomLogging.Log("ServerRecieve Error: UserCreatedFolder - " + E.ToString());
-                ServerSendFunctions.SendTCPData(SenderClientID, ServerSendFunctions.ErrorNotification("Failed to create folder - Server failed to create the folder locally."));
+                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to create folder - Server failed to create the folder locally."));
                 return;
             }
 
@@ -550,7 +550,7 @@ namespace TuringServer
             ParentFolderData.SubFolders.Add(NewFolderData);
             Server.LoadedProject.FolderDataLookup.Add(NewID, NewFolderData);
 
-            ServerSendFunctions.SendTCPToAllClients(ServerSendFunctions.FolderCreated(NewID));
+            Server.SendTCPToAllClients(ServerSendPacketFunctions.FolderCreated(NewID));
         }
 
         /* -PACKET LAYOUT-
@@ -577,19 +577,19 @@ namespace TuringServer
 
             if (FolderID == 0)
             {
-                ServerSendFunctions.SendTCPData(SenderClientID, ServerSendFunctions.ErrorNotification("Failed to rename folder - Cannot rename base project folder."));
+                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to rename folder - Cannot rename base project folder."));
                 return;
             }
 
             if (!FileManager.IsValidFileName(NewFolderName))
             {
-                ServerSendFunctions.SendTCPData(SenderClientID, ServerSendFunctions.ErrorNotification("Failed to rename folder - New folder name invalid."));
+                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to rename folder - New folder name invalid."));
                 return;
             }
 
             if (!Server.LoadedProject.FolderDataLookup.ContainsKey(FolderID))
             {
-                ServerSendFunctions.SendTCPData(SenderClientID, ServerSendFunctions.ErrorNotification("Failed to rename folder - Folder doesn't exist."));
+                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to rename folder - Folder doesn't exist."));
                 return;
             }
 
@@ -598,7 +598,7 @@ namespace TuringServer
 
             if (Directory.Exists(NewDirectory))
             {
-                ServerSendFunctions.SendTCPData(SenderClientID, ServerSendFunctions.ErrorNotification("Failed to rename folder - Folder with this name already exists."));
+                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to rename folder - Folder with this name already exists."));
                 return;
             }
 
@@ -609,7 +609,7 @@ namespace TuringServer
             catch (Exception E)
             {
                 CustomLogging.Log("ServerRecieve Error: UserRenamedFolder - " + E.ToString());
-                ServerSendFunctions.SendTCPData(SenderClientID, ServerSendFunctions.ErrorNotification("Failed to rename folder - Server failed to rename the folder locally."));
+                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to rename folder - Server failed to rename the folder locally."));
                 return;
             }
 
@@ -629,7 +629,7 @@ namespace TuringServer
                 }
             }
 
-            ServerSendFunctions.SendTCPToAllClients(ServerSendFunctions.FolderRenamed(FolderID));
+            Server.SendTCPToAllClients(ServerSendPacketFunctions.FolderRenamed(FolderID));
         }
 
         /* -PACKET LAYOUT-
@@ -656,19 +656,19 @@ namespace TuringServer
 
             if (FolderID == 0)
             {
-                ServerSendFunctions.SendTCPData(SenderClientID, ServerSendFunctions.ErrorNotification("Failed to move folder - Cannot move base project folder."));
+                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to move folder - Cannot move base project folder."));
                 return;
             }
 
             if (!Server.LoadedProject.FolderDataLookup.ContainsKey(FolderID))
             {
-                ServerSendFunctions.SendTCPData(SenderClientID, ServerSendFunctions.ErrorNotification("Failed to move folder - Folder doesn't exist."));
+                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to move folder - Folder doesn't exist."));
                 return;
             }
 
             if (!Server.LoadedProject.FolderDataLookup.ContainsKey(TargetFolderID))
             {
-                ServerSendFunctions.SendTCPData(SenderClientID, ServerSendFunctions.ErrorNotification("Failed to move folder - Target folder doesn't exist."));
+                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to move folder - Target folder doesn't exist."));
                 return;
             }
 
@@ -679,7 +679,7 @@ namespace TuringServer
 
             if (Directory.Exists(NewDirectory))
             {
-                ServerSendFunctions.SendTCPData(SenderClientID, ServerSendFunctions.ErrorNotification("Failed to move folder - Folder with this name already exists."));
+                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to move folder - Folder with this name already exists."));
                 return;
             }
 
@@ -690,7 +690,7 @@ namespace TuringServer
             catch (Exception E)
             {
                 CustomLogging.Log("ServerRecieve Error: UserMovedFolder - " + E.ToString());
-                ServerSendFunctions.SendTCPData(SenderClientID, ServerSendFunctions.ErrorNotification("Failed to move folder - Server failed to move the folder locally."));
+                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to move folder - Server failed to move the folder locally."));
                 return;
             }
 
@@ -712,7 +712,7 @@ namespace TuringServer
                 }
             }
 
-            ServerSendFunctions.SendTCPToAllClients(ServerSendFunctions.FolderMoved(FolderID));
+            Server.SendTCPToAllClients(ServerSendPacketFunctions.FolderMoved(FolderID));
         }
 
         /* -PACKET LAYOUT-
@@ -736,13 +736,13 @@ namespace TuringServer
 
             if (FolderID == 0)
             {
-                ServerSendFunctions.SendTCPData(SenderClientID, ServerSendFunctions.ErrorNotification("Failed to delete folder - Cannot delete base project folder."));
+                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to delete folder - Cannot delete base project folder."));
                 return;
             }
 
             if (!Server.LoadedProject.FolderDataLookup.ContainsKey(FolderID))
             {
-                ServerSendFunctions.SendTCPData(SenderClientID, ServerSendFunctions.ErrorNotification("Failed to delete folder - Folder doesn't exist."));
+                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to delete folder - Folder doesn't exist."));
                 return;
             }
 
@@ -779,7 +779,7 @@ namespace TuringServer
                 }
             }
 
-            ServerSendFunctions.SendTCPToAllClients(ServerSendFunctions.FolderDeleted(FolderID));
+            Server.SendTCPToAllClients(ServerSendPacketFunctions.FolderDeleted(FolderID));
         }
 
         #endregion

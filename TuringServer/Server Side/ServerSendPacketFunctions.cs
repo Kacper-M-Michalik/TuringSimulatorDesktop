@@ -5,27 +5,8 @@ using TuringServer.Logging;
 
 namespace TuringServer
 {
-    static class ServerSendFunctions
+    static class ServerSendPacketFunctions
     {
-        #region Helper Functions
-        public static void SendTCPData(int ClientID, Packet Data)
-        {
-            Server.Clients[ClientID].TCP.SendDataToClient(Data);
-        }
-
-        public static void SendTCPToAllClients(Packet Data)
-        {
-            for (int i = 0; i < Server.MaxClients; i++)
-            {
-                if (Server.Clients[i].TCP.ConnectionSocket != null)
-                {
-                    Server.Clients[i].TCP.SendDataToClient(Data);
-                }
-            }
-            //Data.Dispose();
-        }
-        #endregion
-
         #region Main
         public static Packet LogData(string LogData)
         {
@@ -40,6 +21,8 @@ namespace TuringServer
         public static Packet ErrorNotification(string ErrorString)
         {
             Packet Data = new Packet();
+
+            CustomLogging.Log("SERVER: ErrorNotif COPY: " + ErrorString);
 
             Data.Write((int)ServerSendPackets.ErrorNotification);
             Data.Write(ErrorString);

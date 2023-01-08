@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using TuringCore;
 
-namespace TuringServer
+namespace TuringCore
 {
-    public static class ClientSendFunctions
+    public static class ClientSendPacketFunctions
     {
         public static Packet LoadProject(string Location)
         {

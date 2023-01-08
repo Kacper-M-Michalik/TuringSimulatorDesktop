@@ -26,17 +26,16 @@ namespace TuringTesting
 
         public static void ReceiveLogData(Packet Data)
         {
-            Console.WriteLine("LOG DATA FROM SERVER: " + Data.ReadString());
+            CustomLogging.Log("LOG DATA FROM SERVER: " + Data.ReadString());
         }
-
 
         public static void ReceivedFileFromServer(Packet Data)
         {
             CustomLogging.Log("CLIENT: Recieved File");
 
-            if (UIEventBindings.DataSubscribers.ContainsKey(Data.ReadInt(false)))
+            if (UIEventManager.DataSubscribers.ContainsKey(Data.ReadInt(false)))
             {
-                List<ReceivedDataCallback> Callbacks = UIEventBindings.DataSubscribers[Data.ReadInt(false)];
+                List<ReceivedDataCallback> Callbacks = UIEventManager.DataSubscribers[Data.ReadInt(false)];
 
                 int BasePointer = Data.ReadPointerPosition;
                 for (int i = 1; i < Callbacks.Count; i++)

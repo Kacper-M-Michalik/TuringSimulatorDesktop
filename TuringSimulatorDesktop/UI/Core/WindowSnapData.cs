@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TuringSimulatorDesktop.UI.Prefabs;
 
 namespace TuringSimulatorDesktop.UI
 {
@@ -19,7 +20,7 @@ namespace TuringSimulatorDesktop.UI
     public class WindowGroupData
     {
         public List<WindowGroupData> SubGroups;
-        public WindowView ChildWindow;
+        public Window ChildWindow;
         public GroupType TilingOrientation;
 
         int X, Y;

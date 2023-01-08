@@ -18,6 +18,12 @@
     <None Remove="OLDUI\**" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Remove="UI\Core\UIMesh.cs" />
+    <Compile Remove="UI\Views\FileViewerView.cs" />
+    <Compile Remove="UI\Views\OldWindowView.cs" />
+    <Compile Remove="UI\Views\WindowView.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <None Remove="Icon.ico" />
     <None Remove="Icon.bmp" />
   </ItemGroup>

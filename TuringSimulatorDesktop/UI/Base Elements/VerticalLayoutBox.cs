@@ -2,88 +2,169 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using TuringSimulatorDesktop.Input;
 
 namespace TuringSimulatorDesktop.UI
 {
-    public class VerticalLayoutBox : IVisualElement
+    public class VerticalLayoutBox : IVisualElement, IPollable
     {
-        public int Width, Height;
+        Vector2 position;
+        public Vector2 Position
+        {
+            get => position;
+            set
+            {
+                position = value;
+                Group.X = UIUtils.ConvertFloatToInt(position.X);
+                Group.Y = UIUtils.ConvertFloatToInt(position.Y);
+                UpdateLayout();
+                Port.X = UIUtils.ConvertFloatToInt(Position.X); 
+                Port.Y = UIUtils.ConvertFloatToInt(Position.Y);
+            }
+        }
+
+        Point bounds;
+        public Point Bounds
+        {
+            get => bounds;
+            set
+            {
+                bounds = value;
+                Group.Width = bounds.X;
+                Group.Height = bounds.Y;
+                Port.Width = bounds.X;
+                Port.Height = bounds.Y;
+            }
+        }
+
         public bool IsActive = true;
 
-        List<IVisualElement> Elements;
+        Viewport Port;
+
+        Vector2 LayoutEndBound;
         public float Spacing;
         public bool UniformAreas;
         public bool UniformAreaAutoSize;
         public float UniformAreaSize;
-
+        public Vector2 ViewOffsetBoundsMin;
+        public Vector2 ViewOffset;
+        public bool Scrollable;
+        public float ScrollFactor = 0.2f;
         public bool DrawBounded = true;
 
-        Vector2 position;
-        public Vector2 Position { get => position; set => position = value; }
-        public Vector2 GetBounds { get => new Vector2(Width, Height); }
+        public ActionGroup Group { get; private set; }
+        List<IVisualElement> Elements;
 
-        public VerticalLayoutBox(int SetWidth, int SetHeight)
+        public VerticalLayoutBox()
         {
+            Group = InputManager.CreateActionGroup();
+            Group.PollableObjects.Add(this);
             Elements = new List<IVisualElement>();
+            Port = new Viewport();
+
+            Bounds = new Point(0, 0);
+            Position = Vector2.Zero;
+        }
+        public VerticalLayoutBox(int width, int height)
+        {
+            Group = InputManager.CreateActionGroup();
+            Group.PollableObjects.Add(this);
+            Elements = new List<IVisualElement>();
+            Port = new Viewport();
+
+            Bounds = new Point(width, height);
+            Position = Vector2.Zero;
+        }
+        public VerticalLayoutBox(int width, int height, Vector2 position)
+        {
+            Group = InputManager.CreateActionGroup();
+            Group.PollableObjects.Add(this);
+            Elements = new List<IVisualElement>();
+            Port = new Viewport();
+
+            Bounds = new Point(width, height);
+            Position = position;
+        }
+
+        public bool IsMouseOver()
+        {
+            return (IsActive && InputManager.MouseData.X >= Position.X && InputManager.MouseData.X <= Position.X + bounds.X && InputManager.MouseData.Y >= Position.Y && InputManager.MouseData.Y <= Position.Y + bounds.Y);
+        }
+
+        public void PollInput(bool IsInActionGroupFrame)
+        {
+            if (IsInActionGroupFrame && Scrollable && IsMouseOver() && InputManager.ScrollWheelDelta != 0)
+            {
+                ViewOffset.Y += (float)InputManager.ScrollWheelDelta * ScrollFactor;
+                ViewOffset.Y = Math.Clamp(ViewOffset.Y, Math.Clamp(-LayoutEndBound.Y + bounds.Y, float.MinValue, ViewOffsetBoundsMin.Y), ViewOffsetBoundsMin.Y);
+                UpdateLayout();
+            }
+        }
+
+        public void AddElement(IVisualElement Element)
+        {
+            Elements.Add(Element);
+        }
+
+        public void RemoveElement(IVisualElement Element)
+        {
+            Elements.Remove(Element);
+            UpdateLayout();
+        }
+
+        public void Clear()
+        {
+            Elements.Clear();
+            UpdateLayout();
         }
 
         public void UpdateLayout()
         {
-            Vector2 PlacementPosition = Position;
+            Vector2 PlacementPosition = Position + ViewOffset;
 
             if (!UniformAreas)
             {
                 for (int i = 0; i < Elements.Count; i++)
                 {
                     Elements[i].Position = PlacementPosition;
-                    PlacementPosition = new Vector2(PlacementPosition.X, PlacementPosition.Y + Elements[i].GetBounds.Y + Spacing);
+                    PlacementPosition = new Vector2(PlacementPosition.X, PlacementPosition.Y + Elements[i].Bounds.Y + Spacing);
                 }
             }
             else
             {
                 if (UniformAreaAutoSize)
                 {
-                    float GreatestBound = 0;
+                    float UniformAreaSize = 0;
                     for (int i = 0; i < Elements.Count; i++)
                     {
-                        if (Elements[i].GetBounds.Y > GreatestBound)
+                        if (Elements[i].Bounds.Y > UniformAreaSize)
                         {
-                            GreatestBound = Elements[i].GetBounds.Y;
+                            UniformAreaSize = Elements[i].Bounds.Y;
                         }
                     }
-
-                    for (int i = 0; i < Elements.Count; i++)
-                    {
-                        Elements[i].Position = PlacementPosition;
-                        PlacementPosition = new Vector2(PlacementPosition.X, PlacementPosition.Y + GreatestBound + Spacing);
-                    }
                 }
-                else
+               
+                for (int i = 0; i < Elements.Count; i++)
                 {
-                    for (int i = 0; i < Elements.Count; i++)
-                    {
-                        Elements[i].Position = PlacementPosition;
-                        PlacementPosition = new Vector2(PlacementPosition.X, PlacementPosition.Y + UniformAreaSize + Spacing);
-                    }
+                    Elements[i].Position = PlacementPosition;
+                    PlacementPosition = new Vector2(PlacementPosition.X, PlacementPosition.Y + UniformAreaSize + Spacing);
                 }
+                
             }
+
+            LayoutEndBound = PlacementPosition - ViewOffset - Position - ViewOffsetBoundsMin - new Vector2(0, Spacing);
         }
 
-        public void Draw(Viewport BoundPort = default)
+        public void Draw(Viewport? BoundPort = null)
         {
             if (IsActive)
             {
                 if (DrawBounded)
-                {
-                    Viewport Port = new Viewport(UIUtils.ConvertFloatToInt(Position.X), UIUtils.ConvertFloatToInt(Position.Y), Width, Height);
-                    if (!UIUtils.IsDefaultViewport(BoundPort))
+                {                    
+                    if (BoundPort != null)
                     {
-                        Port = UIUtils.CalculateOverlapPort(Port, BoundPort);
+                        Port = UIUtils.CalculateOverlapPort(Port, BoundPort.Value);
                     }
-
                     for (int i = 0; i < Elements.Count; i++)
                     {
                         Elements[i].Draw(Port);
@@ -91,20 +172,10 @@ namespace TuringSimulatorDesktop.UI
                 }
                 else
                 {
-                    if (UIUtils.IsDefaultViewport(BoundPort))
+                    for (int i = 0; i < Elements.Count; i++)
                     {
-                        for (int i = 0; i < Elements.Count; i++)
-                        {
-                            Elements[i].Draw();
-                        }
-                    }
-                    else
-                    {
-                        for (int i = 0; i < Elements.Count; i++)
-                        {
-                            Elements[i].Draw(BoundPort);
-                        }
-                    }
+                        Elements[i].Draw(BoundPort);
+                    }                   
                 }
             }
         }

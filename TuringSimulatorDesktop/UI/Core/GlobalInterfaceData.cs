@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -14,10 +15,12 @@ using System.IO;
 
 namespace TuringSimulatorDesktop
 {
-    public static class GlobalInterfaceData
+    public static class GlobalRenderingData
     {
-        public static int MinimumApplicationWindowWidth = 200;
-        public static int MinimumApplicationWindowHeight = 200;
+        public static int MainMenuWidth = 780;
+        public static int MainMenuHeight = 780;
+        public static int MinimumApplicationWindowWidth = 770;
+        public static int MinimumApplicationWindowHeight = 370;
 
         public static bool UIRequiresRedraw = true;
         
@@ -51,7 +54,7 @@ namespace TuringSimulatorDesktop
         static Color UIOverlayDebugColor2 = new Color(255, 124, 255);
         static Color UIOverlayDebugColor3 = new Color(0, 145, 0);
         static Color UIOverlayDebugColor4 = new Color(0, 255, 0);
-        public static Color DebugColor = Color.Yellow;
+        public static Color DebugColor = Color.Purple;
 
         public static Dictionary<UILookupKey, Texture2D> TextureLookup = new Dictionary<UILookupKey, Texture2D>();
 
@@ -63,7 +66,7 @@ namespace TuringSimulatorDesktop
             System.IO.MemoryStream memoryStream = new MemoryStream(bufferSize);
             Image.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Png);
 
-            Texture2D Texture = Texture2D.FromStream(GlobalInterfaceData.Device, memoryStream);
+            Texture2D Texture = Texture2D.FromStream(GlobalRenderingData.Device, memoryStream);
             return Texture;
         }
 
@@ -74,7 +77,7 @@ namespace TuringSimulatorDesktop
             System.IO.MemoryStream memoryStream = new MemoryStream(bufferSize);
             image.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Png);
 
-            Texture2D Texture = Texture2D.FromStream(GlobalInterfaceData.Device, memoryStream);
+            Texture2D Texture = Texture2D.FromStream(GlobalRenderingData.Device, memoryStream);
             return Texture;
         }
 
@@ -169,6 +172,68 @@ namespace TuringSimulatorDesktop
         }
     }
 
+    public static class GlobalLayoutData
+    {
+        public static Dictionary<UILayoutKey, LayoutData> Guide = new Dictionary<UILayoutKey, LayoutData>();
+        static Dictionary<UILayoutKey, LayoutData> InternalReferenceGuide = new Dictionary<UILayoutKey, LayoutData>()
+        {
+           // {UILayoutKey.FileExplorerTitle, new LayoutData( new Point(10, 0), new Vector2(  ) )}
+
+
+
+
+
+        };
+
+        static float UIScale = 1f;
+        public static void ChangeScale(float NewScale)
+        {
+            UIScale = NewScale;
+            Guide.Clear();
+
+            foreach (KeyValuePair<UILayoutKey, LayoutData> Pair in InternalReferenceGuide)
+            {
+                Guide.Add(Pair.Key, new LayoutData(Scale(Pair.Value.Bounds), Scale(Pair.Value.Position)));
+            }
+        }
+        public static Point Scale(Point Value)
+        {
+            return new Point(Convert.ToInt32((float)Value.X * UIScale), Convert.ToInt32((float)Value.Y * UIScale));
+        }
+        public static Vector2 Scale(Vector2 Value)
+        {
+            return new Vector2(Value.X * UIScale, Value.Y * UIScale);
+        }
+        public static float Scale(float Value)
+        {
+            return Value * UIScale;
+        }
+    }
+
+    public class LayoutData
+    {
+        public Point Bounds;
+        public Vector2 Position;
+
+        public LayoutData(Point bounds, Vector2 position)
+        {
+            Bounds = bounds;
+            Position = position;
+        }
+    }
+
+    public enum UILayoutKey
+    {
+        FileExplorerTitle,
+        FileExplorerSearchbar,
+        FileExplorerLayoutbox,
+        
+        FIleIcon,
+        FileLabel,
+    }
+
+
+
     public enum UILookupKey
     {
         AlphabetIcon,
@@ -187,4 +252,5 @@ namespace TuringSimulatorDesktop
         Debug1,
         Debug2,
     }
+    public enum AnchorPoint { TopLeft, TopRight, BottomLeft, BottomRight }
 }

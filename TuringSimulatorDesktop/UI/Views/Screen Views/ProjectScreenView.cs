@@ -6,15 +6,19 @@ using System.Threading.Tasks;
 using TuringSimulatorDesktop.Input;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using TuringSimulatorDesktop.UI.Prefabs;
 
 namespace TuringSimulatorDesktop.UI
 {
     public class ProjectScreenView : View, IPollable
     {
+        int Width, Height;
         ActionGroup Group;
 
-        UIMesh ScreenBackground;
-        UIMesh ToolbarBackground;
+        Icon Header;
+        Icon Background;
+
+       // FileBrowserView Browser;
 
         //Button ExitProjectButton;
         //Button WindowAddDropDown;
@@ -23,39 +27,21 @@ namespace TuringSimulatorDesktop.UI
         WindowGroupData BaseGroup;
         WindowGroupConnection Connections;
 
-        List<WindowView> Windows;
-        WindowView CurrentlyFocusedWindow;
+        List<Window> Windows;
+        Window CurrentlyFocusedWindow;
 
         bool IsDragging;
-
-        // DEBUG
-        WindowView DebugWindow;
 
         public ProjectScreenView()
         {
             Group = InputManager.CreateActionGroup();
-            ViewResize(GlobalInterfaceData.Device.PresentationParameters.BackBufferWidth, GlobalInterfaceData.Device.PresentationParameters.BackBufferHeight);
+            ViewResize(GlobalRenderingData.Device.PresentationParameters.BackBufferWidth, GlobalRenderingData.Device.PresentationParameters.BackBufferHeight);
 
-            ToolbarBackground = UIMesh.CreateRectangle(Vector2.Zero, GlobalInterfaceData.Device.PresentationParameters.BackBufferWidth, GlobalInterfaceData.ToolbarHeight, GlobalInterfaceData.HeaderColor);
-            ScreenBackground = UIMesh.CreateRectangle(Vector2.Zero, GlobalInterfaceData.Device.PresentationParameters.BackBufferWidth, GlobalInterfaceData.Device.PresentationParameters.BackBufferHeight, GlobalInterfaceData.BackgroundColor);
+            Windows = new List<Window>();
 
-            //ProjectTitle = new TextLabel(Vector2.One, 8, "LOREM ipsum wubbalubbadub dub");
-
-            Windows = new List<WindowView>();
-
-            CreateWindow();
-            CreateWindow();
-
-            /*
-            WindowView Win1 = new WindowView(200, 200, this, BaseGroup);
-            Win1.ViewPositionSet(300, 0);
-            Windows.Add(Win1);
-            DebugWindow = Win1;
-
-            WindowView Win2 = new WindowView(100, 400, this, BaseGroup);
-            Win2.ViewPositionSet(0, 25);
-            Windows.Add(Win2);
-            */
+            Window Temp = new Window(new Vector2(100, 100), new Point(300, 400));
+            Temp.SetView(new FileBrowserView(Point.Zero, Vector2.Zero));
+            Windows.Add(Temp);
 
             Group.PollableObjects.Add(this);
         }
@@ -92,7 +78,7 @@ namespace TuringSimulatorDesktop.UI
 
             if (IsDragging)
             {
-                CurrentlyFocusedWindow.ViewPositionMove(InputManager.MouseDeltaX, InputManager.MouseDeltaY);
+                CurrentlyFocusedWindow.Position += new Vector2(InputManager.MouseDeltaX, InputManager.MouseDeltaY);
 
                 if (InputManager.LeftMouseReleased)
                 {
@@ -101,7 +87,7 @@ namespace TuringSimulatorDesktop.UI
                 }
             }
 
-            if (!IsDragging && InputManager.LeftMousePressed && CurrentlyFocusedWindow != null && CurrentlyFocusedWindow.IsMouseOverTab())
+            if (!IsDragging && InputManager.LeftMousePressed && CurrentlyFocusedWindow != null && CurrentlyFocusedWindow.IsMouseOverHeader())
             {
                 IsDragging = true;
             }
@@ -109,9 +95,9 @@ namespace TuringSimulatorDesktop.UI
 
         public override void Draw()
         {
-            GlobalUIRenderer.Draw(ScreenBackground);
-            GlobalUIRenderer.Draw(ToolbarBackground);
-            //GlobalMeshRenderer.Draw(ProjectTitle, Port);
+            Background.Draw();
+            Header.Draw();
+
             for (int i = 0; i < Windows.Count; i++)
             {
                 Windows[i].Draw();
@@ -123,7 +109,7 @@ namespace TuringSimulatorDesktop.UI
             WindowGroupData NewBaseGroup = new WindowGroupData();
                 
             WindowGroupData NewWindowGroup = new WindowGroupData();
-            WindowView NewWindow = new WindowView(100, 100, this);
+            Window NewWindow = new Window(new Vector2(100, 100), new Point(300, 400));
             NewWindowGroup.ChildWindow = NewWindow;
 
             if (BaseGroup != null) NewBaseGroup.SubGroups.Add(BaseGroup);
@@ -136,11 +122,13 @@ namespace TuringSimulatorDesktop.UI
 
         public override void ViewResize(int NewWidth, int NewHeight)
         {
+            Width = NewWidth;
+            Height = NewHeight;
             Group.Width = NewWidth;
             Group.Height = NewHeight;
 
-            ToolbarBackground = UIMesh.CreateRectangle(Vector2.Zero, NewWidth, GlobalInterfaceData.ToolbarHeight, GlobalInterfaceData.HeaderColor);
-            ScreenBackground = UIMesh.CreateRectangle(Vector2.Zero, NewWidth, NewHeight, GlobalInterfaceData.BackgroundColor); 
+            Background = new Icon(Width, Height, Vector2.Zero, GlobalRenderingData.BackgroundColor);
+            Header = new Icon(Width, GlobalRenderingData.WindowTitleBarHeight, Vector2.Zero, GlobalRenderingData.HeaderColor);
         }
 
         public override void ViewPositionSet(int X, int Y)

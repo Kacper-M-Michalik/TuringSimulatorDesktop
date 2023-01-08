@@ -23,7 +23,7 @@ namespace TuringServer
         static TcpListener ServerTcpListener;
         public static Dictionary<int, ServerClientSlot> Clients { get; private set; }
 
-        static Queue<Packet> PacketProcessingQueue;
+        static Queue<Packet> PacketProcessingQueue = new Queue<Packet>();
         static Queue<Packet> PacketsBeingProcessed;
         static bool MarkForClosing;
         static long LastTick;
@@ -53,8 +53,6 @@ namespace TuringServer
             CustomLogging.Log("SERVER: Server Started on port: " + Port.ToString());
 
             ServerTcpListener.BeginAcceptTcpClient(new AsyncCallback(NewTCPClientConnectedCallback), null);
-
-            PacketProcessingQueue = new Queue<Packet>();
             
             RunServer();
 
@@ -82,6 +80,26 @@ namespace TuringServer
             ServerThread.Start();
             */
         }
+
+        #region Helper Functions
+        public static void SendTCPData(int ClientID, Packet Data)
+        {
+            Clients[ClientID].TCP.SendDataToClient(Data);
+            Data.Dispose();
+        }
+
+        public static void SendTCPToAllClients(Packet Data)
+        {
+            for (int i = 0; i < MaxClients; i++)
+            {
+                if (Clients[i].TCP.ConnectionSocket != null)
+                {
+                    Clients[i].TCP.SendDataToClient(Data);
+                }
+            }
+            Data.Dispose();
+        }
+        #endregion
 
         static void RunServer()
         {    
@@ -183,10 +201,11 @@ namespace TuringServer
             ServerTcpListener.Stop();
             ServerTcpListener = null;
             Clients = null;
-            PacketProcessingQueue = null;
+            PacketProcessingQueue.Clear();
             PacketsBeingProcessed = null;
             LoadedProject = null;
-
+            
+            CustomLogging.LogClientID = -1;
             CustomLogging.Log("SERVER: Server Closed");
         }
     }
@@ -252,15 +271,14 @@ namespace TuringServer
 
             private void OnReceiveDataFromClient(IAsyncResult Result)
             {
-                try
-                {
-                    if (ConnectionSocket == null) return;
+               // try
+              //  {
+                    //if (ConnectionSocket == null) return;
 
                     CustomLogging.Log("THREAD NOTIF SERVER: Server dealing with incoming data on thread " + Thread.CurrentThread.ManagedThreadId.ToString());
-                    int IncomingDataLength = DataStream.EndRead(Result);
 
                     //warning -> if ther are packets that are intended for this client after disconnect, shit will hit the fan, possible bug with customconsole, as changing logclientid on seperate thread than variable is used on
-                    if (IncomingDataLength == 0)
+                    if (!ConnectionSocket.Connected)
                     {
                         TCPInternalDisconnect();
                         CustomLogging.Log("SERVER: Client " + ID.ToString() + " has disconnected!");
@@ -268,7 +286,9 @@ namespace TuringServer
                         if (CustomLogging.LogClientID == ID) CustomLogging.LogClientID = -1;
 
                         return;
-                    }
+                    }            
+
+                    int IncomingDataLength = DataStream.EndRead(Result);
 
                     byte[] UsefuldataBuffer = new byte[IncomingDataLength];
                     Array.Copy(ReceiveDataBuffer, UsefuldataBuffer, IncomingDataLength);
@@ -302,11 +322,11 @@ namespace TuringServer
                     }
 
                     if (ConnectionSocket != null) DataStream.BeginRead(ReceiveDataBuffer, 0, DataBufferSize, OnReceiveDataFromClient, null);
-                }
-                catch (Exception E)
-                {
-                    CustomLogging.Log(E.ToString());
-                }
+              //   }
+             //   catch (Exception E)
+             //   {
+             //       CustomLogging.Log(E.ToString());
+             //   }
             }
 
             public void TCPInternalDisconnect()

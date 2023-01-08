@@ -11,64 +11,101 @@ using TuringSimulatorDesktop.Input;
 namespace TuringSimulatorDesktop.UI
 {
     public delegate void OnEditInputBox(InputBox Sender);
+    public delegate void OnClickedInputBox(InputBox Sender);
+    public delegate void OnClickedAwayInputBox(InputBox Sender);
 
     public class InputBox : IVisualElement, IClickable
     {
-        public int Width { get => OutputLabel.Width; set { OutputLabel.Width = value; } }
-        public int Height { get => OutputLabel.Height; set { OutputLabel.Height = value; } }
-        public bool IsActive { get => OutputLabel.IsActive; set { OutputLabel.IsActive = value; } }
+        Vector2 position;
+        public Vector2 Position
+        {
+            get => position;
+            set
+            {
+                position = value;
+                Background.Position = position;
+                OutputLabel.Position = position;
+            }
+        }
 
-        //not in use right now
-        KeyboardModifiers Modifiers = new KeyboardModifiers();
+        Point bounds;
+        public Point Bounds
+        {
+            get => bounds;
+            set
+            {
+                bounds = value;
+                Background.Bounds = bounds;
+                OutputLabel.Bounds = bounds;
+            }
+        }
 
+        public bool IsActive = true;
+
+        //TODO - NOT FULLY IMPLEMENTED
+        public KeyboardModifiers Modifiers = new KeyboardModifiers();
         StringBuilder Builder = new StringBuilder();
-
         public bool IsFocused;
         public event OnEditInputBox EditEvent;
+        public event OnClickedAwayInputBox ClickEvent;
+        public event OnClickedAwayInputBox ClickAwayEvent;
+        public string Text 
+        {
+            get => OutputLabel.Text;
+            set
+            {
+                OutputLabel.Text = value;
+                Builder.Clear();
+                Builder.Append(Text);
+            }
+        }
+        public Color BackgroundColor
+        {
+            get => Background.DrawColor;
+            set => Background.DrawColor = value;
+        }
 
-        public string Text { get => OutputLabel.Text; set => OutputLabel.Text = value; }
-        public Label OutputLabel;
-        public UIMesh Background;
+        Icon Background;
+        Label OutputLabel;
 
-        public Vector2 Position { get => OutputLabel.Position; set { OutputLabel.Position = value; Background.MeshTransformations = Matrix.CreateWorld(new Vector3(Position.X, Position.Y, 0), Vector3.Forward, Vector3.Up); } }
-        public Vector2 GetBounds { get => new Vector2(Width, Height); }
+        public InputBox(int width, int height, ActionGroup group)
+        {
+            Background = new Icon(GlobalRenderingData.DebugColor);
+            OutputLabel = new Label(0, 0);
+            Bounds = new Point(width, height);
+            Position = Vector2.Zero;
 
+            GlobalRenderingData.OSWindow.TextInput += TextInput;
+
+            group.ClickableObjects.Add(this);
+        }
         public InputBox(int width, int height, Vector2 position, ActionGroup group)
         {
-            OutputLabel = new Label(width, height, position, GlobalInterfaceData.StandardRegularFont);
-            Background = UIMesh.CreateRectangle(Vector2.Zero, width, height, GlobalInterfaceData.DebugColor);
+            Background = new Icon();
+            OutputLabel = new Label(0,0);
+            Bounds = new Point(width, height);
             Position = position;
 
-            GlobalInterfaceData.OSWindow.TextInput += TextInput;
+            GlobalRenderingData.OSWindow.TextInput += TextInput;
 
             group.ClickableObjects.Add(this);
         }
 
         public void Clicked()
         {
-//#if DEBUG
-            //Background.OverlayColor = GlobalInterfaceData.UIOverlayDebugColor2;
-//#endif
             IsFocused = true;
+            ClickEvent.Invoke(this);
         }
 
         public void ClickedAway()
-        {
-#if DEBUG
-            Background.OverlayColor = GlobalInterfaceData.DebugColor;
-#endif
+        {                        
             IsFocused = false;
+            ClickAwayEvent.Invoke(this);
         }
 
         public bool IsMouseOver()
         {
-            return (IsActive && InputManager.MouseData.X >= Position.X && InputManager.MouseData.X <= Position.X + Width && InputManager.MouseData.Y >= Position.Y && InputManager.MouseData.Y <= Position.Y + Height);
-        }
-
-        public void Draw(Viewport BoundPort = default)
-        {
-            GlobalUIRenderer.Draw(Background);
-            OutputLabel.Draw();
+            return (IsActive && InputManager.MouseData.X >= Position.X && InputManager.MouseData.X <= Position.X + bounds.X && InputManager.MouseData.Y >= Position.Y && InputManager.MouseData.Y <= Position.Y + bounds.Y);
         }
 
         public void TextInput(object Sender, TextInputEventArgs Args)
@@ -81,7 +118,7 @@ namespace TuringSimulatorDesktop.UI
                         Builder.Append("    ");
                         break;
                     case Keys.Enter:
-                        Builder.Append("/n");
+                        if (Modifiers.AllowsNewLine) Builder.Append("/n");
                         break;
                     case Keys.Back:
                         if (Builder.Length > 0)
@@ -100,6 +137,15 @@ namespace TuringSimulatorDesktop.UI
                 EditEvent?.Invoke(this);            
             }
            
+        }
+
+        public void Draw(Viewport? BoundPort = null)
+        {
+            if (IsActive)
+            {
+                Background.Draw(BoundPort);
+                OutputLabel.Draw(BoundPort);
+            }
         }
 
     }

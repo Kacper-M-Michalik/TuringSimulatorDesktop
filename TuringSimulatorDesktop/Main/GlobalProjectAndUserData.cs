@@ -12,17 +12,18 @@ namespace TuringSimulatorDesktop
 {
     public static class GlobalProjectAndUserData
     {
+        static readonly JsonSerializerOptions Options = new JsonSerializerOptions() { WriteIndented = false };
+
         public static string UserDataPath;
         public static LocalUserData UserData;    
 
         public static void SaveUserData()
         {
-            JsonSerializerOptions Options = new JsonSerializerOptions() { WriteIndented = false };
-            string SaveJson = JsonSerializer.Serialize(UserData, Options);
+            //string SaveJson = JsonSerializer.Serialize(UserData, Options);
 
             try
             {
-                File.WriteAllBytes(UserDataPath, Encoding.Unicode.GetBytes(SaveJson));
+                File.WriteAllBytes(UserDataPath, JsonSerializer.SerializeToUtf8Bytes(UserData, Options));
             }
             catch (Exception E)
             {
@@ -33,11 +34,11 @@ namespace TuringSimulatorDesktop
 
         public static void LoadUserData(string Path)
         {
-            string SaveFileJson = File.ReadAllText(Path, Encoding.Unicode);
+            //string SaveFileJson = File.ReadAllText(Path, Encoding.Unicode);
 
             try
             {
-                UserData = JsonSerializer.Deserialize<LocalUserData>(SaveFileJson);
+                UserData = JsonSerializer.Deserialize<LocalUserData>(File.ReadAllBytes(Path));
                 UserDataPath = Path;
             }
             catch (Exception E)

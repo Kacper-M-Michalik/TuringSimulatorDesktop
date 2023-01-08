@@ -9,7 +9,7 @@ namespace TuringSimulatorDesktop.Input
     public class KeyboardModifiers
     {
         public bool AllowsShift = true;
-        public bool AllowsAltGear = true;
+        public bool AllowsNewLine = true;
         public bool AllowsNumbers = true;
         public bool AllowsCharacters = true;
         public bool AllowsSymbols = true;

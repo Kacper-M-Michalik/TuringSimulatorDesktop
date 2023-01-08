@@ -46,7 +46,7 @@ namespace TuringSimulatorDesktop.UI
             
             UpdateElements();
 
-            DebugManager.LastCreatedWindow = this;
+           // DebugManager.LastCreatedWindow = this;
         }
 
         public override void Draw()
@@ -57,7 +57,7 @@ namespace TuringSimulatorDesktop.UI
             if (CurrentView != null) CurrentView.Draw();
         }
 
-        public void CloseWindow(Button Sender)
+        public void CloseWindow(ButtonIcon Sender)
         {
             IsMarkedForDeletion = true;
         }
@@ -70,7 +70,7 @@ namespace TuringSimulatorDesktop.UI
 
         public bool IsMouseOverTab()
         {
-            if (InputManager.MouseData.Y < (Y + GlobalInterfaceData.WindowTabHeight) && InputManager.MouseData.Y > Y && InputManager.MouseData.X < (X + Width) && InputManager.MouseData.X > X) return true;
+            if (InputManager.MouseData.Y < (Y + GlobalRenderingData.WindowTabHeight) && InputManager.MouseData.Y > Y && InputManager.MouseData.X < (X + Width) && InputManager.MouseData.X > X) return true;
             return false;
         }
 
@@ -105,8 +105,8 @@ namespace TuringSimulatorDesktop.UI
     
         public void UpdateElements()
         {
-            Border = UIMesh.CreateRectangle(new Vector2(X, Y), Width, Height, GlobalInterfaceData.DebugColor);
-            Background = UIMesh.CreateRectangle(new Vector2(X + 1, Y + 1), Width - 2, Height - 2, GlobalInterfaceData.BackgroundColor);
+            Border = UIMesh.CreateRectangle(new Vector2(X, Y), Width, Height, GlobalRenderingData.DebugColor);
+            Background = UIMesh.CreateRectangle(new Vector2(X + 1, Y + 1), Width - 2, Height - 2, GlobalRenderingData.BackgroundColor);
             //CloseButton.Position = new Vector2(X + Width - 15, Y + 5);
             Group.X = X;
             Group.Y = Y;
