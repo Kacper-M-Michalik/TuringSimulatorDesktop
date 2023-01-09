@@ -47,7 +47,7 @@ namespace TuringSimulatorDesktop.UI
                 UpdateLabel();
             } 
         }
-        public float FontSize = 12f;
+        public float FontSize = 12;
         public bool AutoSizeMesh = false;
 
         public Icon Background;

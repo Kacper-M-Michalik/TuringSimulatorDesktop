@@ -35,7 +35,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         public FileData Data;
         FileBrowserView Browser;
 
-        ButtonIcon Background;
+        Button Background;
         Label NameLabel;
 
         public FileDisplayItem(FileData data, FileBrowserView browser, ActionGroup group)
@@ -43,7 +43,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Data = data;
             Browser = browser;
 
-            Background = new ButtonIcon(group);
+            Background = new Button(group);
             Background.BaseTexture = GlobalRenderingData.TextureLookup[UILookupKey.FolderIcon];
             Background.OnClickedEvent += Clicked;
             NameLabel = new Label();

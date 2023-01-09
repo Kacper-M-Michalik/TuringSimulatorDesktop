@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using TuringSimulatorDesktop.UI.Prefabs;
+using System.Windows.Forms;
 
 namespace TuringSimulatorDesktop.UI
 {
@@ -20,14 +21,14 @@ namespace TuringSimulatorDesktop.UI
         Icon Header;
         Icon Background;
 
-        ButtonIcon CloseButton;
+        Button CloseButton;
 
         Label Title;
         
-        ButtonIcon NewProjectButton;
-        ButtonIcon LoadProjectButton;
-        ButtonIcon JoinProjectButton;
-        ButtonIcon HostProjectButton;
+        Button NewProjectButton;
+        Button LoadProjectButton;
+        Button JoinProjectButton;
+        Button HostProjectButton;
 
         RecentFilesViewer Viewer;
         //DropDownMenu Menu;
@@ -40,7 +41,7 @@ namespace TuringSimulatorDesktop.UI
             //Background = new Icon(Width, Height, Vector2.Zero, GlobalInterfaceData.BackgroundColor);// UIMesh.CreateRectangle(Vector2.Zero, Width, Height, GlobalInterfaceData.BackgroundColor);
             //Header = new Icon(Width, GlobalInterfaceData.WindowTitleBarHeight, Vector2.Zero, GlobalInterfaceData.HeaderColor);//UIMesh.CreateRectangle(Vector2.Zero, Width, GlobalInterfaceData.WindowTitleBarHeight, GlobalInterfaceData.HeaderColor);
 
-            CloseButton = new ButtonIcon(45, GlobalRenderingData.WindowTitleBarHeight, UILookupKey.Debug1, new Vector2(735, 0), Group);
+            CloseButton = new Button(45, GlobalRenderingData.WindowTitleBarHeight, UILookupKey.Debug1, new Vector2(705, 0), Group);
             CloseButton.OnClickedEvent += Close;
             CloseButton.HighlightOnMouseOver = true;
 
@@ -48,46 +49,73 @@ namespace TuringSimulatorDesktop.UI
             Title.FontSize = 20;
             Title.Text = "T";
 
-            Viewer = new RecentFilesViewer(500, 700, new Vector2(10, 42));
+            Viewer = new RecentFilesViewer(470, GlobalRenderingData.MainMenuHeight - 52, new Vector2(10, 42));
             if (GlobalProjectAndUserData.UserData != null)
             {
                 Viewer.DisplayRecentFiles();
             }
 
-            NewProjectButton = new ButtonIcon(250, 70, UILookupKey.NewProjectButton, UILookupKey.NewProjectButtonHightlight, new Vector2(520, 42), Group);
+            NewProjectButton = new Button(250, 70, UILookupKey.NewProjectButton, UILookupKey.NewProjectButtonHightlight, new Vector2(490, 42), Group);
             NewProjectButton.HighlightOnMouseOver = true;
 
-            LoadProjectButton = new ButtonIcon(250, 70, UILookupKey.LoadProjectButton, UILookupKey.LoadProjectButtonHightlight, new Vector2(520, 122), Group);
+            LoadProjectButton = new Button(250, 70, UILookupKey.LoadProjectButton, UILookupKey.LoadProjectButtonHightlight, new Vector2(490, 122), Group);
             LoadProjectButton.HighlightOnMouseOver = true;
             LoadProjectButton.OnClickedEvent += SelectProjectLocation;
 
-            HostProjectButton = new ButtonIcon(250, 70, UILookupKey.HostProjectButton, new Vector2(520, 202), Group);
+            HostProjectButton = new Button(250, 70, UILookupKey.HostProjectButton, UILookupKey.HostProjectButtonHightlight, new Vector2(490, 202), Group);
             HostProjectButton.HighlightOnMouseOver = true;
 
-            JoinProjectButton = new ButtonIcon(250, 70, UILookupKey.JoinProjectButton, new Vector2(520, 282), Group);
+            JoinProjectButton = new Button(250, 70, UILookupKey.JoinProjectButton, UILookupKey.JoinProjectButtonHightlight, new Vector2(490, 282), Group);
             JoinProjectButton.HighlightOnMouseOver = true;
 
            // Menu = new DropDownMenu(60, 20, new Vector2(45, 6), Group);
         }
 
+        string Location;
         public void SelectProjectLocation(Button Sender)
         {
-            BackendInterface.StartProjectServer(2, 28104);
-            Packet LoadPacket = ClientSendPacketFunctions.LoadProject("E:\\Professional Programming\\MAIN\\TestLocation");
-            LoadPacket.InsertPacketLength();
-            LoadPacket.SaveTemporaryBufferToPernamentReadBuffer();
-            Server.AddPacketToProcessOnServerThread(0, LoadPacket);
-            
-            UIEventManager.ClientSuccessConnectingDelegate += ConnectedToServer;
-            Client.ConnectToServer(System.Net.IPAddress.Parse("127.0.0.1"), 28104);
+            OpenFileDialog Dialog = new OpenFileDialog
+            {
+                InitialDirectory = @"C:\",
+                Title = "Browse tproj Files",
+
+                CheckFileExists = true,
+                CheckPathExists = true,
+
+                DefaultExt = "tproj",
+                Filter = "tproj files (*.tproj)|*.tproj",
+                FilterIndex = 2,
+                RestoreDirectory = true,
+
+                ReadOnlyChecked = true,
+                ShowReadOnly = true
+            };
+
+            if (Dialog.ShowDialog() == DialogResult.OK)
+            {
+                BackendInterface.StartProjectServer(1, 28104);
+                Location = Dialog.FileName;
+                UIEventManager.ClientSuccessConnectingDelegate = ConnectedToLocalServerInThisInstance;
+                Client.ConnectToServer(System.Net.IPAddress.Parse("127.0.0.1"), 28104);
+            }
+        }
+        void ConnectedToLocalServerInThisInstance(object sender, EventArgs e)
+        {
+            UIEventManager.ClientSuccessConnecting = false;
+            UIEventManager.ClientSuccessConnectingDelegate = null;
+            UIEventManager.ServerSuccessLoadingProjectDelegate = ServerSuccessfullyLoadedLocalFile;
+            Client.SendTCPData(ClientSendPacketFunctions.LoadProject(Location));
+        }
+        void ServerSuccessfullyLoadedLocalFile(object sender, EventArgs e)
+        {
+            UIEventManager.ServerSuccessLoadingProject = false;
+            UIEventManager.ServerSuccessLoadingProjectDelegate = null;
+            GlobalProjectAndUserData.UpdateRecentlyOpenedFile(Location);
+            ConnectedToServer(this, null);
         }
 
         void ConnectedToServer(object sender, EventArgs e)
         {
-            FileInfoWrapper OpenedProject = new FileInfoWrapper("TestProject", "E:\\Professional Programming\\MAIN\\TestLocation", DateTime.Now);
-            GlobalProjectAndUserData.UserData.RecentlyAccessedFiles.Add(OpenedProject);
-            GlobalProjectAndUserData.SaveUserData();
-
             UIEventManager.ClientSuccessConnecting = false;
             UIEventManager.ClientSuccessConnectingDelegate = null;
 

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace TuringSimulatorDesktop.UI
 {
-    public class StateTransitionPrefab
+    public class StateTransitionView
     {
         //( CurrentState , TapeValue ) => ( NewState , New Value, Move Dir  )
 
@@ -20,7 +20,7 @@ namespace TuringSimulatorDesktop.UI
         public InputBox NewTapeValueTextBox;
         public InputBox MoveDirectionTextBox;
 
-        public StateTransitionPrefab()
+        public StateTransitionView()
         {
             //BackgroundLabel = new TextLabel();
 

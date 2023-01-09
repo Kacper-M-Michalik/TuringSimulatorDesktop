@@ -18,6 +18,8 @@ namespace TuringSimulatorDesktop.UI
         Icon Header;
         Icon Background;
 
+        Label Title;
+
        // FileBrowserView Browser;
 
         //Button ExitProjectButton;
@@ -40,9 +42,14 @@ namespace TuringSimulatorDesktop.UI
             Windows = new List<Window>();
 
             Window Temp = new Window(new Vector2(100, 100), new Point(300, 400));
-            Temp.SetView(new FileBrowserView(Point.Zero, Vector2.Zero));
+            Temp.AddView(new FileBrowserView());
+            Temp.AddView(new FileBrowserView());
             Windows.Add(Temp);
 
+            Title = new Label();
+            Title.FontSize = 14;
+            Title.Text = GlobalProjectAndUserData.ProjectData.ProjectName;
+            Title.Position = new Vector2(1920 / 2, 0);
             Group.PollableObjects.Add(this);
         }
 
@@ -97,6 +104,7 @@ namespace TuringSimulatorDesktop.UI
         {
             Background.Draw();
             Header.Draw();
+            Title.Draw();
 
             for (int i = 0; i < Windows.Count; i++)
             {

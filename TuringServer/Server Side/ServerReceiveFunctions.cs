@@ -61,7 +61,7 @@ namespace TuringServer
 
             Server.LoadedProject = NewProjectData;
 
-            //notify connected clients that project was changed?
+            Server.SendTCPToAllClients(ServerSendPacketFunctions.ProjectData());
         }
 
         /* -PACKET LAYOUT-

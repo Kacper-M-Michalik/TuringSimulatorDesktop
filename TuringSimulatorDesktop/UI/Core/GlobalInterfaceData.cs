@@ -17,8 +17,8 @@ namespace TuringSimulatorDesktop
 {
     public static class GlobalRenderingData
     {
-        public static int MainMenuWidth = 780;
-        public static int MainMenuHeight = 780;
+        public static int MainMenuWidth = 750;
+        public static int MainMenuHeight = 750;
         public static int MinimumApplicationWindowWidth = 770;
         public static int MinimumApplicationWindowHeight = 370;
 
@@ -95,9 +95,11 @@ namespace TuringSimulatorDesktop
 
             TextureLookup.Add(UILookupKey.NewProjectButtonHightlight, ApplyBorderHighlight(CopyTexture(UILookupKey.NewProjectButton)));
             TextureLookup.Add(UILookupKey.LoadProjectButtonHightlight, ApplyBorderHighlight(CopyTexture(UILookupKey.LoadProjectButton)));
+            TextureLookup.Add(UILookupKey.HostProjectButtonHightlight, ApplyBorderHighlight(CopyTexture(UILookupKey.HostProjectButton)));
+            TextureLookup.Add(UILookupKey.JoinProjectButtonHightlight, ApplyBorderHighlight(CopyTexture(UILookupKey.JoinProjectButton)));
 
-            TextureLookup.Add(UILookupKey.Debug1, GenerateFilledTexture(10, 10, UIOverlayDebugColor1));
-            TextureLookup.Add(UILookupKey.Debug2, GenerateFilledTexture(10, 10, UIOverlayDebugColor2));
+            TextureLookup.Add(UILookupKey.Debug1, GenerateFilledTexture(1, 1, UIOverlayDebugColor1));
+            TextureLookup.Add(UILookupKey.Debug2, GenerateFilledTexture(1, 1, UIOverlayDebugColor2));
 
 
             //manually implement per ui
@@ -170,6 +172,8 @@ namespace TuringSimulatorDesktop
             Texture.SetData(Values);
             return Texture;
         }
+
+
     }
 
     public static class GlobalLayoutData

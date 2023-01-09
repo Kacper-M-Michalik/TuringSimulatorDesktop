@@ -158,6 +158,7 @@ namespace TuringSimulatorDesktop
             //Process interrupts
             if (UIEventManager.ClientSuccessConnecting) UIEventManager.ClientSuccessConnectingDelegate?.Invoke(this, new EventArgs());
             if (UIEventManager.ClientFailedConnecting) UIEventManager.ClientFailedConnectingDelegate?.Invoke(this, new EventArgs());
+            if (UIEventManager.ServerSuccessLoadingProject) UIEventManager.ServerSuccessLoadingProjectDelegate?.Invoke(this, new EventArgs());
 
             if (GlobalRenderingData.UIRequiresRedraw)
             {

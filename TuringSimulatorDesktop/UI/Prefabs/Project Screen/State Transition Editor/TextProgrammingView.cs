@@ -14,7 +14,7 @@ namespace TuringSimulatorDesktop.UI
         //OldButton SaveButton;
         //OldButton CompileButton;
 
-        List<StateTransitionPrefab> TransitionList;
+        List<StateTransitionView> TransitionList;
 
         public TextProgrammingView()
         {

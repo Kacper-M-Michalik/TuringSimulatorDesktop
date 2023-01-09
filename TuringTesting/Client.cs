@@ -191,7 +191,8 @@ namespace TuringTesting
                     //Get Type
                     int PacketType = Data.ReadInt();
                     //Execute function
-                    ClientReceiveFunctions.PacketToFunction[PacketType](Data);
+                    if (ClientReceiveFunctions.PacketToFunction.ContainsKey(PacketType))
+                        ClientReceiveFunctions.PacketToFunction[PacketType](Data);
                     Data.Dispose();
                 }
 

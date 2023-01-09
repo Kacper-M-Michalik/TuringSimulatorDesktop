@@ -10,8 +10,8 @@ namespace TuringSimulatorDesktop.UI
 {
     public interface IVisualElement
     {
-        public void Draw(Viewport? BoundPort = null);
         public Vector2 Position { get; set; }
         public Point Bounds { get; set; }
+        public void Draw(Viewport? BoundPort = null);
     }
 }

@@ -98,7 +98,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         public RecentFileCard(FileInfoWrapper FileInfo)
         {
-            Background = new Icon(478, 80, Vector2.Zero, GlobalRenderingData.SubHeaderColor);
+            Background = new Icon(450, 80, Vector2.Zero, GlobalRenderingData.SubHeaderColor);
 
             FileName = new Label();
             FileLocation = new Label();
@@ -125,7 +125,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         public Point Bounds 
         {
-            get => new Point(478, 80); 
+            get => Background.Bounds; 
             set 
             { 
                 return;

@@ -21,6 +21,8 @@ namespace TuringSimulatorDesktop.UI
                 Group.X = UIUtils.ConvertFloatToInt(position.X);
                 Group.Y = UIUtils.ConvertFloatToInt(position.Y);
                 UpdateLayout();
+                Port.X = UIUtils.ConvertFloatToInt(Position.X);
+                Port.Y = UIUtils.ConvertFloatToInt(Position.Y);
             }
         }
 
@@ -33,10 +35,14 @@ namespace TuringSimulatorDesktop.UI
                 bounds = value;
                 Group.Width = bounds.X;
                 Group.Height = bounds.Y;
+                Port.Width = bounds.X;
+                Port.Height = bounds.Y;
             }
         }
 
         public bool IsActive = true;
+
+        Viewport Port;
 
         Vector2 LayoutEndBound;
         public float Spacing;
@@ -46,17 +52,28 @@ namespace TuringSimulatorDesktop.UI
         public Vector2 ViewOffsetBoundsMin;
         public Vector2 ViewOffset;
         public bool Scrollable;
-        public float ScrollFactor = 1f;
+        public float ScrollFactor = 0.2f;
         public bool DrawBounded = true;
 
         public ActionGroup Group { get; private set; }
         List<IVisualElement> Elements;
 
+        public HorizontalLayoutBox()
+        {
+            Group = InputManager.CreateActionGroup();
+            Group.PollableObjects.Add(this);
+            Elements = new List<IVisualElement>();
+            Port = new Viewport();
+
+            Bounds = new Point(0, 0);
+            Position = Vector2.Zero;
+        }
         public HorizontalLayoutBox(int width, int height)
         {
             Group = InputManager.CreateActionGroup();
             Group.PollableObjects.Add(this);
             Elements = new List<IVisualElement>();
+            Port = new Viewport();
 
             Bounds = new Point(width, height);
             Position = Vector2.Zero;
@@ -66,6 +83,7 @@ namespace TuringSimulatorDesktop.UI
             Group = InputManager.CreateActionGroup();
             Group.PollableObjects.Add(this);
             Elements = new List<IVisualElement>();
+            Port = new Viewport();
 
             Bounds = new Point(width, height);
             Position = position;
@@ -88,7 +106,20 @@ namespace TuringSimulatorDesktop.UI
 
         public void AddElement(IVisualElement Element)
         {
+            //change element group here REMEBER
             Elements.Add(Element);
+        }
+
+        public void RemoveElement(IVisualElement Element)
+        {
+            Elements.Remove(Element);
+            UpdateLayout();
+        }
+
+        public void Clear()
+        {
+            Elements.Clear();
+            UpdateLayout();
         }
 
         public void UpdateLayout()
@@ -107,29 +138,22 @@ namespace TuringSimulatorDesktop.UI
             {
                 if (UniformAreaAutoSize)
                 {
-                    float GreatestBound = 0;
+                    float UniformAreaSize = 0;
                     for (int i = 0; i < Elements.Count; i++)
                     {
-                        if (Elements[i].Bounds.X > GreatestBound)
+                        if (Elements[i].Bounds.X > UniformAreaSize)
                         {
-                            GreatestBound = Elements[i].Bounds.X;
+                            UniformAreaSize = Elements[i].Bounds.X;
                         }
                     }
+                }
 
-                    for (int i = 0; i < Elements.Count; i++)
-                    {
-                        Elements[i].Position = PlacementPosition;
-                        PlacementPosition = new Vector2(PlacementPosition.X + GreatestBound + Spacing, PlacementPosition.Y);
-                    }
-                }
-                else
+                for (int i = 0; i < Elements.Count; i++)
                 {
-                    for (int i = 0; i < Elements.Count; i++)
-                    {
-                        Elements[i].Position = PlacementPosition;
-                        PlacementPosition = new Vector2(PlacementPosition.X + UniformAreaSize + Spacing, PlacementPosition.Y);
-                    }
+                    Elements[i].Position = PlacementPosition;
+                    PlacementPosition = new Vector2(PlacementPosition.X + UniformAreaSize + Spacing, PlacementPosition.Y);
                 }
+
             }
 
             LayoutEndBound = PlacementPosition - ViewOffset - Position - ViewOffsetBoundsMin - new Vector2(Spacing, 0);
@@ -141,7 +165,6 @@ namespace TuringSimulatorDesktop.UI
             {
                 if (DrawBounded)
                 {
-                    Viewport Port = new Viewport(UIUtils.ConvertFloatToInt(Position.X), UIUtils.ConvertFloatToInt(Position.Y), bounds.X, bounds.Y);
                     if (BoundPort != null)
                     {
                         Port = UIUtils.CalculateOverlapPort(Port, BoundPort.Value);

@@ -32,9 +32,12 @@ namespace TuringServer
 
         public static Packet ProjectData()
         {
-            //send rules
-            //send directory
-            return null;
+            Packet Data = new Packet();
+
+            Data.Write((int)ServerSendPackets.SentProjectData);
+            Data.Write(Server.LoadedProject.ProjectName);
+
+            return Data;
         }
 
         public static Packet FolderData(int FolderID)

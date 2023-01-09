@@ -25,10 +25,12 @@ namespace TuringSimulatorDesktop
         public static void PushToListeners(int FileID, Packet Data)
         {
             List<SubscriberDataCallback> Subscribers = FileUpdateSubscribers[FileID];
+            int StartPointerPosition = Data.ReadPointerPosition;            
             //if (!FileUpdateSubscribers.ContainsKey(FileID)) return;
             for (int i = Subscribers.Count - 1; i > -1; i--)
             {
                 Subscribers[i](Data);
+                Data.ReadPointerPosition = StartPointerPosition;
             }
         }
 
@@ -39,6 +41,9 @@ namespace TuringSimulatorDesktop
         public static EventHandler ClientSuccessConnectingDelegate;
         public static bool ClientFailedConnecting;
         public static EventHandler ClientFailedConnectingDelegate;
+
+        public static bool ServerSuccessLoadingProject;
+        public static EventHandler ServerSuccessLoadingProjectDelegate;
 
         //public static EventHandler RecievedErrorNotification;
         // public static EventHandler UpdateFileBrowser;

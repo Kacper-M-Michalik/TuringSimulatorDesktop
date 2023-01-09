@@ -13,11 +13,18 @@ namespace TuringSimulatorDesktop
         public delegate void PacketFunctionPointer(Packet Data);
         public static Dictionary<int, PacketFunctionPointer> PacketToFunction = new Dictionary<int, PacketFunctionPointer>()
         {
+            {(int)ServerSendPackets.SentProjectData, ReceivedProjectData},
             {(int)ServerSendPackets.ErrorNotification, ReceiveErrorNotification},
             {(int)ServerSendPackets.SentOrUpdatedFile, ReceivedFileFromServer},
             {(int)ServerSendPackets.SentFolderData, ReceivedFolderDataFromServer},
             {(int)ServerSendPackets.LogData, ReceiveLogData},
         };
+
+        public static void ReceivedProjectData(Packet Data)
+        {
+            GlobalProjectAndUserData.ProjectData = new ConnectedProjectData(Data.ReadString());
+            UIEventManager.ServerSuccessLoadingProject = true;
+        }
 
         public static void ReceiveErrorNotification(Packet Data)
         {

@@ -16,20 +16,16 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             {
                 position = value;
                 Background.Position = position;
+                Header.Position = new Vector2(position.X + 1, position.Y + 1);
+                ButtonLayout.Position = new Vector2(position.X + 1, position.Y + 1);
                 if (CurrentView != null) CurrentView.Position = new Vector2(position.X + 1, position.Y + 25);
                 
                 int X = UIUtils.ConvertFloatToInt(position.X);
                 int Y = UIUtils.ConvertFloatToInt(position.Y);
 
-                HeaderPort.X = X;
-                HeaderPort.Y = Y; 
                 MainPort.X = X + 1;
                 MainPort.Y = Y + 25;
 
-                HeaderGroup.X = X;
-                HeaderGroup.Y = Y;
-                MainGroup.X = X + 1;
-                MainGroup.Y = Y + 25;
             }
         }
 
@@ -41,41 +37,35 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             {
                 bounds = value;
                 Background.Bounds = bounds;
+                Header.Bounds = new Point(bounds.X - 2, 24);
+                ButtonLayout.Bounds = new Point(bounds.X - 2, 24);
                 if (CurrentView != null) CurrentView.Bounds = new Point(bounds.X - 2, bounds.Y - 26);
 
-                HeaderPort.Width = bounds.X;
-                HeaderPort.Height = 24;
                 MainPort.Width = bounds.X;
                 MainPort.Height = bounds.Y - 26;
-
-                HeaderGroup.Width = bounds.X;
-                HeaderGroup.Height = 24;
-                MainGroup.Width = bounds.X;
-                MainGroup.Height = bounds.Y - 26;
             }
         }
 
         public bool IsActive = true;
 
-        public IVisualElement CurrentView;
+        IView CurrentView;
         public bool IsMouseOverDraggableArea;
         public bool IsMarkedForDeletion;
-        Viewport HeaderPort;
         Viewport MainPort;
-        ActionGroup HeaderGroup;
-        ActionGroup MainGroup;
 
+        Icon Header;
         Icon Background;
+        HorizontalLayoutBox ButtonLayout;
 
         public Window(Vector2 position, Point bounds)
         {
-            HeaderPort = new Viewport();
             MainPort = new Viewport();
 
-            HeaderGroup = InputManager.CreateActionGroup();
-            MainGroup = InputManager.CreateActionGroup();
-
             Background = new Icon(GlobalRenderingData.DarkAccentColor);
+            Header = new Icon(GlobalRenderingData.HeaderColor);
+            ButtonLayout = new HorizontalLayoutBox();
+            ButtonLayout.Spacing = 2;
+
             Position = position;
             Bounds = bounds;
 
@@ -92,11 +82,34 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             return (IsActive && InputManager.MouseData.X >= Position.X && InputManager.MouseData.X <= Position.X + bounds.X && InputManager.MouseData.Y >= Position.Y && InputManager.MouseData.Y <= Position.Y + 24);
         }
 
-        public void SetView(IVisualElement View)
+        public void AddView(IView View)
         {
-            CurrentView = View;
+            WindowHeaderButton HB = new WindowHeaderButton(View, this, ButtonLayout.Group);
+            ButtonLayout.AddElement(HB);
+            ButtonLayout.UpdateLayout();
+            SetView(HB);
+        }
+
+        public void SetView(WindowHeaderButton ViewButton)
+        {
+            if (CurrentView != null) CurrentView.IsActive = false;
+            CurrentView = ViewButton.View;
+            CurrentView.IsActive = true;
             CurrentView.Position = new Vector2(position.X + 1, position.Y + 25);
             CurrentView.Bounds = new Point(bounds.X - 2, bounds.Y - 26);
+        }
+
+        public void RemoveView(WindowHeaderButton ViewButton)
+        {
+            if (ViewButton.View == CurrentView)
+            {
+                //ButtonLayout.
+            }
+            else
+            {
+                ButtonLayout.RemoveElement(ViewButton);
+                ButtonLayout.UpdateLayout();
+            }
         }
 
         public void Draw(Viewport? BoundPort = null)
@@ -104,6 +117,9 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             if (IsActive)
             {
                 Background.Draw();
+                Header.Draw();
+                ButtonLayout.Draw();
+
                 if (CurrentView != null) CurrentView.Draw(MainPort);
             }
         }

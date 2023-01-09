@@ -9,7 +9,7 @@ using TuringSimulatorDesktop.Input;
 
 namespace TuringSimulatorDesktop.UI.Prefabs
 {
-    public class FileBrowserView : IVisualElement
+    public class FileBrowserView : IVisualElement, IView
     {
         Vector2 position;
         public Vector2 Position 
@@ -41,8 +41,11 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             {
                 isActive = value;
                 Group.IsActive = isActive;
+                FileLayout.Group.IsActive = isActive;
             }
         }
+
+        public string Title => "File Browser";
 
         string DefaultText = "Search Folder";
         int CurrentlyOpenedFolderID;
@@ -54,28 +57,25 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         InputBox Searchbar;
         VerticalLayoutBox FileLayout;
 
-        public FileBrowserView(Point bounds, Vector2 position)
+        public FileBrowserView()
         {
-            Group = InputManager.CreateActionGroup(0, 0, bounds.X, bounds.Y);
+            Group = InputManager.CreateActionGroup();
 
-            Background = new Icon(bounds.X, bounds.Y, GlobalRenderingData.BackgroundColor);
-            Searchbar = new InputBox(bounds.X, 20, Group);
+            Background = new Icon(GlobalRenderingData.BackgroundColor);
+            Searchbar = new InputBox(0, 20, Group);
             Searchbar.Text = DefaultText;
             Searchbar.ClickEvent += ClearSearchbar;
             Searchbar.ClickAwayEvent += ResetSearchbar;
             Searchbar.EditEvent += FilterFiles;
             Searchbar.Modifiers.AllowsNewLine = false;
 
-            FileLayout = new VerticalLayoutBox(bounds.X, bounds.Y - 20);
+            FileLayout = new VerticalLayoutBox();
             FileLayout.Scrollable = true;
             FileLayout.Spacing = 10f;
             FileLayout.UniformAreas = true;
             FileLayout.UniformAreaSize = 60f;
 
-            IsActive = true;
-            this.bounds = bounds;
-            this.position = position;
-            MoveLayout();
+            IsActive = false;
 
             SwitchOpenedFolder(0);
         }

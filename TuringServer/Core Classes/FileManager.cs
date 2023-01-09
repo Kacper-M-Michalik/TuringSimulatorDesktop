@@ -66,12 +66,11 @@ namespace TuringServer
 
             if (CorrectPath == "") return null;
 
-            string SaveFileJson = File.ReadAllText(CorrectPath);
             ProjectSaveFile SaveFile;
 
             try
             {
-                SaveFile = JsonSerializer.Deserialize<ProjectSaveFile>(SaveFileJson);
+                SaveFile = JsonSerializer.Deserialize<ProjectSaveFile>(File.ReadAllBytes(CorrectPath));
             }
             catch (Exception E)
             {

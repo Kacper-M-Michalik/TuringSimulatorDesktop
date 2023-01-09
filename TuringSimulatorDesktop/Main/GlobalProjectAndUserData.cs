@@ -15,7 +15,24 @@ namespace TuringSimulatorDesktop
         static readonly JsonSerializerOptions Options = new JsonSerializerOptions() { WriteIndented = false };
 
         public static string UserDataPath;
-        public static LocalUserData UserData;    
+        public static LocalUserData UserData;
+        public static ConnectedProjectData ProjectData;
+
+        public static void UpdateRecentlyOpenedFile(string FileDirectory)
+        {
+            for (int i = 0; i < UserData.RecentlyAccessedFiles.Count; i++)
+            {
+                if (UserData.RecentlyAccessedFiles[i].FullPath == FileDirectory)
+                {
+                    UserData.RecentlyAccessedFiles[i].LastAccessed = DateTime.Now;
+                    SaveUserData();
+                    return;
+                }
+            }
+
+            UserData.RecentlyAccessedFiles.Add(new FileInfoWrapper(ProjectData.ProjectName, FileDirectory, DateTime.Now));
+            SaveUserData();
+        }
 
         public static void SaveUserData()
         {
@@ -46,6 +63,16 @@ namespace TuringSimulatorDesktop
                 CustomLogging.Log("UI Error: Failed to deserialize LocalUserData File" + E.ToString());
             }
 
+        }
+    }
+
+    public class ConnectedProjectData
+    {
+        public string ProjectName;
+
+        public ConnectedProjectData(string projectName)
+        {
+            ProjectName = projectName;
         }
     }
 }
