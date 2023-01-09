@@ -48,14 +48,15 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         public bool IsActive = true;
 
+        Icon Header;
+        Icon Background;
+        HorizontalLayoutBox ButtonLayout;
+
+
         IView CurrentView;
         public bool IsMouseOverDraggableArea;
         public bool IsMarkedForDeletion;
         Viewport MainPort;
-
-        Icon Header;
-        Icon Background;
-        HorizontalLayoutBox ButtonLayout;
 
         public Window(Vector2 position, Point bounds)
         {
@@ -84,13 +85,14 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         public void AddView(IView View)
         {
-            WindowHeaderButton HB = new WindowHeaderButton(View, this, ButtonLayout.Group);
+            WindowHeaderItem HB = new WindowHeaderItem(View, this, ButtonLayout.Group);
+            View.OwnerWindow = this;
             ButtonLayout.AddElement(HB);
             ButtonLayout.UpdateLayout();
             SetView(HB);
         }
 
-        public void SetView(WindowHeaderButton ViewButton)
+        public void SetView(WindowHeaderItem ViewButton)
         {
             if (CurrentView != null) CurrentView.IsActive = false;
             CurrentView = ViewButton.View;
@@ -99,7 +101,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             CurrentView.Bounds = new Point(bounds.X - 2, bounds.Y - 26);
         }
 
-        public void RemoveView(WindowHeaderButton ViewButton)
+        public void RemoveView(WindowHeaderItem ViewButton)
         {
             if (ViewButton.View == CurrentView)
             {

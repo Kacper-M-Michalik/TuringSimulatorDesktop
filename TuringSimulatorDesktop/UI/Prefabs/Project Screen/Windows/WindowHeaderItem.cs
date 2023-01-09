@@ -5,11 +5,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using TuringSimulatorDesktop.Input;
 
 namespace TuringSimulatorDesktop.UI.Prefabs
 {
-    public class WindowHeaderButton : IVisualElement, IPollable, IClickable
+    public class WindowHeaderItem : IVisualElement, IPollable, IClickable
     {
         Vector2 position;
         public Vector2 Position
@@ -35,17 +36,17 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             }
         }
 
-        public IView View;
-        Window Window;
-
         Icon Background;
         Label Title;
         Button CloseButton;
 
-        public WindowHeaderButton(IView view, Window window, ActionGroup group)
+        public IView View;
+        Window OwnerWindow;
+
+        public WindowHeaderItem(IView view, Window window, ActionGroup group)
         {
             View = view;
-            Window = window;
+            OwnerWindow = window;
             group.ClickableObjects.Add(this);
             group.PollableObjects.Add(this);
 
@@ -64,7 +65,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         public void Clicked()
         {
-            Window.SetView(this);
+            OwnerWindow.SetView(this);
         }
 
         public void ClickedAway()
@@ -74,7 +75,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         void Remove(Button Sender)
         {
-            Window.RemoveView(this);
+            OwnerWindow.RemoveView(this);
         }
 
         public bool IsMouseOver()
@@ -84,6 +85,12 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         public void PollInput(bool IsInActionGroupFrame)
         {
+            if (View.Title != Title.Text)
+            {
+                Title.Text = View.Title;
+                Bounds = Title.Bounds + new Point(21, 0);
+            }
+
             if (IsInActionGroupFrame && IsMouseOver())
             {
                 CloseButton.IsActive = true;
@@ -97,9 +104,9 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         public void Draw(Viewport? BoundPort = null)
         {
-            Background.Draw();
-            Title.Draw();
-            CloseButton.Draw();
+            Background.Draw(BoundPort);
+            Title.Draw(BoundPort);
+            CloseButton.Draw(BoundPort);
         }
 
     }

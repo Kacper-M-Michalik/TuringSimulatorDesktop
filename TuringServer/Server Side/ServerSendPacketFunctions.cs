@@ -46,6 +46,7 @@ namespace TuringServer
 
             Data.Write((int)ServerSendPackets.SentFolderData);
             Data.Write(FolderID);
+            Data.Write(Server.LoadedProject.FolderDataLookup[FolderID].Name);
 
             Data.Write(Server.LoadedProject.FolderDataLookup[FolderID].SubFolders.Count);
             foreach (DirectoryFolder Folder in Server.LoadedProject.FolderDataLookup[FolderID].SubFolders)
@@ -69,6 +70,9 @@ namespace TuringServer
             Packet Data = new Packet();
 
             Data.Write((int)ServerSendPackets.SentOrUpdatedFile);
+            Data.Write(FileID);
+
+            Data.Write(Server.LoadedProject.FileDataLookup[FileID].Name);
             Data.Write(Server.LoadedProject.FileDataLookup[FileID].Version);
             Data.Write(Server.LoadedProject.CacheDataLookup[FileID].FileData);
 

@@ -49,9 +49,12 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         Icon ForeGround;
         Label Title;
         VerticalLayoutBox LayoutBox;
+        MainScreenView MainScreen;
 
-        public RecentFilesViewer(int width, int height, Vector2 position)
+        public RecentFilesViewer(MainScreenView Screen)
         {
+            MainScreen = Screen;
+
             Background = new Icon(GlobalRenderingData.DarkAccentColor);
             Header = new Icon(GlobalRenderingData.HeaderColor);
             ForeGround = new Icon(GlobalRenderingData.BackgroundColor);
@@ -66,15 +69,15 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             LayoutBox.ViewOffsetBoundsMin = new Vector2(0f, 5f);
             LayoutBox.ViewOffset = new Vector2(0f, 5f);
 
-            Bounds = new Point(width, height);
-            Position = position;
+            //Bounds = new Point(width, height);
+            //Position = position;
         }
 
         public void DisplayRecentFiles()
         {
             for (int i = 0; i < GlobalProjectAndUserData.UserData.RecentlyAccessedFiles.Count; i++)
             {
-                LayoutBox.AddElement(new RecentFileCard(GlobalProjectAndUserData.UserData.RecentlyAccessedFiles[i]));
+                LayoutBox.AddElement(new RecentFileCard(GlobalProjectAndUserData.UserData.RecentlyAccessedFiles[i], MainScreen, LayoutBox.Group));
             }
             LayoutBox.UpdateLayout();
         }
@@ -91,24 +94,6 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
     public class RecentFileCard : IVisualElement
     {
-        Icon Background;
-        Label FileName;
-        Label FileLocation;
-        Label FileLastAccessed;
-
-        public RecentFileCard(FileInfoWrapper FileInfo)
-        {
-            Background = new Icon(450, 80, Vector2.Zero, GlobalRenderingData.SubHeaderColor);
-
-            FileName = new Label();
-            FileLocation = new Label();
-            FileLastAccessed = new Label();
-
-            FileName.Text = FileInfo.FileName;
-            FileLocation.Text = FileInfo.FullPath;
-            FileLastAccessed.Text = FileInfo.LastAccessed.ToString("g");
-        }
-
         Vector2 position;
         public Vector2 Position 
         { 
@@ -130,6 +115,37 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             { 
                 return;
             } 
+        }
+
+        Button Background;
+        Label FileName;
+        Label FileLocation;
+        Label FileLastAccessed;
+
+        FileInfoWrapper FileInfo;
+        MainScreenView MainScreen;
+
+        public RecentFileCard(FileInfoWrapper Info, MainScreenView Screen, ActionGroup group)
+        {
+            FileInfo = Info;
+            MainScreen = Screen;
+
+            Background = new Button(450, 80, group);
+            Background.BaseTexture = GlobalRenderingData.TextureLookup[UILookupKey.SubHeader];//, ,Vector2.Zero, GlobalRenderingData.SubHeaderColor);
+            Background.OnClickedEvent += LoadRecentProject;
+
+            FileName = new Label();
+            FileLocation = new Label();
+            FileLastAccessed = new Label();
+
+            FileName.Text = FileInfo.FileName;
+            FileLocation.Text = FileInfo.FullPath;
+            FileLastAccessed.Text = FileInfo.LastAccessed.ToString("g");
+        }
+
+        void LoadRecentProject(Button Sender)
+        {
+            MainScreen.SelectedProject(FileInfo.FullPath);
         }
 
         public void Draw(Viewport? BoundPort = null)

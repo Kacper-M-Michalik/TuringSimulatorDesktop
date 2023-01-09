@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace TuringSimulatorDesktop.UI
 {
-    public abstract class View
+    public abstract class ScreenView
     {
         public abstract void Draw();
         public abstract void ViewResize(int NewWidth, int NewHeight);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TuringSimulatorDesktop.UI.Prefabs;
 
 namespace TuringSimulatorDesktop.UI
 {
@@ -10,5 +11,6 @@ namespace TuringSimulatorDesktop.UI
     {
         public string Title { get; }
         public bool IsActive { get; set; }
+        public Window OwnerWindow { get; set; }
     }
 }

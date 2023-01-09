@@ -30,13 +30,22 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             }
         }
 
-        public bool IsActive = true;
-
-        public FileData Data;
-        FileBrowserView Browser;
+        bool isActive;
+        public bool IsActive 
+        { 
+            get => isActive;
+            set
+            {
+                isActive = value;
+                Background.IsActive = isActive;
+            }
+        }
 
         Button Background;
         Label NameLabel;
+
+        public FileData Data;
+        FileBrowserView Browser;
 
         public FileDisplayItem(FileData data, FileBrowserView browser, ActionGroup group)
         {            
@@ -44,7 +53,14 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Browser = browser;
 
             Background = new Button(group);
-            Background.BaseTexture = GlobalRenderingData.TextureLookup[UILookupKey.FolderIcon];
+            if (Data.Type == FileType.Folder)
+            {
+                Background.BaseTexture = GlobalRenderingData.TextureLookup[UILookupKey.FolderIcon];
+            }
+            else
+            {
+                Background.BaseTexture = GlobalRenderingData.TextureLookup[UILookupKey.TransitionTableIcon];
+            }
             Background.OnClickedEvent += Clicked;
             NameLabel = new Label();
 
@@ -56,7 +72,14 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         public void Clicked(Button Sender)
         {
-            Browser.SwitchOpenedFolder(Data.ID);
+            if (Data.Type == FileType.Folder)
+            {
+                Browser.SwitchOpenedFolder(Data.ID);
+            }
+            else
+            {
+                Browser.OwnerWindow.AddView(new TextProgrammingView(Data.ID));
+            }
         }
 
         public void Draw(Viewport? BoundPort = null)

@@ -100,6 +100,9 @@ namespace TuringSimulatorDesktop
 
             TextureLookup.Add(UILookupKey.Debug1, GenerateFilledTexture(1, 1, UIOverlayDebugColor1));
             TextureLookup.Add(UILookupKey.Debug2, GenerateFilledTexture(1, 1, UIOverlayDebugColor2));
+            TextureLookup.Add(UILookupKey.Header, GenerateFilledTexture(1, 1, HeaderColor));
+            TextureLookup.Add(UILookupKey.SubHeader, GenerateFilledTexture(1, 1, SubHeaderColor));
+            TextureLookup.Add(UILookupKey.Background, GenerateFilledTexture(1, 1, BackgroundColor));
 
 
             //manually implement per ui
@@ -255,6 +258,9 @@ namespace TuringSimulatorDesktop
         JoinProjectButtonHightlight,
         Debug1,
         Debug2,
+        Header,
+        SubHeader,
+        Background,
     }
     public enum AnchorPoint { TopLeft, TopRight, BottomLeft, BottomRight }
 }

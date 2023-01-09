@@ -38,12 +38,14 @@ namespace TuringSimulatorDesktop
 
         public static void ReceivedFileFromServer(Packet Data)
         {
+            CustomLogging.Log("CLIENT: Recieved FILE Data");
 
+            UIEventManager.PushToListeners(Data.ReadInt(false), Data);
         }
 
         public static void ReceivedFolderDataFromServer(Packet Data)
         {
-            CustomLogging.Log("CLIENT: Recieved Folder Data");
+            CustomLogging.Log("CLIENT: Recieved FOLDER Data");
 
             UIEventManager.PushToListeners(Data.ReadInt(false), Data);
         }

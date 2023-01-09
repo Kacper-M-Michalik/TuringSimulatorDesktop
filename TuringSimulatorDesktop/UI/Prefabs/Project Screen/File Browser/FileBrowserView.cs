@@ -9,7 +9,7 @@ using TuringSimulatorDesktop.Input;
 
 namespace TuringSimulatorDesktop.UI.Prefabs
 {
-    public class FileBrowserView : IVisualElement, IView
+    public class FileBrowserView : IView
     {
         Vector2 position;
         public Vector2 Position 
@@ -45,19 +45,24 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             }
         }
 
+        Icon Background;
+        InputBox Searchbar;
+        VerticalLayoutBox FileLayout;
+        ActionGroup Group;
+
         public string Title => "File Browser";
+        Window ownerWindow;
+        public Window OwnerWindow
+        {
+            get => ownerWindow;
+            set => ownerWindow = value;
+        }
 
         string DefaultText = "Search Folder";
         int CurrentlyOpenedFolderID;
         List<FileDisplayItem> Files = new List<FileDisplayItem>();
 
-        ActionGroup Group;
-
-        Icon Background;
-        InputBox Searchbar;
-        VerticalLayoutBox FileLayout;
-
-        public FileBrowserView()
+        public FileBrowserView(int FolderToDisplay)
         {
             Group = InputManager.CreateActionGroup();
 
@@ -77,10 +82,10 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             IsActive = false;
 
-            SwitchOpenedFolder(0);
+            SwitchOpenedFolder(FolderToDisplay);
         }
         
-        public void FilesUpdated(Packet Data)
+        public void FolderUpdated(Packet Data)
         {
             CustomLogging.Log("CLIENT: Window received Folder Data");
 
@@ -94,9 +99,10 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             */
             if (Data.ReadInt() != CurrentlyOpenedFolderID)
             {
-                CustomLogging.Log("Cllient: File Browser Window Fatal Error, recived unwated fodler data!");
+                CustomLogging.Log("Cllient: File Browser Window Fatal Error, recived unwated folder data!");
                 return;
             }
+            Data.ReadString();
 
             int FolderCount = Data.ReadInt();
             for (int i = 0; i < FolderCount; i++)
@@ -116,20 +122,25 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         public void SwitchOpenedFolder(int ID)
         {
-            UIEventManager.Unsubscribe(CurrentlyOpenedFolderID, FilesUpdated);
+            UIEventManager.Unsubscribe(CurrentlyOpenedFolderID, FolderUpdated);
             CurrentlyOpenedFolderID = ID;
-            UIEventManager.Subscribe(CurrentlyOpenedFolderID, FilesUpdated);
+            UIEventManager.Subscribe(CurrentlyOpenedFolderID, FolderUpdated);
             Client.SendTCPData(ClientSendPacketFunctions.RequestFolderData(ID));
         }
 
         void FilterFiles(InputBox Sender)
         {
+            for (int i = 0; i < Files.Count; i++)
+            {
+                Files[i].IsActive = false;
+            }
             FileLayout.Clear();
             if (Searchbar.Text == "" || Searchbar.Text == DefaultText)
             {
                 for (int i = 0; i < Files.Count; i++)
                 {
                     FileLayout.AddElement(Files[i]);
+                    Files[i].IsActive = true;
                 }
             }
             else

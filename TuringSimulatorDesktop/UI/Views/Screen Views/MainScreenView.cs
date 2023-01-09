@@ -13,7 +13,7 @@ using System.Windows.Forms;
 
 namespace TuringSimulatorDesktop.UI
 {
-    public class MainScreenView : View
+    public class MainScreenView : ScreenView
     {        
         int Width, Height;
         ActionGroup Group;
@@ -49,7 +49,9 @@ namespace TuringSimulatorDesktop.UI
             Title.FontSize = 20;
             Title.Text = "T";
 
-            Viewer = new RecentFilesViewer(470, GlobalRenderingData.MainMenuHeight - 52, new Vector2(10, 42));
+            Viewer = new RecentFilesViewer(this);
+            Viewer.Bounds = new Point(470, GlobalRenderingData.MainMenuHeight - 52);
+            Viewer.Position = new Vector2(10, 42);
             if (GlobalProjectAndUserData.UserData != null)
             {
                 Viewer.DisplayRecentFiles();
@@ -93,11 +95,15 @@ namespace TuringSimulatorDesktop.UI
 
             if (Dialog.ShowDialog() == DialogResult.OK)
             {
-                BackendInterface.StartProjectServer(1, 28104);
-                Location = Dialog.FileName;
-                UIEventManager.ClientSuccessConnectingDelegate = ConnectedToLocalServerInThisInstance;
-                Client.ConnectToServer(System.Net.IPAddress.Parse("127.0.0.1"), 28104);
+                SelectedProject(Dialog.FileName);
             }
+        }
+        public void SelectedProject(string location)
+        {
+            BackendInterface.StartProjectServer(1, 28104);
+            Location = location;
+            UIEventManager.ClientSuccessConnectingDelegate = ConnectedToLocalServerInThisInstance;
+            Client.ConnectToServer(System.Net.IPAddress.Parse("127.0.0.1"), 28104);
         }
         void ConnectedToLocalServerInThisInstance(object sender, EventArgs e)
         {

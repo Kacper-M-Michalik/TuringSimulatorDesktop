@@ -32,24 +32,14 @@ namespace TuringTesting
         public static void ReceivedFileFromServer(Packet Data)
         {
             CustomLogging.Log("CLIENT: Recieved File");
-
-            if (UIEventManager.DataSubscribers.ContainsKey(Data.ReadInt(false)))
-            {
-                List<ReceivedDataCallback> Callbacks = UIEventManager.DataSubscribers[Data.ReadInt(false)];
-
-                int BasePointer = Data.ReadPointerPosition;
-                for (int i = 1; i < Callbacks.Count; i++)
-                {
-                    Callbacks[i](Data);
-                    Data.ReadPointerPosition = BasePointer;
-                }
-            }
         }
 
         public static void ReceivedFolderDataFromServer(Packet Data)
         {
             CustomLogging.Log("CLIENT: Recieved Folder Data");
 
+            int FolderID = Data.ReadInt();
+            string FolderName = Data.ReadString();
             int Folders = Data.ReadInt();
             for (int i = 0; i < Folders; i++)
             {

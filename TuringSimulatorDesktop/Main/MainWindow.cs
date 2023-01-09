@@ -31,7 +31,7 @@ namespace TuringSimulatorDesktop
     public class MainWindow : Game
     {
         public GraphicsDeviceManager GraphicsManager;
-        public View CurrentView;
+        public ScreenView CurrentView;
         SpriteBatch ScreenBatch;
         int BoundTop;
 

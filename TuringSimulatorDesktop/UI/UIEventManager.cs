@@ -24,13 +24,15 @@ namespace TuringSimulatorDesktop
 
         public static void PushToListeners(int FileID, Packet Data)
         {
-            List<SubscriberDataCallback> Subscribers = FileUpdateSubscribers[FileID];
-            int StartPointerPosition = Data.ReadPointerPosition;            
             //if (!FileUpdateSubscribers.ContainsKey(FileID)) return;
+
+            List<SubscriberDataCallback> Subscribers = FileUpdateSubscribers[FileID];
+            int BasePointer = Data.ReadPointerPosition;      
+            
             for (int i = Subscribers.Count - 1; i > -1; i--)
             {
                 Subscribers[i](Data);
-                Data.ReadPointerPosition = StartPointerPosition;
+                Data.ReadPointerPosition = BasePointer;
             }
         }
 

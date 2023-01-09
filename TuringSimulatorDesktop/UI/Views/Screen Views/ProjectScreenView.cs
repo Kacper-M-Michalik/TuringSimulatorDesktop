@@ -10,7 +10,7 @@ using TuringSimulatorDesktop.UI.Prefabs;
 
 namespace TuringSimulatorDesktop.UI
 {
-    public class ProjectScreenView : View, IPollable
+    public class ProjectScreenView : ScreenView, IPollable
     {
         int Width, Height;
         ActionGroup Group;
@@ -42,8 +42,9 @@ namespace TuringSimulatorDesktop.UI
             Windows = new List<Window>();
 
             Window Temp = new Window(new Vector2(100, 100), new Point(300, 400));
-            Temp.AddView(new FileBrowserView());
-            Temp.AddView(new FileBrowserView());
+            Temp.AddView(new FileBrowserView(0));
+            Temp.AddView(new FileBrowserView(0));
+            //Temp.AddView();
             Windows.Add(Temp);
 
             Title = new Label();
