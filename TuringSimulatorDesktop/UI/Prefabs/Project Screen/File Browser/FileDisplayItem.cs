@@ -46,6 +46,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         public FileData Data;
         FileBrowserView Browser;
+        bool ClickedOnce;
 
         public FileDisplayItem(FileData data, FileBrowserView browser, ActionGroup group)
         {            
@@ -62,6 +63,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 Background.BaseTexture = GlobalRenderingData.TextureLookup[UILookupKey.TransitionTableIcon];
             }
             Background.OnClickedEvent += Clicked;
+            Background.OnClickedAwayEvent += ClickedAway;
             NameLabel = new Label();
 
             Bounds = new Point(60, 60);
@@ -72,6 +74,14 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         public void Clicked(Button Sender)
         {
+            if (!ClickedOnce)
+            {
+                ClickedOnce = true;
+                return;
+            }
+
+            ClickedOnce = false;
+
             if (Data.Type == FileType.Folder)
             {
                 Browser.SwitchOpenedFolder(Data.ID);
@@ -80,6 +90,11 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             {
                 Browser.OwnerWindow.AddView(new TextProgrammingView(Data.ID));
             }
+        }
+
+        public void ClickedAway(Button Sender)
+        {
+            ClickedOnce = false;
         }
 
         public void Draw(Viewport? BoundPort = null)

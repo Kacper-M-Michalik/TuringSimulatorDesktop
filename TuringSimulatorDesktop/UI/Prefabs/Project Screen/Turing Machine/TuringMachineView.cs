@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 
 namespace TuringSimulatorDesktop.UI.Prefabs
 {
+    /*
     public class TuringMachineView : IView
     {
         //has turign machine isntance
 
         //create tape class?
     }
+    */
 }

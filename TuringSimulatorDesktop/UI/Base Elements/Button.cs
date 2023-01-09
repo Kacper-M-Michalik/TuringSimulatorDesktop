@@ -7,6 +7,7 @@ using TuringSimulatorDesktop.Input;
 namespace TuringSimulatorDesktop.UI
 {
     public delegate void OnButtonClick(Button Sender);
+    public delegate void OnButtonClickAway(Button Sender);
 
     public class Button : IVisualElement, IClickable, IPollable
     {
@@ -35,6 +36,7 @@ namespace TuringSimulatorDesktop.UI
         public bool IsActive = true;
 
         public event OnButtonClick OnClickedEvent;
+        public event OnButtonClickAway OnClickedAwayEvent;
         public ActionGroup Group { get; private set; }
 
         public bool HighlightOnMouseOver;
@@ -101,7 +103,7 @@ namespace TuringSimulatorDesktop.UI
 
         void IClickable.ClickedAway()
         {
-
+            OnClickedAwayEvent?.Invoke(this);
         }
 
         public bool IsMouseOver()
