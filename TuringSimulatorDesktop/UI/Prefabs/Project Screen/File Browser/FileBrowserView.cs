@@ -44,12 +44,6 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 FileLayout.Group.IsActive = isActive;
             }
         }
-
-        Icon Background;
-        InputBox Searchbar;
-        VerticalLayoutBox FileLayout;
-        ActionGroup Group;
-
         public string Title => "File Browser";
         Window ownerWindow;
         public Window OwnerWindow
@@ -57,6 +51,11 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             get => ownerWindow;
             set => ownerWindow = value;
         }
+
+        Icon Background;
+        InputBox Searchbar;
+        VerticalLayoutBox FileLayout;
+        ActionGroup Group;        
 
         string DefaultText = "Search Folder";
         int CurrentlyOpenedFolderID;
@@ -147,7 +146,11 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             {
                 for (int i = 0; i < Files.Count; i++)
                 {
-                    if (Files[i].Data.Name.Contains(Searchbar.Text)) FileLayout.AddElement(Files[i]);
+                    if (Files[i].Data.Name.Contains(Searchbar.Text))
+                    {
+                        FileLayout.AddElement(Files[i]);
+                        Files[i].IsActive = true;
+                    }
                 }
             }
             FileLayout.UpdateLayout();
@@ -191,6 +194,12 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 Searchbar.Draw(BoundPort);
                 FileLayout.Draw(BoundPort);
             }
+        }
+
+        public void Close()
+        {
+            FileLayout.Close();
+            Group.IsMarkedForDeletion = true;
         }
     }    
 }

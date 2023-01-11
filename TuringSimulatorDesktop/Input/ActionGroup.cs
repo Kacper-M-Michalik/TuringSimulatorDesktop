@@ -11,13 +11,15 @@ namespace TuringSimulatorDesktop.Input
     public class ActionGroup
     {
         public bool IsActive = true;
+        public bool IsDirtyClickable;
+        public bool IsDirtyPollable;
         public bool IsMarkedForDeletion;
         public bool IsPersistant;
 
         public int X, Y, Width, Height;
         
-        public List<IPollable> PollableObjects = new List<IPollable>();
         public List<IClickable> ClickableObjects = new List<IClickable>();
+        public List<IPollable> PollableObjects = new List<IPollable>();
 
         public ActionGroup()
         {

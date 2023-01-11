@@ -102,16 +102,24 @@ namespace TuringSimulatorDesktop
             {
                 try
                 {
-                    if (ConnectionSocket == null) return;
+                    if (ConnectionSocket == null || !ConnectionSocket.Connected)
+                    {
+                        CustomLogging.Log("CLIENT: Server disconnected me!");
+                        TCPInternalDisconnect();
+
+                        return;
+                    }
 
                     int IncomingDataLength = DataStream.EndRead(Result);
 
+                    /*
                     if (IncomingDataLength == 0)
                     {
                         CustomLogging.Log("CLIENT: SERVER DISCONNECTED ME");
                         TCPInternalDisconnect();
                         return;
                     }
+                    */
 
                     //ReceiveBuffer is always 4096 or whatever , we need to only pack data that is useful into our rebuilt packet -> as such we only copy IncomingDataLength of recievebuffer.
                     byte[] UsefuldataBuffer = new byte[IncomingDataLength];

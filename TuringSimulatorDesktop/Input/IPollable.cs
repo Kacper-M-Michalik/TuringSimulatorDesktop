@@ -9,6 +9,7 @@ namespace TuringSimulatorDesktop.UI
 {
     public interface IPollable
     {
+        public bool IsMarkedForDeletion { get; set; }
         public void PollInput(bool IsInActionGroupFrame);
     }
 }

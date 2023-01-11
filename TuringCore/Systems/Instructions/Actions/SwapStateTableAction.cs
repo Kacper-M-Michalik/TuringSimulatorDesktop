@@ -6,12 +6,20 @@ using System.Threading.Tasks;
 
 namespace TuringCore.Actions
 {
+    /*
     public class SwapStateTableAction : TuringAction
     {
         public string NewStateTableID;
+
+        public SwapStateTableAction(string newStateTableID)
+        {
+            NewStateTableID = newStateTableID;
+        }
+
         public override void Execute(TuringMachine Machine)
         {
             Machine.SetActiveStateTable(NewStateTableID);
         }
     }
+    */
 }

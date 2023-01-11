@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using TuringServer.Logging;
 using TuringCore;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace TuringServer
 {
@@ -148,10 +150,13 @@ namespace TuringServer
 
             int FolderID;
             string FileName;
+            CreateFileType FileType;
+
             try
             {
                 FolderID = Data.ReadInt();
                 FileName = Data.ReadString();
+                FileType = (CreateFileType)Data.ReadInt();
             }
             catch
             {
@@ -159,6 +164,11 @@ namespace TuringServer
                 return;
             }
 
+            if (FileType == CreateFileType.Other)
+            {
+                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to create file - Cannot create file with unknown extension."));
+                return;
+            }
             if (!FileManager.IsValidFileName(FileName))
             {
                 Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to create file - File name uses invalid characters."));
@@ -171,7 +181,7 @@ namespace TuringServer
             }
 
             DirectoryFolder ParentFolder = Server.LoadedProject.FolderDataLookup[FolderID];
-            string NewFileLocation = Server.LoadedProject.BasePath + ParentFolder.LocalPath + FileName;
+            string NewFileLocation = Server.LoadedProject.BasePath + ParentFolder.LocalPath + FileName + FileManager.FileTypeToExtension(FileType);
 
             if (File.Exists(NewFileLocation))
             {
@@ -181,7 +191,22 @@ namespace TuringServer
 
             try
             {
-                FileStream Fs = File.Create(NewFileLocation);
+                FileStream Fs = File.Create(NewFileLocation); 
+                switch (FileType)
+                {
+                    case CreateFileType.Alphabet:
+                        Fs.Write(JsonSerializer.SerializeToUtf8Bytes(new Alphabet()));
+                        break;
+                    case CreateFileType.Tape:
+                        Fs.Write(JsonSerializer.SerializeToUtf8Bytes(new TapeTemplate()));
+                        break;
+                    case CreateFileType.TransitionFile:
+                        Fs.Write(JsonSerializer.SerializeToUtf8Bytes(new TransitionFile()));
+                        break;
+                    case CreateFileType.SlateFile:
+                        Fs.Write(JsonSerializer.SerializeToUtf8Bytes(new SlateFile()));
+                        break;
+                }
                 Fs.Close();
             }
             catch (Exception E)
@@ -191,7 +216,8 @@ namespace TuringServer
             }
 
             int NewID = FileManager.GetNewFileID();
-            DirectoryFile NewFileData = new DirectoryFile(NewID, FileName, Server.LoadedProject.FolderDataLookup[FolderID]);
+
+            DirectoryFile NewFileData = new DirectoryFile(NewID, FileName, FileType, Server.LoadedProject.FolderDataLookup[FolderID]);
             Server.LoadedProject.FileDataLookup.Add(NewID, NewFileData);
             ParentFolder.SubFiles.Add(NewFileData);
             FileManager.LoadFileIntoCache(NewID);

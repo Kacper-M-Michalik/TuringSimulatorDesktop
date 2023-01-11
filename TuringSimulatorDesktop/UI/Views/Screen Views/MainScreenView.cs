@@ -100,7 +100,8 @@ namespace TuringSimulatorDesktop.UI
         }
         public void SelectedProject(string location)
         {
-            BackendInterface.StartProjectServer(1, 28104);
+            //2 TEMP
+            BackendInterface.StartProjectServer(2, 28104);
             Location = location;
             UIEventManager.ClientSuccessConnectingDelegate = ConnectedToLocalServerInThisInstance;
             Client.ConnectToServer(System.Net.IPAddress.Parse("127.0.0.1"), 28104);

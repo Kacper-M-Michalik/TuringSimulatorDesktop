@@ -14,6 +14,7 @@ namespace TuringSimulatorDesktop.UI
     {
         int Width, Height;
         ActionGroup Group;
+        public bool IsMarkedForDeletion { get; set; }
 
         Icon Header;
         Icon Background;
@@ -34,6 +35,7 @@ namespace TuringSimulatorDesktop.UI
 
         bool IsDragging;
 
+
         public ProjectScreenView()
         {
             Group = InputManager.CreateActionGroup();
@@ -41,7 +43,7 @@ namespace TuringSimulatorDesktop.UI
 
             Windows = new List<Window>();
 
-            Window Temp = new Window(new Vector2(100, 100), new Point(300, 400));
+            Window Temp = new Window(new Vector2(100, 100), new Point(800, 600));
             Temp.AddView(new FileBrowserView(0));
             Temp.AddView(new FileBrowserView(0));
             //Temp.AddView();

@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace TuringCore
 {
-    public class InstructionVariant
+    public abstract class CompilableFile
     {
-        public List<TuringAction> Actions = new List<TuringAction>();
+        public abstract StateTable Compile();
     }
 }

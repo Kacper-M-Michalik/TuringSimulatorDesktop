@@ -14,49 +14,25 @@ namespace TuringCore
         public int HeadPosition { get; set; } = 0;
         public InstructionVariant NextInstruction { get; private set; } = null;
 
+        public TapeTemplate OriginalTape { get; private set; }
+
+        public Alphabet ActiveAlphabet { get; private set; }
         public StateTable ActiveStateTable { get; private set; }
         public Tape ActiveTape { get; private set; }
-        Dictionary<string, StateTable> StateTableMemory = new Dictionary<string, StateTable>();
-        Dictionary<string, Tape> TapeMemory = new Dictionary<string, Tape>();
 
-        public void Start(string NewTable, string StartState, string NewTape, int StartHeadPosition)
-        {
-            if (IsActive) throw new Exception("Machine already on");
-            ShallowClear();
-
-            IsActive = true;
-            CurrentState = StartState;
-            HeadPosition = StartHeadPosition;
-
-            SetActiveStateTable(NewTable);
-            SetActiveTape(NewTape);
-
-            if (ActiveStateTable.DefenitionAlphabetID != ActiveTape.DefenitionAlphabetID)
-            {
-                CurrentState = HaltError;
-                NextInstruction = null;
-            }
-            else
-            {
-                NextInstruction = ActiveStateTable[CurrentState][ActiveTape[HeadPosition]];
-            }
-
-        }
         public void Start(string StartState, int StartHeadPosition)
         {
             if (IsActive) throw new Exception("Machine already on");
-            string LoadedTableID = ActiveStateTable.ID;
-            string LoadedTapeID = ActiveTape.ID;
+
             ShallowClear();
 
             IsActive = true;
             CurrentState = StartState;
             HeadPosition = StartHeadPosition;
 
-            SetActiveStateTable(LoadedTableID);
-            SetActiveTape(LoadedTapeID);
+            ActiveTape = OriginalTape.Clone(ActiveAlphabet);
 
-            if (ActiveStateTable.DefenitionAlphabetID != ActiveTape.DefenitionAlphabetID)
+            if (ActiveStateTable.DefenitionAlphabetID != OriginalTape.DefenitionAlphabetID)
             {
                 CurrentState = HaltError;
                 NextInstruction = null;
@@ -87,16 +63,16 @@ namespace TuringCore
             {
                 NextInstruction = null;
             }
-            else if (ActiveStateTable.DefenitionAlphabetID == ActiveTape.DefenitionAlphabetID && ActiveStateTable.ContainsInstructionForState(CurrentState))
+            else if (ActiveStateTable.ContainsInstructionForState(CurrentState))
             {
                 if (ActiveStateTable[CurrentState].ContainsVariant(ActiveTape[HeadPosition]))
                 {
                     NextInstruction = ActiveStateTable[CurrentState][ActiveTape[HeadPosition]];
                 }
-               // else if (ActiveStateTable[CurrentState].ContainsVariant(Project.ProjectAlphabets[ActiveStateTable.DefenitionAlphabetID].WildcardCharacter))
-               // {
-               //     NextInstruction = ActiveStateTable[CurrentState][Project.ProjectAlphabets[ActiveStateTable.DefenitionAlphabetID].WildcardCharacter];
-               // }
+                else if (ActiveStateTable[CurrentState].ContainsVariant(ActiveAlphabet.WildcardCharacter))
+                {
+                    NextInstruction = ActiveStateTable[CurrentState][ActiveAlphabet.WildcardCharacter];
+                }
                 else
                 {
                     CurrentState = HaltError;
@@ -108,24 +84,17 @@ namespace TuringCore
             }
         }
 
-        public void AddStateTableToMemory(StateTable NewStateTable)
+        public void SetActiveTape(TapeTemplate NewTape, Alphabet Alphabet)
         {
-            StateTableMemory.Add(NewStateTable.ID, NewStateTable);
+            OriginalTape = NewTape;
+            ActiveTape = NewTape.Clone(Alphabet);
         }
 
-        public void AddTapeToMemory(Tape NewTape)
+        public void SetActiveStateTable(StateTable Table, Alphabet Alphabet)
         {
-            TapeMemory.Add(NewTape.ID, NewTape);
-        }
-
-        public void SetActiveTape(string ID)
-        {
-            ActiveTape = TapeMemory[ID].Clone();
-        }
-
-        public void SetActiveStateTable(string ID)
-        {
-            ActiveStateTable = StateTableMemory[ID];
+            if (ActiveStateTable.DefenitionAlphabetID != Alphabet.ID) throw new Exception("Wrong alphabet given");
+            ActiveAlphabet = Alphabet;
+            ActiveStateTable = Table;
         }
 
         public void ShallowClear()

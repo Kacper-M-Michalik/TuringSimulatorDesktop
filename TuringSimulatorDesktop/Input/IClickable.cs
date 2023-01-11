@@ -9,6 +9,7 @@ namespace TuringSimulatorDesktop.UI
 {
     public interface IClickable
     {
+        public bool IsMarkedForDeletion { get; set; }
         public void Clicked();
         public void ClickedAway();
         public bool IsMouseOver();

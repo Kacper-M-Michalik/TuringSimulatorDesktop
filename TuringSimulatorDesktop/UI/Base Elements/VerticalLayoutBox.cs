@@ -53,6 +53,7 @@ namespace TuringSimulatorDesktop.UI
         public bool DrawBounded = true;
 
         public ActionGroup Group { get; private set; }
+        public bool IsMarkedForDeletion { get; set; }
         List<IVisualElement> Elements;
 
         public VerticalLayoutBox()
@@ -178,6 +179,12 @@ namespace TuringSimulatorDesktop.UI
                     }                   
                 }
             }
+        }
+
+        public void Close()
+        {
+            Group.IsMarkedForDeletion = true;
+            IsMarkedForDeletion = true;
         }
     }
 }

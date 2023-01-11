@@ -78,6 +78,7 @@ namespace TuringSimulatorDesktop
         CheckBox DrawCheck;
 
         ActionGroup Group;
+        public bool IsMarkedForDeletion { get; set; }
 
         public DebugMenu(ActionGroup group)
         {

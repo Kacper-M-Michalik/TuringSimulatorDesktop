@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TuringCore
 {
-    public class Instruction
+    public class InstructionCollection
     {
         Dictionary<string, InstructionVariant> InstructionVariants = new Dictionary<string, InstructionVariant>();
 

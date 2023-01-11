@@ -6,8 +6,12 @@ using System.Threading.Tasks;
 
 namespace TuringCore
 {
-    public class InstructionVariant
+    public enum CreateFileType
     {
-        public List<TuringAction> Actions = new List<TuringAction>();
+        Alphabet,
+        Tape,
+        TransitionFile,
+        SlateFile,
+        Other
     }
 }

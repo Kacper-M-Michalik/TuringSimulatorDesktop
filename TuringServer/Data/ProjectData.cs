@@ -36,9 +36,7 @@ namespace TuringServer
 
         public DirectoryFolder BaseDirectoryFolder;
 
-        //TBD
-        public List<Alphabet> ProjectAlphabets;
-
+        public Dictionary<string, int> ProjectAlphabetLookup;
 
         //Rules get sent to client -> client Ui responsible for telling uiser cant run turing with these rules, unless is server simulated turing
         //Allow server to simualte hese windwos as to have mutiple users have access to same window not only file:

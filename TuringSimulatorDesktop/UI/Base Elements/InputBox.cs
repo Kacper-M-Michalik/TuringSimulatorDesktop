@@ -41,6 +41,8 @@ namespace TuringSimulatorDesktop.UI
         }
 
         public bool IsActive = true;
+        ActionGroup Group;
+        public bool IsMarkedForDeletion { get; set; }
 
         //TODO - NOT FULLY IMPLEMENTED
         public KeyboardModifiers Modifiers = new KeyboardModifiers();
@@ -78,6 +80,7 @@ namespace TuringSimulatorDesktop.UI
             GlobalRenderingData.OSWindow.TextInput += TextInput;
 
             group.ClickableObjects.Add(this);
+            Group = group;
         }
         public InputBox(int width, int height, Vector2 position, ActionGroup group)
         {
@@ -148,5 +151,10 @@ namespace TuringSimulatorDesktop.UI
             }
         }
 
+        public void Close()
+        {
+            Group.IsDirtyClickable = true;
+            IsMarkedForDeletion = true;
+        }
     }
 }

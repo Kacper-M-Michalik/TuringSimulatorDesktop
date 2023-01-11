@@ -39,6 +39,7 @@ namespace TuringSimulatorDesktop.UI
 
         public event OnCheckBoxClick OnClickedEvent;
         public ActionGroup Group { get; private set; }
+        public bool IsMarkedForDeletion { get; set; }
         public bool Checked;
 
         public bool HighlightOnMouseOver = true;
@@ -130,6 +131,13 @@ namespace TuringSimulatorDesktop.UI
             {
                 Background.Draw(BoundPort);
             }
+        }
+
+        public void Close()
+        {
+            Group.IsDirtyClickable = true;
+            Group.IsDirtyPollable = true;
+            IsMarkedForDeletion = true;
         }
     }
 }

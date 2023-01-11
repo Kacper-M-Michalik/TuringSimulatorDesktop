@@ -55,5 +55,10 @@ namespace TuringSimulatorDesktop.UI
                 LayoutBox.Draw(BoundPort);                
             }
         }
+
+        public void Close()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

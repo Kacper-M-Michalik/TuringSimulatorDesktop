@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TuringCore
+namespace TuringSimulatorDesktop.UI.Prefabs
 {
-    public class InstructionVariant
+    public class TapeItem //: IVisualElement
     {
-        public List<TuringAction> Actions = new List<TuringAction>();
+
     }
 }

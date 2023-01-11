@@ -22,7 +22,7 @@ namespace TuringServer
         {
             Packet Data = new Packet();
 
-            CustomLogging.Log("SERVER: ErrorNotif COPY: " + ErrorString);
+            CustomLogging.Log("SERVER: Error Notif COPY: " + ErrorString);
 
             Data.Write((int)ServerSendPackets.ErrorNotification);
             Data.Write(ErrorString);
@@ -36,6 +36,7 @@ namespace TuringServer
 
             Data.Write((int)ServerSendPackets.SentProjectData);
             Data.Write(Server.LoadedProject.ProjectName);
+            //add lookup for alphabets here
 
             return Data;
         }
@@ -72,6 +73,7 @@ namespace TuringServer
             Data.Write((int)ServerSendPackets.SentOrUpdatedFile);
             Data.Write(FileID);
 
+            Data.Write((int)Server.LoadedProject.FileDataLookup[FileID].FileType);
             Data.Write(Server.LoadedProject.FileDataLookup[FileID].Name);
             Data.Write(Server.LoadedProject.FileDataLookup[FileID].Version);
             Data.Write(Server.LoadedProject.CacheDataLookup[FileID].FileData);

@@ -69,7 +69,7 @@ namespace TuringSimulatorDesktop.Input
                                 ActionGroups[i].ClickableObjects[j].Clicked();
                                 if (PreviouslyClickedObject != null && ActionGroups[i].ClickableObjects[j] != PreviouslyClickedObject) PreviouslyClickedObject.ClickedAway();
                                 PreviouslyClickedObject = ActionGroups[i].ClickableObjects[j];
-                                RecepientFound = true;                                
+                                RecepientFound = true;
                             }
 
                             j--;
@@ -107,7 +107,25 @@ namespace TuringSimulatorDesktop.Input
             for (int i = ActionGroups.Count - 1; i > -1; i--)
             {
                 if (ActionGroups[i].IsMarkedForDeletion && !ActionGroups[i].IsPersistant) ActionGroups.RemoveAt(i);
-                else if (ActionGroups[i].IsPersistant) ActionGroups[i].IsMarkedForDeletion = false;
+                else
+                {
+                    if (ActionGroups[i].IsDirtyClickable)
+                    {
+                        for (int j = ActionGroups[i].ClickableObjects.Count - 1; j > -1; j--)
+                        {
+                            if (ActionGroups[i].ClickableObjects[j].IsMarkedForDeletion) ActionGroups[i].ClickableObjects.RemoveAt(j);
+                        }
+                        ActionGroups[i].IsDirtyClickable = false;
+                    }
+                    if (ActionGroups[i].IsDirtyPollable)
+                    {
+                        for (int j = ActionGroups[i].PollableObjects.Count - 1; j > -1; j--)
+                        {
+                            if (ActionGroups[i].PollableObjects[j].IsMarkedForDeletion) ActionGroups[i].PollableObjects.RemoveAt(j);
+                        }
+                        ActionGroups[i].IsDirtyPollable = false;
+                    }
+                }
             }
         }
 

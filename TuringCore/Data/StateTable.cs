@@ -7,14 +7,14 @@ namespace TuringCore
     {
         public string ID;
         public string DefenitionAlphabetID;
-        Dictionary<string, Instruction> Instructions = new Dictionary<string, Instruction>();
+        Dictionary<string, InstructionCollection> Instructions = new Dictionary<string, InstructionCollection>();
         HashSet<string> HaltStates = new HashSet<string>();
 
-        public Instruction this[string State]
+        public InstructionCollection this[string State]
         {
             get
             {
-                if (Instructions.TryGetValue(State, out Instruction InstructionToReturn))
+                if (Instructions.TryGetValue(State, out InstructionCollection InstructionToReturn))
                 {
                     return InstructionToReturn;
                 }
@@ -25,7 +25,7 @@ namespace TuringCore
             }
         }
 
-        public void AddInstruction(string TriggerState, Instruction NewInstruction)
+        public void AddInstruction(string TriggerState, InstructionCollection NewInstruction)
         {
             Instructions.Add(TriggerState, NewInstruction);
         }

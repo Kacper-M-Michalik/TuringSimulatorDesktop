@@ -33,8 +33,50 @@ namespace TuringServer
         public static string GetFileNameFromPath(string FilePath)
         {
             int Index = FilePath.LastIndexOf(Path.DirectorySeparatorChar) + 1;
-            return FilePath.Substring(Index);
-        } 
+
+            int HasType = FilePath.LastIndexOf('.');
+            if (HasType != -1) return FilePath.Substring(Index, FilePath.LastIndexOf('.') - Index);
+            else return FilePath.Substring(Index);
+        }
+
+        public static string GetFileExtensionFromPath(string FilePath)
+        {
+            return FilePath.Substring(FilePath.LastIndexOf('.'));
+        }        
+
+        public static CreateFileType ExtensionToFileType(string Extension)
+        {
+            switch (Extension)
+            {
+                case ".alph":
+                    return CreateFileType.Alphabet;
+                case ".tape":
+                    return CreateFileType.Tape;
+                case ".trt":
+                    return CreateFileType.TransitionFile;
+                case ".slt":
+                    return CreateFileType.SlateFile;
+                default:
+                    return CreateFileType.Other;
+            }
+        }
+
+        public static string FileTypeToExtension(CreateFileType FileType)
+        {
+            switch (FileType)
+            {
+                case CreateFileType.Alphabet:
+                    return ".alph";
+                case CreateFileType.Tape:
+                    return ".tape";
+                case CreateFileType.TransitionFile:
+                    return ".trt";
+                case CreateFileType.SlateFile:
+                    return ".slt";
+                default:
+                    return "";
+            }
+        }
 
         //ID 0 reserved for BaseFolder
         static int NextID = 1;
@@ -84,6 +126,7 @@ namespace TuringServer
             Dictionary<int, DirectoryFile> NewFileDataLookup = new Dictionary<int, DirectoryFile>();
             DirectoryFolder BaseFolder = new DirectoryFolder(0, SaveFile.BaseFolder, null);
             Dictionary<int, DirectoryFolder> NewFolderDataLookup = new Dictionary<int, DirectoryFolder>() { { 0, BaseFolder } };
+            Dictionary<string, int> NewProjectAlphabetLookup = new Dictionary<string, int>();
 
             Queue<(string, DirectoryFolder)> FolderQueue = new Queue<(string, DirectoryFolder)>();
             FolderQueue.Enqueue((ProjectBasePath + SaveFile.BaseFolder, null));
@@ -107,7 +150,13 @@ namespace TuringServer
                 string[] Files = Directory.GetFiles(FolderInfo.Item1);
                 for (int i = 0; i < Files.Length; i++)
                 {
-                    DirectoryFile NewFileData = new DirectoryFile(GetNewFileID(), GetFileNameFromPath(Files[i]), NewFolder);
+                    int ID = GetNewFileID();
+                    string Name = GetFileNameFromPath(Files[i]);
+                    string Extension = GetFileExtensionFromPath(Files[i]);
+
+                    if (ExtensionToFileType(Extension) == CreateFileType.Alphabet) NewProjectAlphabetLookup.Add(Name, ID);
+
+                    DirectoryFile NewFileData = new DirectoryFile(ID, Name, Extension, NewFolder);
                     NewFileDataLookup.Add(NewFileData.ID, NewFileData);
                     NewFolder.SubFiles.Add(NewFileData);
                 }
@@ -130,7 +179,9 @@ namespace TuringServer
 
                 CacheDataLookup = NewCacheDataLookup,
                 FileDataLookup = NewFileDataLookup,
-                FolderDataLookup = NewFolderDataLookup
+                FolderDataLookup = NewFolderDataLookup,
+
+                ProjectAlphabetLookup = NewProjectAlphabetLookup
             };            
 
         }

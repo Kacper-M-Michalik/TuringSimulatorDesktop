@@ -33,12 +33,15 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             {
                 bounds = value;
                 Background.Bounds = bounds;
+                CloseButton.Position = new Vector2(position.X + Title.Bounds.X + 4, position.Y);
             }
         }
 
         Icon Background;
         Label Title;
         Button CloseButton;
+        ActionGroup Group;
+        public bool IsMarkedForDeletion { get; set; }
 
         public IView View;
         Window OwnerWindow;
@@ -49,6 +52,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             OwnerWindow = window;
             group.ClickableObjects.Add(this);
             group.PollableObjects.Add(this);
+            Group = group;
 
             Background = new Icon(GlobalRenderingData.SubHeaderColor);
             Title = new Label();
@@ -89,6 +93,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             {
                 Title.Text = View.Title;
                 Bounds = Title.Bounds + new Point(21, 0);
+                
             }
 
             if (IsInActionGroupFrame && IsMouseOver())
@@ -109,5 +114,11 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             CloseButton.Draw(BoundPort);
         }
 
+        public void Close()
+        {
+            Group.IsDirtyClickable = true;
+            Group.IsDirtyPollable = true;
+            IsMarkedForDeletion = true;
+        }
     }
 }

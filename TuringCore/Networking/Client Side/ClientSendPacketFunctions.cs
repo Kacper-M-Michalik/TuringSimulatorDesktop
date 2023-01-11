@@ -49,13 +49,14 @@ namespace TuringCore
             return Data;
         }
 
-        public static Packet CreateFile(int Folder, string NewName)
+        public static Packet CreateFile(int Folder, string NewName, CreateFileType FileType)
         {
             Packet Data = new Packet();
 
             Data.Write((int)ClientSendPackets.CreateFile);
             Data.Write(Folder);
             Data.Write(NewName);
+            Data.Write((int)FileType);
 
             return Data;
         }

@@ -57,6 +57,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         public bool IsMouseOverDraggableArea;
         public bool IsMarkedForDeletion;
         Viewport MainPort;
+        List<WindowHeaderItem> Headers = new List<WindowHeaderItem>();
 
         public Window(Vector2 position, Point bounds)
         {
@@ -87,6 +88,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         {
             WindowHeaderItem HB = new WindowHeaderItem(View, this, ButtonLayout.Group);
             View.OwnerWindow = this;
+            Headers.Add(HB);
             ButtonLayout.AddElement(HB);
             ButtonLayout.UpdateLayout();
             SetView(HB);
@@ -105,13 +107,25 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         {
             if (ViewButton.View == CurrentView)
             {
-                //ButtonLayout.
+                int Index = Headers.IndexOf(ViewButton);
+                if (Index < Headers.Count - 1)
+                {
+                    SetView(Headers[Index + 1]);
+                }
+                else if (Index > 0)
+                {
+                    SetView(Headers[Index - 1]);
+                }
+                else
+                {
+                    CurrentView = null;
+                }
             }
-            else
-            {
-                ButtonLayout.RemoveElement(ViewButton);
-                ButtonLayout.UpdateLayout();
-            }
+
+            ViewButton.Close();
+            Headers.Remove(ViewButton);
+            ButtonLayout.RemoveElement(ViewButton);
+            ButtonLayout.UpdateLayout();
         }
 
         public void Draw(Viewport? BoundPort = null)
@@ -124,6 +138,11 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
                 if (CurrentView != null) CurrentView.Draw(MainPort);
             }
+        }
+
+        public void Close()
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -6,12 +6,20 @@ using System.Threading.Tasks;
 
 namespace TuringCore.Actions
 {
+    /*
     public class SwapTapeAction : TuringAction
     {
         public string NewTapeID;
+
+        public SwapTapeAction(string newTapeID)
+        {
+            NewTapeID = newTapeID;
+        }
+
         public override void Execute(TuringMachine Machine)
         {
             Machine.SetActiveTape(NewTapeID);
         }
     }
+    */
 }

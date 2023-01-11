@@ -90,6 +90,11 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Title.Draw();
             LayoutBox.Draw();
         }
+
+        public void Close()
+        {
+            LayoutBox.Close();
+        }
     }
 
     public class RecentFileCard : IVisualElement

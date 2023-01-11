@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using TuringCore;
 
 namespace TuringServer
 {
@@ -39,12 +40,29 @@ namespace TuringServer
         public HashSet<int> SubscriberIDs;
 
         public string Name;
+        public string Extension;
+        public CreateFileType FileType;
         public DirectoryFolder ParentFolder;
 
-        public DirectoryFile(int SetID, string SetName, DirectoryFolder SetParentFolder)
+        public DirectoryFile(int SetID, string SetName, string SetExtension, DirectoryFolder SetParentFolder)
         {
             ID = SetID;
             Name = SetName;
+            Extension = SetExtension;
+            FileType = FileManager.ExtensionToFileType(Extension);
+
+            Version = 1;
+            ParentFolder = SetParentFolder;
+            SubscriberIDs = new HashSet<int>();
+        }
+        public DirectoryFile(int SetID, string SetName, CreateFileType SetType, DirectoryFolder SetParentFolder)
+        {
+            ID = SetID;
+            Name = SetName;
+
+            FileType = SetType;
+            Extension = FileManager.FileTypeToExtension(FileType);
+
             Version = 1;
             ParentFolder = SetParentFolder;
             SubscriberIDs = new HashSet<int>();
@@ -52,7 +70,7 @@ namespace TuringServer
 
         public string GetLocalPath()
         {
-            return ParentFolder.LocalPath + Name;
+            return ParentFolder.LocalPath + Name + Extension;
         }
     }
 

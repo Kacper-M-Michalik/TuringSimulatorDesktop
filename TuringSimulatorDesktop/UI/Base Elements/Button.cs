@@ -38,6 +38,7 @@ namespace TuringSimulatorDesktop.UI
         public event OnButtonClick OnClickedEvent;
         public event OnButtonClickAway OnClickedAwayEvent;
         public ActionGroup Group { get; private set; }
+        public bool IsMarkedForDeletion { get; set; }
 
         public bool HighlightOnMouseOver;
         public Texture2D BaseTexture;
@@ -129,6 +130,13 @@ namespace TuringSimulatorDesktop.UI
             {
                 Background.Draw(BoundPort);
             }
+        }
+
+        public void Close()
+        {
+            Group.IsDirtyClickable = true;
+            Group.IsDirtyPollable = true;
+            IsMarkedForDeletion = true;
         }
     }
 }
