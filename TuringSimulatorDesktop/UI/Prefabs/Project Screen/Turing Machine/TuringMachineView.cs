@@ -52,12 +52,80 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         Icon Background;
 
+        Button RestartButton;
         Button StepButton;
+
         Button ExecuteButton;
+        Button PauseButton;
+        Button Speed1Button;
+        Button Speed2Button;
+        Button Speed3Button;
 
         ActionGroup Group;
 
         TuringMachine Machine;
+
+        public TuringMachineView()
+        {
+
+        }
+
+        public void LoadStateTableSource(int File)
+        {            
+            //request file here
+
+            //UIEventManager.Subscribe(GlobalProjectAndUserData.ProjectData.AlphabetToFileLookup[Table.DefenitionAlphabetID], );
+            //Client.SendTCPData(ClientSendPacketFunctions.RequestFile(GlobalProjectAndUserData.ProjectData.AlphabetToFileLookup[Table.DefenitionAlphabetID], false));
+
+        }
+
+        public void ReceivedStateTableSourceData(Packet Data)
+        {
+            //serialize state table
+            //request alphabet ddata
+        }
+
+        public void ReceivedAlphabetData(Packet Data)
+        {
+            //deserialize
+        }
+
+        public void LoadTape(int FileID)
+        {
+
+        }
+        public void ReceivedTapeData(Packet Data)
+        {
+
+        }
+
+
+
+        public void Step(Button Sender)
+        {
+
+        }
+        public void Execute(Button Sender)
+        {
+
+        }
+        public void Pause(Button Sender)
+        {
+
+        }
+        public void SetSpeed1(Button Sender)
+        {
+
+        }
+        public void SetSpeed2(Button Sender)
+        {
+
+        }
+        public void SetSpeed3(Button Sender)
+        {
+
+        }
+
 
         void MoveLayout()
         {
@@ -74,25 +142,6 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             Background.Bounds = bounds;
         }
-
-        public void LoadStateTable(StateTable Table)
-        {            
-            //UIEventManager.Subscribe(GlobalProjectAndUserData.ProjectData.AlphabetToFileLookup[Table.DefenitionAlphabetID], );
-            //Client.SendTCPData(ClientSendPacketFunctions.RequestFile(GlobalProjectAndUserData.ProjectData.AlphabetToFileLookup[Table.DefenitionAlphabetID], false));
-
-        }
-
-        public void ReceivedAlphabet(Packet Data)
-        {
-            //deserialize
-        }
-
-        public void LoadTape(int FileID)
-        {
-
-        }
-
-        //udpate local soruce tape, state table call set
 
         public void Draw(Viewport? BoundPort = null)
         {

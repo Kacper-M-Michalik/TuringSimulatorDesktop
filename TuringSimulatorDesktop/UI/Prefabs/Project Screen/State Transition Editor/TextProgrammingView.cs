@@ -80,9 +80,6 @@ namespace TuringSimulatorDesktop.UI
 
             IsActive = false;
 
-            //TEMP
-            Client.SendTCPData(ClientSendPacketFunctions.CreateFile(0, "Auto Created File", CreateFileType.TransitionFile));
-
             CurrentlyOpenedFileID = FileToDisplay;
             SwitchOpenedFile(FileToDisplay);
         }

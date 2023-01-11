@@ -97,13 +97,13 @@ namespace TuringSimulatorDesktop.UI
         public void Clicked()
         {
             IsFocused = true;
-            ClickEvent.Invoke(this);
+            ClickEvent?.Invoke(this);
         }
 
         public void ClickedAway()
         {                        
             IsFocused = false;
-            ClickAwayEvent.Invoke(this);
+            ClickAwayEvent?.Invoke(this);
         }
 
         public bool IsMouseOver()

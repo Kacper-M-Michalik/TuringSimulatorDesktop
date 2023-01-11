@@ -61,7 +61,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         int CurrentlyOpenedFolderID;
         List<FileDisplayItem> Files = new List<FileDisplayItem>();
 
-        public FileBrowserView(int FolderToDisplay)
+        public FileBrowserView()
         {
             Group = InputManager.CreateActionGroup();
 
@@ -81,7 +81,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             IsActive = false;
 
-            SwitchOpenedFolder(FolderToDisplay);
+            SwitchOpenedFolder(0);
         }
         
         public void FolderUpdated(Packet Data)
@@ -91,11 +91,6 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             FileLayout.Clear();
             Files.Clear();
 
-            /*
-            UIEventManager.Unsubscribe(CurrentlyOpenedFolderID, FilesUpdated);
-            CurrentlyOpenedFolderID = Data.ReadInt();
-            UIEventManager.Subscribe(CurrentlyOpenedFolderID, FilesUpdated);
-            */
             if (Data.ReadInt() != CurrentlyOpenedFolderID)
             {
                 CustomLogging.Log("Cllient: File Browser Window Fatal Error, recived unwated folder data!");
@@ -122,9 +117,10 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         public void SwitchOpenedFolder(int ID)
         {
             UIEventManager.Unsubscribe(CurrentlyOpenedFolderID, FolderUpdated);
+            Client.SendTCPData(ClientSendPacketFunctions.UnsubscribeFromFolderUpdates(CurrentlyOpenedFolderID));
             CurrentlyOpenedFolderID = ID;
             UIEventManager.Subscribe(CurrentlyOpenedFolderID, FolderUpdated);
-            Client.SendTCPData(ClientSendPacketFunctions.RequestFolderData(ID));
+            Client.SendTCPData(ClientSendPacketFunctions.RequestFolderData(ID,true));
         }
 
         void FilterFiles(InputBox Sender)
