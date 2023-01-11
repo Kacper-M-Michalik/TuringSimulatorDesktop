@@ -44,8 +44,7 @@ namespace TuringSimulatorDesktop
         public static bool ClientFailedConnecting;
         public static EventHandler ClientFailedConnectingDelegate;
 
-        public static bool ServerSuccessLoadingProject;
-        public static EventHandler ServerSuccessLoadingProjectDelegate;
+        public static EventHandler RecievedProjectDataFromServerDelegate;
 
         //public static EventHandler RecievedErrorNotification;
         // public static EventHandler UpdateFileBrowser;

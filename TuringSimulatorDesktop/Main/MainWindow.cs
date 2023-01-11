@@ -158,7 +158,16 @@ namespace TuringSimulatorDesktop
             //Process interrupts
             if (UIEventManager.ClientSuccessConnecting) UIEventManager.ClientSuccessConnectingDelegate?.Invoke(this, new EventArgs());
             if (UIEventManager.ClientFailedConnecting) UIEventManager.ClientFailedConnectingDelegate?.Invoke(this, new EventArgs());
+            //if (UIEventManager.RecievedProjectDataFromServer) UIEventManager.RecievedProjectDataFromServerDelegate?.Invoke(this, new EventArgs());
+
+            /*
             if (UIEventManager.ServerSuccessLoadingProject) UIEventManager.ServerSuccessLoadingProjectDelegate?.Invoke(this, new EventArgs());
+            if (UIEventManager.NewProjectDataRecieved && CurrentView is ProjectScreenView)
+            {
+                ((ProjectScreenView)CurrentView).UpdatedProject();
+                UIEventManager.NewProjectDataRecieved = false;
+            }
+            */
 
             if (GlobalRenderingData.UIRequiresRedraw)
             {
@@ -223,6 +232,7 @@ namespace TuringSimulatorDesktop
         protected override void OnExiting(Object sender, EventArgs args)
         {
             base.OnExiting(sender, args);
+            Client.Disconnect();
             TuringServer.Server.CloseServer();
         }
     }

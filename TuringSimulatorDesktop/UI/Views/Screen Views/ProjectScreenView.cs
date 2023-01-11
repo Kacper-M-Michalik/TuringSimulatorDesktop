@@ -7,6 +7,7 @@ using TuringSimulatorDesktop.Input;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using TuringSimulatorDesktop.UI.Prefabs;
+using TuringCore;
 
 namespace TuringSimulatorDesktop.UI
 {
@@ -20,6 +21,9 @@ namespace TuringSimulatorDesktop.UI
         Icon Background;
 
         Label Title;
+
+        Button AddFileButton;
+        InputBox FileName;
 
        // FileBrowserView Browser;
 
@@ -44,16 +48,28 @@ namespace TuringSimulatorDesktop.UI
             Windows = new List<Window>();
 
             Window Temp = new Window(new Vector2(100, 100), new Point(800, 600));
-            Temp.AddView(new FileBrowserView(0));
-            Temp.AddView(new FileBrowserView(0));
+            Temp.AddView(new FileBrowserView());
+            Temp.AddView(new FileBrowserView());
             //Temp.AddView();
             Windows.Add(Temp);
 
             Title = new Label();
             Title.FontSize = 14;
-            Title.Text = GlobalProjectAndUserData.ProjectData.ProjectName;
             Title.Position = new Vector2(1920 / 2, 0);
+
+            AddFileButton = new Button(20, 20, UILookupKey.Debug1, UILookupKey.Debug2, Group);
+            AddFileButton.Position = new Vector2(10, 10);
+            AddFileButton.OnClickedEvent += AddFile;
+            FileName = new InputBox(100, 20, Group);
+            FileName.Position = new Vector2(32, 10);
+
             Group.PollableObjects.Add(this);
+        }
+
+        public void UpdatedProject(object sender, EventArgs e)
+        {
+            Title.Text = GlobalProjectAndUserData.ProjectData.ProjectName;
+            //do clearing etc here
         }
 
         public void PollInput(bool IsInActionFrameGroup)
@@ -103,17 +119,12 @@ namespace TuringSimulatorDesktop.UI
             }
         }
 
-        public override void Draw()
+        public void AddFile(Button Sender)
         {
-            Background.Draw();
-            Header.Draw();
-            Title.Draw();
-
-            for (int i = 0; i < Windows.Count; i++)
-            {
-                Windows[i].Draw();
-            }
+            //TEMP
+            Client.SendTCPData(ClientSendPacketFunctions.CreateFile(0, FileName.Text, CreateFileType.TransitionFile));
         }
+
 
         public void CreateWindow()
         {
@@ -129,6 +140,20 @@ namespace TuringSimulatorDesktop.UI
             BaseGroup = NewBaseGroup;
 
             Windows.Add(NewWindow);
+        }
+        public override void Draw()
+        {
+            Background.Draw();
+            Header.Draw();
+            Title.Draw();
+
+            AddFileButton.Draw();
+            FileName.Draw();
+
+            for (int i = 0; i < Windows.Count; i++)
+            {
+                Windows[i].Draw();
+            }
         }
 
         public override void ViewResize(int NewWidth, int NewHeight)

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TuringCore;
 using TuringServer;
+using TuringSimulatorDesktop.UI;
 
 namespace TuringSimulatorDesktop
 {
@@ -23,7 +24,7 @@ namespace TuringSimulatorDesktop
         public static void ReceivedProjectData(Packet Data)
         {
             GlobalProjectAndUserData.ProjectData = new ConnectedProjectData(Data.ReadString());
-            UIEventManager.ServerSuccessLoadingProject = true;
+            UIEventManager.RecievedProjectDataFromServerDelegate?.Invoke(null, null);// = true;
         }
 
         public static void ReceiveErrorNotification(Packet Data)

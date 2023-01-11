@@ -195,6 +195,7 @@ namespace TuringServer
                 if (Clients[i].TCP.ConnectionSocket == null)
                 {
                     Clients[i].TCP.ConnectClientToServer(NewClient);
+                    if (LoadedProject != null) AddPacketToProcessOnServerThread(i, ClientSendPacketFunctions.RequestProjectData());
                     return;
                 }
             }

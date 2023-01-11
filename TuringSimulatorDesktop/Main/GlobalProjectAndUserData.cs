@@ -36,8 +36,6 @@ namespace TuringSimulatorDesktop
 
         public static void SaveUserData()
         {
-            //string SaveJson = JsonSerializer.Serialize(UserData, Options);
-
             try
             {
                 File.WriteAllBytes(UserDataPath, JsonSerializer.SerializeToUtf8Bytes(UserData, Options));
@@ -51,8 +49,6 @@ namespace TuringSimulatorDesktop
 
         public static void LoadUserData(string Path)
         {
-            //string SaveFileJson = File.ReadAllText(Path, Encoding.Unicode);
-
             try
             {
                 UserData = JsonSerializer.Deserialize<LocalUserData>(File.ReadAllBytes(Path));

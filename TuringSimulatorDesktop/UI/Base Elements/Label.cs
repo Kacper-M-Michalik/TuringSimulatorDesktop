@@ -69,7 +69,8 @@ namespace TuringSimulatorDesktop.UI
 
             Bounds = new Point(width, height);
             Position = Vector2.Zero;
-        }public Label(int width, int height, Vector2 position, FontSystem font)
+        }
+        public Label(int width, int height, Vector2 position, FontSystem font)
         {
             Background = new Icon();
             RichText = new RichTextLayout();
@@ -77,7 +78,8 @@ namespace TuringSimulatorDesktop.UI
 
             Bounds = new Point(width, height);
             Position = position;
-        } public Label(int width, int height, Vector2 position)
+        }
+        public Label(int width, int height, Vector2 position)
         {
             Background = new Icon();
             RichText = new RichTextLayout();

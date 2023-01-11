@@ -18,16 +18,19 @@ namespace TuringServer
         public static Dictionary<int, PacketFunctionPointer> PacketToFunction = new Dictionary<int, PacketFunctionPointer>()
         {
             {(int)ClientSendPackets.LoadProject, UserRequestedLoadProject},
+
             {(int)ClientSendPackets.RequestLogReceieverStatus, UserRequestedLogReceieverStatus},
             {(int)ClientSendPackets.RequestProjectData, UserRequestedProjectData},
             {(int)ClientSendPackets.RequestFolderData, UserRequestedFolderData},
-            {(int)ClientSendPackets.CreateFile, UserCreatedNewFile},
             {(int)ClientSendPackets.RequestFile, UserRequestedFile},
+            {(int)ClientSendPackets.UnsubscribeFromUpdatesForFile, UserUnsubscribedFromFileUpdates},
+            {(int)ClientSendPackets.UnsubscribeFromUpdatesForFolder, UserUnsubscribedFromFolderUpdates},
+
             {(int)ClientSendPackets.UpdateFile, UserUpdatedFile},
+            {(int)ClientSendPackets.CreateFile, UserCreatedNewFile},
             {(int)ClientSendPackets.RenameFile, UserRenamedFile},
             {(int)ClientSendPackets.MoveFile, UserMovedFile},
             {(int)ClientSendPackets.DeleteFile, UserDeletedFile},
-            {(int)ClientSendPackets.UnsubscribeFromUpdatesForFile, UserUnsubscribedFromFileUpdates},
             {(int)ClientSendPackets.CreateFolder, UserCreatedFolder},
             {(int)ClientSendPackets.RenameFolder, UserRenamedFolder},
             {(int)ClientSendPackets.MoveFolder, UserMovedFolder},
@@ -77,6 +80,11 @@ namespace TuringServer
          */
         public static void UserRequestedProjectData(int SenderClientID, Packet Data)
         {
+            if (Server.LoadedProject == null)
+            {
+                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("No project currently loaded!"));
+                return;
+            }
             Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ProjectData());
         }
 

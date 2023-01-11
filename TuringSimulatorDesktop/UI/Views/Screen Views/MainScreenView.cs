@@ -30,6 +30,7 @@ namespace TuringSimulatorDesktop.UI
         Button JoinProjectButton;
         Button HostProjectButton;
 
+        InputBox IPBox;
         RecentFilesViewer Viewer;
         //DropDownMenu Menu;
 
@@ -69,9 +70,14 @@ namespace TuringSimulatorDesktop.UI
 
             JoinProjectButton = new Button(250, 70, UILookupKey.JoinProjectButton, UILookupKey.JoinProjectButtonHightlight, new Vector2(490, 282), Group);
             JoinProjectButton.HighlightOnMouseOver = true;
+            JoinProjectButton.OnClickedEvent += ConnectToOtherDevice;
 
+
+            IPBox = new InputBox(100, 20, Group);
+            IPBox.Position = Vector2.Zero;
            // Menu = new DropDownMenu(60, 20, new Vector2(45, 6), Group);
         }
+
 
         string Location;
         public void SelectProjectLocation(Button Sender)
@@ -98,37 +104,48 @@ namespace TuringSimulatorDesktop.UI
                 SelectedProject(Dialog.FileName);
             }
         }
+
         public void SelectedProject(string location)
         {
             //2 TEMP
             BackendInterface.StartProjectServer(2, 28104);
             Location = location;
-            UIEventManager.ClientSuccessConnectingDelegate = ConnectedToLocalServerInThisInstance;
+            UIEventManager.ClientSuccessConnectingDelegate = ConnectedToLocalServer;
+            //UIEventManager.ClientFailedConnecting//
             Client.ConnectToServer(System.Net.IPAddress.Parse("127.0.0.1"), 28104);
         }
-        void ConnectedToLocalServerInThisInstance(object sender, EventArgs e)
+        void ConnectedToLocalServer(object sender, EventArgs e)
         {
             UIEventManager.ClientSuccessConnecting = false;
             UIEventManager.ClientSuccessConnectingDelegate = null;
-            UIEventManager.ServerSuccessLoadingProjectDelegate = ServerSuccessfullyLoadedLocalFile;
+            UIEventManager.RecievedProjectDataFromServerDelegate = ServerSentProjectData;
             Client.SendTCPData(ClientSendPacketFunctions.LoadProject(Location));
         }
-        void ServerSuccessfullyLoadedLocalFile(object sender, EventArgs e)
-        {
-            UIEventManager.ServerSuccessLoadingProject = false;
-            UIEventManager.ServerSuccessLoadingProjectDelegate = null;
+        void ServerSentProjectData(object sender, EventArgs e)
+        {   
             GlobalProjectAndUserData.UpdateRecentlyOpenedFile(Location);
-            ConnectedToServer(this, null);
+            FullyConnectedToServer(this, null);
         }
 
-        void ConnectedToServer(object sender, EventArgs e)
+
+        void ConnectToOtherDevice(Button Sender)
+        {
+            UIEventManager.RecievedProjectDataFromServerDelegate = FullyConnectedToServer;
+            //UIEventManager.ClientFailedConnecting//
+            Client.ConnectToServer(System.Net.IPAddress.Parse(IPBox.Text), 28104);
+        }
+
+
+        void FullyConnectedToServer(object sender, EventArgs e)
         {
             UIEventManager.ClientSuccessConnecting = false;
             UIEventManager.ClientSuccessConnectingDelegate = null;
 
             InputManager.DeleteAllActionGroups();
             GlobalRenderingData.MainWindow.LeaveMainMenu();
-            GlobalRenderingData.MainWindow.CurrentView = new ProjectScreenView();
+            ProjectScreenView ProjectView = new ProjectScreenView();
+            UIEventManager.RecievedProjectDataFromServerDelegate = ProjectView.UpdatedProject;
+            GlobalRenderingData.MainWindow.CurrentView = ProjectView;
         }
 
         public void Minimise(Button Sender)
@@ -161,6 +178,8 @@ namespace TuringSimulatorDesktop.UI
             LoadProjectButton.Draw();
             JoinProjectButton.Draw();
             HostProjectButton.Draw();
+
+            IPBox.Draw();
         }
 
         public override void ViewResize(int NewWidth, int NewHeight)
