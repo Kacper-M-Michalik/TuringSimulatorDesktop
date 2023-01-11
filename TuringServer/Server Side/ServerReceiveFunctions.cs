@@ -85,11 +85,13 @@ namespace TuringServer
          */
         public static void UserRequestedFolderData(int SenderClientID, Packet Data)
         {
-            int FolderID; 
+            int FolderID;
+            bool SubscribeToFolderChanges;
             
             try
             {
                 FolderID = Data.ReadInt();
+                SubscribeToFolderChanges = Data.ReadBool();
             }
             catch
             {
@@ -102,6 +104,8 @@ namespace TuringServer
                 Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to request folder - Folder doesn't exist."));
                 return;
             }
+
+            if (SubscribeToFolderChanges) Server.LoadedProject.FolderDataLookup[FolderID].SubscriberIDs.Add(SenderClientID);
 
             Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.FolderData(FolderID));
         }
@@ -221,6 +225,12 @@ namespace TuringServer
             Server.LoadedProject.FileDataLookup.Add(NewID, NewFileData);
             ParentFolder.SubFiles.Add(NewFileData);
             FileManager.LoadFileIntoCache(NewID);
+
+            Packet SendPacket = ServerSendPacketFunctions.FolderData(FolderID);
+            foreach (int SubscriberID in Server.LoadedProject.FolderDataLookup[FolderID].SubscriberIDs)
+            {
+                Server.SendTCPData(SubscriberID, SendPacket);
+            }
         }
                      
         /* -PACKET LAYOUT-
@@ -293,7 +303,6 @@ namespace TuringServer
             Server.LoadedProject.CacheDataLookup[FileID].ResetExpiryTimer();
 
             Packet SendPacket = ServerSendPacketFunctions.FileData(FileID);
-
             foreach (int Client in FileData.SubscriberIDs)
             {
                 Server.SendTCPData(Client, SendPacket);
@@ -367,10 +376,23 @@ namespace TuringServer
                 FileManager.DeleteFileByPath(NewFileLocation);
                 return;
             }
-
+            
             FileData.Name = NewFileName;
 
-            Server.SendTCPToAllClients(ServerSendPacketFunctions.FileRenamed(FileID));
+            Packet SendPacket = ServerSendPacketFunctions.FolderData(FileData.ParentFolder.ID);
+            foreach (int SubscriberID in Server.LoadedProject.FolderDataLookup[FileData.ParentFolder.ID].SubscriberIDs)
+            {
+                Server.SendTCPData(SubscriberID, SendPacket);
+            }
+
+            //REDO TO SEND ONYL RENAME INSTEAD OF WHOLE FILE
+            SendPacket = ServerSendPacketFunctions.FileData(FileData.ID);
+            foreach (int SubscriberID in Server.LoadedProject.FileDataLookup[FileData.ID].SubscriberIDs)
+            {
+                Server.SendTCPData(SubscriberID, SendPacket);
+            }
+
+            //Server.SendTCPToAllClients(ServerSendPacketFunctions.FileRenamed(FileID));
         }
 
         /* -PACKET LAYOUT-
@@ -439,10 +461,24 @@ namespace TuringServer
                 return;
             }
 
+            int PreviousFolderID = FileData.ParentFolder.ID;
+
             FileData.ParentFolder.SubFiles.Remove(FileData);
             FileData.ParentFolder = FolderData;
 
-            Server.SendTCPToAllClients(ServerSendPacketFunctions.FileMoved(FileID));
+            Packet SendPacket = ServerSendPacketFunctions.FolderData(PreviousFolderID);
+            foreach (int SubscriberID in Server.LoadedProject.FolderDataLookup[PreviousFolderID].SubscriberIDs)
+            {
+                Server.SendTCPData(SubscriberID, SendPacket);
+            }
+
+            SendPacket = ServerSendPacketFunctions.FolderData(FileData.ID);
+            foreach (int SubscriberID in Server.LoadedProject.FolderDataLookup[FileData.ID].SubscriberIDs)
+            {
+                Server.SendTCPData(SubscriberID, SendPacket);
+            }
+
+            //Server.SendTCPToAllClients(ServerSendPacketFunctions.FileMoved(FileID));
         }
 
         /* -PACKET LAYOUT-
@@ -479,7 +515,19 @@ namespace TuringServer
             Server.LoadedProject.CacheDataLookup.Remove(FileID);
             Server.LoadedProject.FileDataLookup.Remove(FileID);
 
-            Server.SendTCPToAllClients(ServerSendPacketFunctions.FileDeleted(FileID));
+            Packet SendPacket = ServerSendPacketFunctions.FolderData(FileData.ParentFolder.ID);
+            foreach (int SubscriberID in Server.LoadedProject.FolderDataLookup[FileData.ParentFolder.ID].SubscriberIDs)
+            {
+                Server.SendTCPData(SubscriberID, SendPacket);
+            }
+
+            SendPacket = ServerSendPacketFunctions.FileDeleted(FileData.ID);
+            foreach (int SubscriberID in Server.LoadedProject.FileDataLookup[FileData.ID].SubscriberIDs)
+            {
+                Server.SendTCPData(SubscriberID, SendPacket);
+            }
+
+            //Server.SendTCPToAllClients(ServerSendPacketFunctions.FileDeleted(FileID));
         }
 
         /* -PACKET LAYOUT-
@@ -487,7 +535,7 @@ namespace TuringServer
          */
         public static void UserUnsubscribedFromFileUpdates(int SenderClientID, Packet Data)
         {
-            CustomLogging.Log("SERVER INSTRUCTION: User unsubed from file.");
+            CustomLogging.Log("SERVER INSTRUCTION: User unsubbed from file.");
 
             int FileID;
 
@@ -513,8 +561,32 @@ namespace TuringServer
             //ServerSendFunctions.SendFileUnsubscribed(FileID);
         }
 
-                
+        public static void UserUnsubscribedFromFolderUpdates(int SenderClientID, Packet Data)
+        {
+            CustomLogging.Log("SERVER INSTRUCTION: User unsubbed from folder.");
 
+            int FolderID;
+
+            try
+            {
+                FolderID = Data.ReadInt();
+            }
+            catch
+            {
+                CustomLogging.Log("ServerReceive Error: Invalid unsubscribe folder packet recieved from client: " + SenderClientID.ToString());
+                return;
+            }
+
+            if (!Server.LoadedProject.FolderDataLookup.ContainsKey(FolderID))
+            {
+                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to unsubscribe from folder - Folder doesn't exist."));
+                return;
+            }
+
+            CustomLogging.Log("SERVER INSTRUCTION: User " + SenderClientID.ToString() + " no longer recieiving updates to folder " + FolderID.ToString() + ".");
+
+            Server.LoadedProject.FolderDataLookup[FolderID].SubscriberIDs.Remove(SenderClientID);
+        }
 
         /* -PACKET LAYOUT-
          * int Parent Folder ID
@@ -576,7 +648,13 @@ namespace TuringServer
             ParentFolderData.SubFolders.Add(NewFolderData);
             Server.LoadedProject.FolderDataLookup.Add(NewID, NewFolderData);
 
-            Server.SendTCPToAllClients(ServerSendPacketFunctions.FolderCreated(NewID));
+            Packet SendPacket = ServerSendPacketFunctions.FolderData(ParentFolderData.ID);
+            foreach (int SubscriberID in Server.LoadedProject.FolderDataLookup[ParentFolderData.ID].SubscriberIDs)
+            {
+                Server.SendTCPData(SubscriberID, SendPacket);
+            }
+
+            //Server.SendTCPToAllClients(ServerSendPacketFunctions.FolderCreated(NewID));
         }
 
         /* -PACKET LAYOUT-
@@ -655,7 +733,13 @@ namespace TuringServer
                 }
             }
 
-            Server.SendTCPToAllClients(ServerSendPacketFunctions.FolderRenamed(FolderID));
+            Packet SendPacket = ServerSendPacketFunctions.FolderData(BaseFolder.ParentFolder.ID);
+            foreach (int SubscriberID in Server.LoadedProject.FolderDataLookup[BaseFolder.ParentFolder.ID].SubscriberIDs)
+            {
+                Server.SendTCPData(SubscriberID, SendPacket);
+            }
+
+            //Server.SendTCPToAllClients(ServerSendPacketFunctions.FolderRenamed(FolderID));
         }
 
         /* -PACKET LAYOUT-
@@ -720,6 +804,7 @@ namespace TuringServer
                 return;
             }
 
+            DirectoryFolder PreviousParentFolder = FolderData.ParentFolder;
             FolderData.ParentFolder.SubFolders.Remove(FolderData);
             FolderData.ParentFolder = TargetFolderData;
             TargetFolderData.SubFolders.Add(FolderData);
@@ -738,7 +823,19 @@ namespace TuringServer
                 }
             }
 
-            Server.SendTCPToAllClients(ServerSendPacketFunctions.FolderMoved(FolderID));
+            Packet SendPacket = ServerSendPacketFunctions.FolderData(TargetFolderID);
+            foreach (int SubscriberID in Server.LoadedProject.FolderDataLookup[TargetFolderID].SubscriberIDs)
+            {
+                Server.SendTCPData(SubscriberID, SendPacket);
+            }
+
+            SendPacket = ServerSendPacketFunctions.FolderData(PreviousParentFolder.ID);
+            foreach (int SubscriberID in Server.LoadedProject.FolderDataLookup[PreviousParentFolder.ID].SubscriberIDs)
+            {
+                Server.SendTCPData(SubscriberID, SendPacket);
+            }
+
+            //Server.SendTCPToAllClients(ServerSendPacketFunctions.FolderMoved(FolderID));
         }
 
         /* -PACKET LAYOUT-
@@ -805,7 +902,13 @@ namespace TuringServer
                 }
             }
 
-            Server.SendTCPToAllClients(ServerSendPacketFunctions.FolderDeleted(FolderID));
+            Packet SendPacket = ServerSendPacketFunctions.FolderData(FolderData.ParentFolder.ID);
+            foreach (int SubscriberID in Server.LoadedProject.FolderDataLookup[FolderData.ParentFolder.ID].SubscriberIDs)
+            {
+                Server.SendTCPData(SubscriberID, SendPacket);
+            }
+
+            //Server.SendTCPToAllClients(ServerSendPacketFunctions.FolderDeleted(FolderID));
         }
 
         #endregion

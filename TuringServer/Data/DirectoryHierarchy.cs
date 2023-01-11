@@ -8,6 +8,7 @@ namespace TuringServer
     public class DirectoryFolder
     {
         public int ID;
+        public HashSet<int> SubscriberIDs;
 
         public string Name;
         public DirectoryFolder ParentFolder;
@@ -19,6 +20,8 @@ namespace TuringServer
         public DirectoryFolder(int SetID, string SetName, DirectoryFolder SetParentFolder)
         {
             ID = SetID;
+            SubscriberIDs = new HashSet<int>();
+
             Name = SetName;
             ParentFolder = SetParentFolder;
             UpdatePath();

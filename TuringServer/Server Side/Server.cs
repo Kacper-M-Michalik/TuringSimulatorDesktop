@@ -84,17 +84,26 @@ namespace TuringServer
         #region Helper Functions
         public static void SendTCPData(int ClientID, Packet Data)
         {
-            Clients[ClientID].TCP.SendDataToClient(Data);
+            Data.InsertPacketLength();
+            Clients[ClientID].TCP.SendDataToClient(Data.SaveTemporaryBufferToPernamentReadBuffer());
             Data.Dispose();
         }
+        /*
+        public static void SendTCPData(int ClientID, byte[] Data)
+        {
+            Clients[ClientID].TCP.SendDataToClient(Data);
+        }
+        */
 
         public static void SendTCPToAllClients(Packet Data)
         {
+            Data.InsertPacketLength();
+            byte[] FinalData = Data.SaveTemporaryBufferToPernamentReadBuffer();
             for (int i = 0; i < MaxClients; i++)
             {
                 if (Clients[i].TCP.ConnectionSocket != null)
                 {
-                    Clients[i].TCP.SendDataToClient(Data);
+                    Clients[i].TCP.SendDataToClient(FinalData);
                 }
             }
             Data.Dispose();
@@ -254,14 +263,13 @@ namespace TuringServer
                 CustomLogging.Log("SERVER: Client at " + ConnectionSocket.Client.RemoteEndPoint.ToString() + " has been connected to server!");
             }
 
-            public void SendDataToClient(Packet Data)
+            public void SendDataToClient(byte[] Data)
             {
                 if (ConnectionSocket == null) return;
 
                 try
                 {
-                    Data.InsertPacketLength();
-                    DataStream.BeginWrite(Data.SaveTemporaryBufferToPernamentReadBuffer(), 0, Data.Length(), null, null);
+                    DataStream.BeginWrite(Data, 0, Data.Length, null, null);
                 }
                 catch (Exception E)
                 {

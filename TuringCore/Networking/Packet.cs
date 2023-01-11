@@ -13,7 +13,8 @@ namespace TuringCore
         RequestFolderData,
         RequestFile,
         UnsubscribeFromUpdatesForFile,
-                    
+        UnsubscribeFromUpdatesForFolder,
+
         CreateFile,
         UpdateFile,
         RenameFile,
@@ -33,11 +34,13 @@ namespace TuringCore
 
         SentProjectData,
         SentFolderData,
-
-        CreatedFile,
         SentOrUpdatedFile,
-        RenamedFile,
-        MovedFile,
+
+        //Unecessary?
+
+        //CreatedFile,
+        //RenamedFile,
+        //MovedFile,
         DeletedFile,
 
         CreatedFolder,

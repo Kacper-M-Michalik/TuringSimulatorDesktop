@@ -81,6 +81,7 @@ namespace TuringServer
             return Data;
         }
 
+        /*
         public static Packet FileRenamed(int FileID)
         {
             Packet Data = new Packet();
@@ -102,6 +103,7 @@ namespace TuringServer
             return Data;
             //SendTCPToAllClients(Data);
         }
+        */
 
         public static Packet FileDeleted(int FileID)
         {
@@ -127,6 +129,7 @@ namespace TuringServer
         }
         */
 
+        /*
         public static Packet FolderCreated(int FolderID)
         {
             Packet Data = new Packet();
@@ -159,6 +162,7 @@ namespace TuringServer
             //SendTCPToAllClients(Data);
             return Data;
         }
+        */
 
         public static Packet FolderDeleted(int FolderID)
         {

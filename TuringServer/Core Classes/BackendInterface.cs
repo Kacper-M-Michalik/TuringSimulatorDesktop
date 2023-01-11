@@ -10,10 +10,18 @@ namespace TuringServer
     {
         public static ProjectData LoadedProject { get { return Server.LoadedProject; } }
 
-        public static void StartProjectServer(int SetMaxClients, int SetPort)
+        public static bool StartProjectServer(int SetMaxClients, int SetPort)
         {
+            if (NetworkingUtils.PortInUse(SetPort))
+            {
+                CustomLogging.Log("SERVER: Can't start, port already in use!");
+                return false;
+            }
+
             Thread ServerThread = new Thread(() => Server.StartServer(SetMaxClients, SetPort));
             ServerThread.Start();
+
+            return true;
         }
 
         public static void CloseProject()

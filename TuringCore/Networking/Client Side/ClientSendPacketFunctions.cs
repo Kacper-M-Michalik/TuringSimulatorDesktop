@@ -19,6 +19,15 @@ namespace TuringCore
             return Data;
         }
 
+        public static Packet RequestProjectData()
+        {
+            Packet Data = new Packet();
+
+            Data.Write((int)ClientSendPackets.RequestProjectData);
+
+            return Data;
+        }
+
         public static Packet RequestLogReceiverStatus()
         {
             Packet Data = new Packet();
@@ -39,12 +48,13 @@ namespace TuringCore
             return Data;
         }
 
-        public static Packet RequestFolderData(int FolderID)
+        public static Packet RequestFolderData(int FolderID, bool RecieveUpdates)
         {
             Packet Data = new Packet();
 
             Data.Write((int)ClientSendPackets.RequestFolderData);
             Data.Write(FolderID);
+            Data.Write(RecieveUpdates);
 
             return Data;
         }
@@ -110,6 +120,16 @@ namespace TuringCore
             Packet Data = new Packet();
 
             Data.Write((int)ClientSendPackets.UnsubscribeFromUpdatesForFile);
+            Data.Write(FileID);
+
+            return Data;
+        }
+
+        public static Packet UnsubscribeFromFolderUpdates(int FileID)
+        {
+            Packet Data = new Packet();
+
+            Data.Write((int)ClientSendPackets.UnsubscribeFromUpdatesForFolder);
             Data.Write(FileID);
 
             return Data;
