@@ -41,6 +41,21 @@ namespace TuringServer
             return Data;
         }
 
+        public static Packet FileData(int FileID)
+        {
+            Packet Data = new Packet();
+
+            Data.Write((int)ServerSendPackets.SentOrUpdatedFile);
+            Data.Write(FileID);
+
+            Data.Write((int)Server.LoadedProject.FileDataLookup[FileID].FileType);
+            Data.Write(Server.LoadedProject.FileDataLookup[FileID].Name);
+            Data.Write(Server.LoadedProject.FileDataLookup[FileID].Version);
+            Data.Write(Server.LoadedProject.CacheDataLookup[FileID].FileData);
+
+            return Data;
+        }
+
         public static Packet FolderData(int FolderID)
         {
             Packet Data = new Packet();
@@ -62,21 +77,6 @@ namespace TuringServer
                 Data.Write(File.Name);
                 Data.Write(File.ID);
             }
-
-            return Data;
-        }
-
-        public static Packet FileData(int FileID)
-        {
-            Packet Data = new Packet();
-
-            Data.Write((int)ServerSendPackets.SentOrUpdatedFile);
-            Data.Write(FileID);
-
-            Data.Write((int)Server.LoadedProject.FileDataLookup[FileID].FileType);
-            Data.Write(Server.LoadedProject.FileDataLookup[FileID].Name);
-            Data.Write(Server.LoadedProject.FileDataLookup[FileID].Version);
-            Data.Write(Server.LoadedProject.CacheDataLookup[FileID].FileData);
 
             return Data;
         }
