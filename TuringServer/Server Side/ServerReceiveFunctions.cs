@@ -195,10 +195,25 @@ namespace TuringServer
             DirectoryFolder ParentFolder = Server.LoadedProject.FolderDataLookup[FolderID];
             string NewFileLocation = Server.LoadedProject.BasePath + ParentFolder.LocalPath + FileName + FileManager.FileTypeToExtension(FileType);
 
+            string FinalFileName = FileName;
             if (File.Exists(NewFileLocation))
             {
-                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to create file - File already exists."));
-                return;
+                bool Failed = true;
+                int CopyVersion = 1;
+                while (CopyVersion < 10 && Failed)
+                {
+                    FinalFileName = FileName + " (" + CopyVersion.ToString() + ")";
+                    NewFileLocation = Server.LoadedProject.BasePath + ParentFolder.LocalPath + FinalFileName + FileManager.FileTypeToExtension(FileType);
+                    Failed = File.Exists(NewFileLocation);
+                    CopyVersion++;
+                }
+
+                if (Failed)
+                {
+                    Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to create file - File already exists/too many default name files currently exist."));
+                    return;
+                }
+
             }
 
             try
@@ -229,7 +244,7 @@ namespace TuringServer
 
             int NewID = FileManager.GetNewFileID();
 
-            DirectoryFile NewFileData = new DirectoryFile(NewID, FileName, FileType, Server.LoadedProject.FolderDataLookup[FolderID]);
+            DirectoryFile NewFileData = new DirectoryFile(NewID, FinalFileName, FileType, Server.LoadedProject.FolderDataLookup[FolderID]);
             Server.LoadedProject.FileDataLookup.Add(NewID, NewFileData);
             ParentFolder.SubFiles.Add(NewFileData);
             FileManager.LoadFileIntoCache(NewID);
@@ -566,7 +581,6 @@ namespace TuringServer
             CustomLogging.Log("SERVER INSTRUCTION: User "+SenderClientID.ToString()+" no longer recieiving updates to file "+ FileID.ToString()+".");
 
             Server.LoadedProject.FileDataLookup[FileID].SubscriberIDs.Remove(SenderClientID);
-            //ServerSendFunctions.SendFileUnsubscribed(FileID);
         }
 
         public static void UserUnsubscribedFromFolderUpdates(int SenderClientID, Packet Data)

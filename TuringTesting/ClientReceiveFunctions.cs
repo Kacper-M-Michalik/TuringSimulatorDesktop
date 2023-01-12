@@ -39,7 +39,15 @@ namespace TuringTesting
             CustomLogging.Log("CLIENT: Recieved Folder Data");
 
             int FolderID = Data.ReadInt();
-            string FolderName = Data.ReadString();
+
+            CustomLogging.Log(Data.ReadString());
+
+            int Max = Data.ReadInt();
+            for (int i = 0; i < Max; i++)
+            {
+                CustomLogging.Log(Data.ReadString());
+            }
+
             int Folders = Data.ReadInt();
             for (int i = 0; i < Folders; i++)
             {

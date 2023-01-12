@@ -53,7 +53,7 @@ namespace TuringSimulatorDesktop.Input
             ScrollWheelDelta = MouseData.ScrollWheelValue - PreviousScrollWheel;
             PreviousScrollWheel = MouseData.ScrollWheelValue;
 
-            if (LeftMousePressed)
+            if (LeftMousePressed || RightMousePressed)
             {
                 int i = ActionGroups.Count-1;
                 bool RecepientFound = false;

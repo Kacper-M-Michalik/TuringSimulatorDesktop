@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace TuringSimulatorDesktop
 {
-    public static class GlobalUIRenderer
+    public static class GlobalMeshRenderer
     {
         static GraphicsDevice Device;
         static Effect Effect;
@@ -15,8 +15,8 @@ namespace TuringSimulatorDesktop
 
         public static void Setup()
         {
-            Device = GlobalRenderingData.Device;
-            Effect = GlobalRenderingData.UIEffect;
+            Device = GlobalInterfaceData.Device;
+            Effect = GlobalInterfaceData.UIEffect;
         }
 
         public static void RecalculateProjection(int X, int Y, int Width, int Height)
@@ -99,7 +99,7 @@ namespace TuringSimulatorDesktop
         public static void Draw(Mesh DrawMesh, Matrix Transformations, Texture2D DrawTexture, Viewport? Port = null)
         {
             Viewport port;
-            if (Port == null) port = GlobalRenderingData.FullscreenViewport;
+            if (Port == null) port = GlobalInterfaceData.FullscreenViewport;
             else port = Port.Value;
 
             Device.Viewport = port;
@@ -120,7 +120,7 @@ namespace TuringSimulatorDesktop
         public static void Draw(Mesh DrawMesh, Matrix Transformations, Color DrawColor, Viewport? Port = null)
         {
             Viewport port;
-            if (Port == null) port = GlobalRenderingData.FullscreenViewport;
+            if (Port == null) port = GlobalInterfaceData.FullscreenViewport;
             else port = Port.Value;
 
             Device.Viewport = port;

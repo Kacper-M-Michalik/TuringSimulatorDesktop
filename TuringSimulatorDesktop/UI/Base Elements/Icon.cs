@@ -79,8 +79,8 @@ namespace TuringSimulatorDesktop.UI
         {    
             if (IsActive)
             {
-                if (DrawTexture != null) GlobalUIRenderer.Draw(MeshData, PositionMatrix, DrawTexture, BoundPort);
-                else GlobalUIRenderer.Draw(MeshData, PositionMatrix, DrawColor, BoundPort);   
+                if (DrawTexture != null) GlobalMeshRenderer.Draw(MeshData, PositionMatrix, DrawTexture, BoundPort);
+                else GlobalMeshRenderer.Draw(MeshData, PositionMatrix, DrawColor, BoundPort);   
             }         
         }
     }

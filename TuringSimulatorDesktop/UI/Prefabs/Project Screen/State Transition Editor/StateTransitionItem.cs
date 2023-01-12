@@ -43,7 +43,7 @@ namespace TuringSimulatorDesktop.UI
 
         public StateTransitionItem(ActionGroup group)
         {
-            Background = new Icon(GlobalRenderingData.BackgroundColor);
+            Background = new Icon(GlobalInterfaceData.Scheme.Background);
 
             CurrentStateTextBox = new InputBox(15,10,group);
             TapeValueTextBox = new InputBox(15, 10, group);

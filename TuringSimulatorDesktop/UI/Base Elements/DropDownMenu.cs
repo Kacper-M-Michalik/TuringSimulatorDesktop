@@ -24,9 +24,9 @@ namespace TuringSimulatorDesktop.UI
         public bool HighlightOnMouseOver;
 
         ActionGroup Group;
-        Button DropDownHeader;
+        TextureButton DropDownHeader;
         VerticalLayoutBox LayoutBox;
-        List<Button> MenuButtons;
+        List<TextureButton> MenuButtons;
 
         public DropDownMenu(int headerWidth, int headerHeight, Vector2 position, ActionGroup group)
         {
@@ -40,7 +40,7 @@ namespace TuringSimulatorDesktop.UI
             Position = position;
         }
 
-        public void AddMenuButton(Button button)
+        public void AddMenuButton(TextureButton button)
         {
 
 

@@ -71,7 +71,7 @@ namespace TuringSimulatorDesktop.UI
         {
             Group = InputManager.CreateActionGroup();
 
-            Background = new Icon(GlobalRenderingData.BackgroundColor);
+            Background = new Icon(GlobalInterfaceData.Scheme.Background);
             TransitionLayout = new VerticalLayoutBox();
             TransitionLayout.Scrollable = true;
             TransitionLayout.Spacing = 5f;
@@ -103,7 +103,7 @@ namespace TuringSimulatorDesktop.UI
                 return;
             }
 
-            TestLabel.Text = "VERSION: " + FileVersion.ToString() + "/n" + Encoding.ASCII.GetString(Data.ReadByteArray()) + "/n" + OpenedFile.DefenitionAlphabetID;
+            TestLabel.Text = "VERSION: " + FileVersion.ToString() + "/n" + Encoding.ASCII.GetString(Data.ReadByteArray()) + "/n" + OpenedFile.DefinitionAlphabetID;
 
             for (int i = 0; i < OpenedFile.Transitions.Count; i++)
             {

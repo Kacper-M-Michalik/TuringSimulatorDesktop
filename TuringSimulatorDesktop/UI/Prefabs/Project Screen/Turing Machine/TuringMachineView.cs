@@ -3,12 +3,13 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json;
 using TuringCore;
 using TuringSimulatorDesktop.Input;
 
 namespace TuringSimulatorDesktop.UI.Prefabs
 {    
-    public class TuringMachineView : IView
+    public class TuringMachineView : IView, IPollable
     {
         Vector2 position;
         public Vector2 Position
@@ -49,7 +50,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             get => ownerWindow;
             set => ownerWindow = value;
         }
-
+        public bool IsMarkedForDeletion { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         Icon InfoBackground;
         Label CurrentStateTableTitle;
@@ -62,15 +63,15 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         Icon Background;
 
-        Button ExecuteButton;
-        Button StepButton;
-        Button RestartButton;
+        TextureButton ExecuteButton;
+        TextureButton StepButton;
+        TextureButton RestartButton;
 
-        Button AutoStepButton;
-        Button PauseButton;
-        Button Speed1Button;
-        Button Speed2Button;
-        Button Speed3Button;
+        TextureButton AutoStepButton;
+        TextureButton PauseButton;
+        TextureButton Speed1Button;
+        TextureButton Speed2Button;
+        TextureButton Speed3Button;
 
 
 
@@ -81,53 +82,251 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         ActionGroup Group;
 
+        int CurrentlyOpenedFileID = -1;
+        int CurrentlyOpenedAlphabetID = -1;
+        int CurrentlyOpenedTapeID = -1;
         TuringMachine Machine;
+
+        CompilableFile TempFile;
+        Alphabet TempAlphabet;
+
+        bool IsAutoStepActive;
+        double TimeLeftToNextStep;
+        const double BaseTimeBetweenSteps = 1000;
+        double TimeBetweenStepsMS;
 
         public TuringMachineView()
         {
             Machine = new TuringMachine();
+            TimeBetweenStepsMS = BaseTimeBetweenSteps;
         }
 
-        public void LoadStateTableSource(int File)
-        {            
-            //request file here
+        public void LoadStateTableSource(int FileID)
+        {
+            if (CurrentlyOpenedAlphabetID != -1)
+            {
+                UIEventManager.Unsubscribe(CurrentlyOpenedAlphabetID, ReceivedAlphabetData);
+                Client.SendTCPData(ClientSendPacketFunctions.UnsubscribeFromFileUpdates(CurrentlyOpenedAlphabetID));
+                CurrentlyOpenedAlphabetID = -1;
+                TempAlphabet = null;
+            }
+            if (CurrentlyOpenedFileID != -1)
+            {
+                UIEventManager.Unsubscribe(CurrentlyOpenedFileID, ReceivedStateTableSourceData);
+                Client.SendTCPData(ClientSendPacketFunctions.UnsubscribeFromFileUpdates(CurrentlyOpenedFileID));
+                TempFile = null;
+            }
 
-            //UIEventManager.Subscribe(GlobalProjectAndUserData.ProjectData.AlphabetToFileLookup[Table.DefenitionAlphabetID], );
-            //Client.SendTCPData(ClientSendPacketFunctions.RequestFile(GlobalProjectAndUserData.ProjectData.AlphabetToFileLookup[Table.DefenitionAlphabetID], false));
+            CurrentlyOpenedFileID = FileID;
 
+            UIEventManager.Subscribe(CurrentlyOpenedFileID, ReceivedStateTableSourceData);
+            Client.SendTCPData(ClientSendPacketFunctions.RequestFile(CurrentlyOpenedFileID, true));
+
+            /*
+             state tl references alphabet
+
+            how deal with coding statetale
+            how deal with change to alphaet
+
+            when compile check validity, throw errors -> auto picsk up invalid alphaet
+            updated comes -> gets recompiled by turing view -> if error in compile then display in view
+
+            when load tape to edit -> check if contains non valid alphabet stuff
+            when laod tape in turing machine -> also run invalidity check, if so display on turing view and prevent run
+                         
+             */
         }
 
         public void ReceivedStateTableSourceData(Packet Data)
         {
-            //serialize state table
-            //request alphabet ddata
+            //get rid of fileID
+            if (CurrentlyOpenedFileID != Data.ReadInt())
+            {
+                //new request was sent, throw error or whatver
+                return;
+            }
+
+            CreateFileType File = ((CreateFileType)Data.ReadInt());
+
+            if (File != CreateFileType.TransitionFile && File != CreateFileType.SlateFile)
+            {
+                //diosplay error to UI HERE
+                CustomLogging.Log("Client: Turing Machine Window Fatal Error, received an unexpected non table source data!");
+                return;            
+            }
+
+            CurrentStateTableLabel.Text = Data.ReadString();
+            //get rid of file version
+            Data.ReadInt();
+
+            //deserialize on seperate thread later
+            try
+            {
+                if (File == CreateFileType.TransitionFile)
+                {
+                    TempFile = JsonSerializer.Deserialize<TransitionFile>(Data.ReadByteArray());                
+                }
+                else
+                {
+                    TempFile = JsonSerializer.Deserialize<SlateFile>(Data.ReadByteArray());
+                }
+            }
+            catch
+            {
+                //display error to ui here
+                CustomLogging.Log("Client: Turing Machine Window error, received corrupted transition/slate file");
+                return;
+            }
+
+            //FIGURE OUT LINKED ALPHABET ----
+            //CurrentlyOpenedAlphabetID = FileID;
+            UIEventManager.Subscribe(CurrentlyOpenedAlphabetID, ReceivedAlphabetData);
+            Client.SendTCPData(ClientSendPacketFunctions.RequestFile(CurrentlyOpenedAlphabetID, true));
         }
 
         public void ReceivedAlphabetData(Packet Data)
         {
-            //deserialize
+            if (CurrentlyOpenedAlphabetID != Data.ReadInt())
+            {
+                //new request was sent, throw error or whatver
+                return;
+            }
+
+            CreateFileType File = ((CreateFileType)Data.ReadInt());
+
+            if (File != CreateFileType.Alphabet)
+            {
+                CustomLogging.Log("Client: Turing Machine Window Fatal Error, received an unexpected non alphabet!");
+                return;
+            }
+
+            Data.ReadString();
+            Data.ReadInt();
+
+            try
+            {                
+                TempAlphabet = JsonSerializer.Deserialize<Alphabet>(Data.ReadByteArray());               
+            }
+            catch
+            {
+                //display error to ui here
+                CustomLogging.Log("Client: Turing Machine Window error, received corrupted alphabet file");
+                return;
+            }
+
+            CompileSourceFile();
+        }
+
+        public void CompileSourceFile()
+        {
+            StateTable TempTable = TempFile.Compile(TempAlphabet);
+            if (TempTable == null)
+            {
+                NotificationLabel.Text = "Failed to compile state table: Check it programmed correctly!";
+                CustomLogging.Log("Cllient: Failed to compile file, invalid transition/slate file!");
+                return;
+            }
+
+            Machine.SetActiveStateTable(TempTable, TempAlphabet);
         }
 
         public void LoadTape(int FileID)
         {
+            if (CurrentlyOpenedTapeID != -1)
+            {
+                UIEventManager.Unsubscribe(CurrentlyOpenedTapeID, ReceivedTapeData);
+                Client.SendTCPData(ClientSendPacketFunctions.UnsubscribeFromFileUpdates(CurrentlyOpenedTapeID));
+            }
 
+            CurrentlyOpenedTapeID = FileID;
+            UIEventManager.Subscribe(CurrentlyOpenedTapeID, ReceivedStateTableSourceData);
+            Client.SendTCPData(ClientSendPacketFunctions.RequestFile(CurrentlyOpenedTapeID, true));
         }
+
         public void ReceivedTapeData(Packet Data)
         {
+            if (CurrentlyOpenedTapeID != Data.ReadInt())
+            {
+                //new request was sent, throw error or whatver
+                return;
+            }
 
+            CreateFileType File = ((CreateFileType)Data.ReadInt());
+
+            if (File != CreateFileType.Tape)
+            {
+                CustomLogging.Log("Client: Turing Machine Window Fatal Error, received an unexpected non tape!");
+                return;
+            }
+
+            Data.ReadString();
+            Data.ReadInt();
+
+            TapeTemplate Tape;
+            try
+            {
+                Tape = JsonSerializer.Deserialize<TapeTemplate>(Data.ReadByteArray());
+            }
+            catch
+            {
+                //display error to ui here
+                CustomLogging.Log("Client: Turing Machine Window error, received corrupted tape file");
+                return;
+            }
+
+            Machine.SetActiveTape(Tape);
         }
 
-
-
-        public void Execute(Button Sender)
+        public void PollInput(bool IsInActionGroupFrame)
         {
-            Machine.Start(,);
-            while (Machine.IsActive) Machine.StepProgram();
+            if (IsAutoStepActive)
+            {
+                if (TimeLeftToNextStep < -1) TimeLeftToNextStep = -1;
 
-            //update ui here
+                TimeLeftToNextStep -= GlobalInterfaceData.Time.ElapsedGameTime.TotalMilliseconds;
 
+                if (TimeLeftToNextStep < 0)
+                {
+                    Step(null);
+                    TimeLeftToNextStep = TimeBetweenStepsMS; 
+                }
+            }
         }
-        public void Step(Button Sender)
+
+        public int StartMachine()
+        {
+            //Add Checks HERE
+            //read input boxs for input
+
+            int Code = 0;//Machine.Start();
+            if (Code == 1)
+            {
+                //set error ui
+            }
+            if (Code == 2)
+            {
+                //set error ui
+            }
+            if (Code == 3)
+            {
+                //set error ui
+            }
+            if (Code == 4)
+            {
+                //set error ui
+            }
+
+            return Code;
+        }
+
+        public void Execute(TextureButton Sender)
+        {
+            if (StartMachine() != 0) return;
+            //need to add limit of steps
+            while (Machine.IsActive) Machine.StepProgram();
+            UpdateUI();
+        }
+        public void Step(TextureButton Sender)
         {
             if (Machine.IsActive)
             {
@@ -135,43 +334,45 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             }
             else
             {
-                Machine.Start(,);
+                if (StartMachine() != 0) return;
             }
-            //update ui
+            UpdateUI();
         }
-        public void Restart(Button Sender)
+        public void Restart(TextureButton Sender)
         {
-            Machine.Start();
+            StartMachine();
         }
-        public void AutoStep(Button Sender)
+        public void AutoStep(TextureButton Sender)
         {
-            if (Machine.IsActive)
+            if (!Machine.IsActive)
             {
-                //start stepping co routine
+                if (StartMachine() != 0) return;
             }
-            else
-            {
-                Machine.Start();
-                //start coroutine
-            }
+
+            TimeLeftToNextStep = TimeBetweenStepsMS;
+            IsAutoStepActive = true;
         }
-        public void Pause(Button Sender)
+        public void Pause(TextureButton Sender)
         {
-            //pause coroutine
+            IsAutoStepActive = false;
         }
-        public void SetSpeed1(Button Sender)
+        public void SetSpeed1(TextureButton Sender)
+        {
+            TimeBetweenStepsMS = BaseTimeBetweenSteps;
+        }
+        public void SetSpeed2(TextureButton Sender)
+        {
+            TimeBetweenStepsMS = BaseTimeBetweenSteps / 2;
+        }
+        public void SetSpeed3(TextureButton Sender)
+        {
+            TimeBetweenStepsMS = BaseTimeBetweenSteps / 4;
+        }
+
+        public void UpdateUI()
         {
 
         }
-        public void SetSpeed2(Button Sender)
-        {
-
-        }
-        public void SetSpeed3(Button Sender)
-        {
-
-        }
-
 
         void MoveLayout()
         {
@@ -197,11 +398,9 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 
             }
         }
-
         public void Close()
         {
             Group.IsMarkedForDeletion = true;
         }
-
     }    
 }

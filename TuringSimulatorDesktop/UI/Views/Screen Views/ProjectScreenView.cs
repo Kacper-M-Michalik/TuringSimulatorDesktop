@@ -22,7 +22,7 @@ namespace TuringSimulatorDesktop.UI
 
         Label Title;
 
-        Button AddFileButton;
+        TextureButton AddFileButton;
         InputBox FileName;
 
        // FileBrowserView Browser;
@@ -43,7 +43,7 @@ namespace TuringSimulatorDesktop.UI
         public ProjectScreenView()
         {
             Group = InputManager.CreateActionGroup();
-            ViewResize(GlobalRenderingData.Device.PresentationParameters.BackBufferWidth, GlobalRenderingData.Device.PresentationParameters.BackBufferHeight);
+            ViewResize(GlobalInterfaceData.Device.PresentationParameters.BackBufferWidth, GlobalInterfaceData.Device.PresentationParameters.BackBufferHeight);
 
             Windows = new List<Window>();
 
@@ -57,7 +57,7 @@ namespace TuringSimulatorDesktop.UI
             Title.FontSize = 14;
             Title.Position = new Vector2(1920 / 2, 0);
 
-            AddFileButton = new Button(20, 20, UILookupKey.Debug1, UILookupKey.Debug2, Group);
+            AddFileButton = new TextureButton(20, 20, Group);
             AddFileButton.Position = new Vector2(10, 10);
             AddFileButton.OnClickedEvent += AddFile;
             FileName = new InputBox(100, 20, Group);
@@ -163,8 +163,8 @@ namespace TuringSimulatorDesktop.UI
             Group.Width = NewWidth;
             Group.Height = NewHeight;
 
-            Background = new Icon(Width, Height, Vector2.Zero, GlobalRenderingData.BackgroundColor);
-            Header = new Icon(Width, GlobalRenderingData.WindowTitleBarHeight, Vector2.Zero, GlobalRenderingData.HeaderColor);
+            Background = new Icon(Width, Height, Vector2.Zero, GlobalInterfaceData.Scheme.Background);
+            Header = new Icon(Width, 32, Vector2.Zero, GlobalInterfaceData.Scheme.Header);
         }
 
         public override void ViewPositionSet(int X, int Y)

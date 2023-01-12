@@ -55,9 +55,9 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         {
             MainScreen = Screen;
 
-            Background = new Icon(GlobalRenderingData.DarkAccentColor);
-            Header = new Icon(GlobalRenderingData.HeaderColor);
-            ForeGround = new Icon(GlobalRenderingData.BackgroundColor);
+            Background = new Icon(GlobalInterfaceData.Scheme.DarkAccent);
+            Header = new Icon(GlobalInterfaceData.Scheme.Header);
+            ForeGround = new Icon(GlobalInterfaceData.Scheme.Background);
 
             Title = new Label();
             Title.Text = "Recently Opened Projects";
@@ -122,7 +122,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             } 
         }
 
-        Button Background;
+        ColorButton Background;
         Label FileName;
         Label FileLocation;
         Label FileLastAccessed;
@@ -135,8 +135,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             FileInfo = Info;
             MainScreen = Screen;
 
-            Background = new Button(450, 80, group);
-            Background.BaseTexture = GlobalRenderingData.TextureLookup[UILookupKey.SubHeader];//, ,Vector2.Zero, GlobalRenderingData.SubHeaderColor);
+            Background = new ColorButton(450, 80, group);
+            Background.BaseColor = GlobalInterfaceData.Scheme.SubHeader;//, ,Vector2.Zero, GlobalRenderingData.SubHeaderColor);
             Background.OnClickedEvent += LoadRecentProject;
 
             FileName = new Label();

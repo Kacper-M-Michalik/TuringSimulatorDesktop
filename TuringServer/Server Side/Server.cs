@@ -284,7 +284,7 @@ namespace TuringServer
               //  {
                     //if (ConnectionSocket == null) return;
 
-                    CustomLogging.Log("THREAD NOTIF SERVER: Server dealing with incoming data on thread " + Thread.CurrentThread.ManagedThreadId.ToString());
+                    CustomLogging.Log("SERVER: Server dealing with incoming data on thread " + Thread.CurrentThread.ManagedThreadId.ToString()+ ". From client: " + ID.ToString());
 
                     //warning -> if ther are packets that are intended for this client after disconnect, shit will hit the fan, possible bug with customconsole, as changing logclientid on seperate thread than variable is used on
                     if (!ConnectionSocket.Connected)
@@ -301,8 +301,6 @@ namespace TuringServer
 
                     byte[] UsefuldataBuffer = new byte[IncomingDataLength];
                     Array.Copy(ReceiveDataBuffer, UsefuldataBuffer, IncomingDataLength);
-
-                    CustomLogging.Log("SERVER: Server is receiving data from client " + ID.ToString() + "!");
 
                     PacketCurrentlyBeingRebuilt.Write(UsefuldataBuffer, false);
                     PacketCurrentlyBeingRebuilt.SaveTemporaryBufferToPernamentReadBuffer();

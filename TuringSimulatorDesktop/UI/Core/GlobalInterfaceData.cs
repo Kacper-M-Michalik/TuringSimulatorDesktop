@@ -15,14 +15,12 @@ using System.IO;
 
 namespace TuringSimulatorDesktop
 {
-    public static class GlobalRenderingData
+    public static class GlobalInterfaceData
     {
         public static int MainMenuWidth = 750;
         public static int MainMenuHeight = 750;
         public static int MinimumApplicationWindowWidth = 770;
         public static int MinimumApplicationWindowHeight = 370;
-
-        public static bool UIRequiresRedraw = true;
         
         public static GameWindow OSWindow;
         public static MainWindow MainWindow;
@@ -33,33 +31,14 @@ namespace TuringSimulatorDesktop
         public static Effect UIEffect;
         public static SpriteBatch TextBatch;
 
+
         public static FontSystem StandardRegularFont;
+        public static FontSystem StandardBoldFont;
         public static FontSystem MediumRegularFont;
 
-        public static int ToolbarHeight = 35;
-        public static int WindowTabHeight = 25;
+        public static ColorScheme Scheme = new ColorScheme();
 
-        public static int WindowTitleBarHeight = 32;
 
-        public static Color HeaderColor = new Color(25, 27, 29);
-        public static Color SubHeaderColor = new Color(38, 40, 44);
-        public static Color BackgroundColor = new Color(30, 32, 34);
-
-        public static Color BrightAccentColor = new Color(64, 115, 255);
-        public static Color DarkAccentColor = new Color(60, 60, 64);
-        public static Color HighlightEdgeColorChange = new Color(30, 30, 30);
-
-        public static Color FontColor = Color.White;
-        public static Color FontGrayedOutColor = Color.White;
-
-        public static Color TuringMachineActionColor = Color.White;
-        public static Color TuringMachineSecondaryActionColor = Color.White;
-
-        static Color UIOverlayDebugColor1 = new Color(124, 0, 124);
-        static Color UIOverlayDebugColor2 = new Color(255, 124, 255);
-        static Color UIOverlayDebugColor3 = new Color(0, 145, 0);
-        static Color UIOverlayDebugColor4 = new Color(0, 255, 0);
-        public static Color DebugColor = Color.Purple;
 
         public static Dictionary<UILookupKey, Texture2D> TextureLookup = new Dictionary<UILookupKey, Texture2D>();
 
@@ -71,7 +50,7 @@ namespace TuringSimulatorDesktop
             System.IO.MemoryStream memoryStream = new MemoryStream(bufferSize);
             Image.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Png);
 
-            Texture2D Texture = Texture2D.FromStream(GlobalRenderingData.Device, memoryStream);
+            Texture2D Texture = Texture2D.FromStream(GlobalInterfaceData.Device, memoryStream);
             return Texture;
         }
 
@@ -82,7 +61,7 @@ namespace TuringSimulatorDesktop
             System.IO.MemoryStream memoryStream = new MemoryStream(bufferSize);
             image.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Png);
 
-            Texture2D Texture = Texture2D.FromStream(GlobalRenderingData.Device, memoryStream);
+            Texture2D Texture = Texture2D.FromStream(GlobalInterfaceData.Device, memoryStream);
             return Texture;
         }
 
@@ -102,13 +81,7 @@ namespace TuringSimulatorDesktop
             TextureLookup.Add(UILookupKey.LoadProjectButtonHightlight, ApplyBorderHighlight(CopyTexture(UILookupKey.LoadProjectButton)));
             TextureLookup.Add(UILookupKey.HostProjectButtonHightlight, ApplyBorderHighlight(CopyTexture(UILookupKey.HostProjectButton)));
             TextureLookup.Add(UILookupKey.JoinProjectButtonHightlight, ApplyBorderHighlight(CopyTexture(UILookupKey.JoinProjectButton)));
-
-            TextureLookup.Add(UILookupKey.Debug1, GenerateFilledTexture(1, 1, UIOverlayDebugColor1));
-            TextureLookup.Add(UILookupKey.Debug2, GenerateFilledTexture(1, 1, UIOverlayDebugColor2));
-            TextureLookup.Add(UILookupKey.Header, GenerateFilledTexture(1, 1, HeaderColor));
-            TextureLookup.Add(UILookupKey.SubHeader, GenerateFilledTexture(1, 1, SubHeaderColor));
-            TextureLookup.Add(UILookupKey.Background, GenerateFilledTexture(1, 1, BackgroundColor));
-
+            TextureLookup.Add(UILookupKey.DebugTexture, GenerateFilledTexture(1,1, Scheme.UIOverlayDebugColor1));
 
             //manually implement per ui
             //paint background, paint on icons, text
@@ -159,22 +132,22 @@ namespace TuringSimulatorDesktop
             for (int i = 0; i < Texture.Width; i++)
             {
                 Color Col = Values[i];
-                Values[i] = new Color(Col.R + HighlightEdgeColorChange.R, Col.G + HighlightEdgeColorChange.G, Col.G + HighlightEdgeColorChange.B, Col.A);
+                Values[i] = new Color(Col.R + Scheme.HighlightEdgeColorChange.R, Col.G + Scheme.HighlightEdgeColorChange.G, Col.G + Scheme.HighlightEdgeColorChange.B, Col.A);
             }
             for (int i = Texture.Width * (Texture.Height - 1); i < Texture.Width * Texture.Height; i++)
             {
                 Color Col = Values[i];
-                Values[i] = new Color(Col.R + HighlightEdgeColorChange.R, Col.G + HighlightEdgeColorChange.G, Col.G + HighlightEdgeColorChange.B, Col.A);
+                Values[i] = new Color(Col.R + Scheme.HighlightEdgeColorChange.R, Col.G + Scheme.HighlightEdgeColorChange.G, Col.G + Scheme.HighlightEdgeColorChange.B, Col.A);
             }
             for (int i = Texture.Width; i < Texture.Width * (Texture.Height - 1); i += Texture.Width)
             {
                 Color Col = Values[i];
-                Values[i] = new Color(Col.R + HighlightEdgeColorChange.R, Col.G + HighlightEdgeColorChange.G, Col.G + HighlightEdgeColorChange.B, Col.A);
+                Values[i] = new Color(Col.R + Scheme.HighlightEdgeColorChange.R, Col.G + Scheme.HighlightEdgeColorChange.G, Col.G + Scheme.HighlightEdgeColorChange.B, Col.A);
             }
             for (int i = Texture.Width * 2 - 1; i < Texture.Width * Texture.Height; i += Texture.Width)
             {
                 Color Col = Values[i];
-                Values[i] = new Color(Col.R + HighlightEdgeColorChange.R, Col.G + HighlightEdgeColorChange.G, Col.G + HighlightEdgeColorChange.B, Col.A);
+                Values[i] = new Color(Col.R + Scheme.HighlightEdgeColorChange.R, Col.G + Scheme.HighlightEdgeColorChange.G, Col.G + Scheme.HighlightEdgeColorChange.B, Col.A);
             }
 
             Texture.SetData(Values);
@@ -182,68 +155,82 @@ namespace TuringSimulatorDesktop
         }
 
 
-    }
-
-    public static class GlobalLayoutData
-    {
-        public static Dictionary<UILayoutKey, LayoutData> Guide = new Dictionary<UILayoutKey, LayoutData>();
-        static Dictionary<UILayoutKey, LayoutData> InternalReferenceGuide = new Dictionary<UILayoutKey, LayoutData>()
-        {
-           // {UILayoutKey.FileExplorerTitle, new LayoutData( new Point(10, 0), new Vector2(  ) )}
 
 
-
-
-
-        };
-
-        static float UIScale = 1f;
-        public static void ChangeScale(float NewScale)
+        const int ReferenceHeight = 1080;
+        static double UIScale = 1f;
+        public static void UpdateScaleManual(double NewScale)
         {
             UIScale = NewScale;
-            Guide.Clear();
-
-            foreach (KeyValuePair<UILayoutKey, LayoutData> Pair in InternalReferenceGuide)
-            {
-                Guide.Add(Pair.Key, new LayoutData(Scale(Pair.Value.Bounds), Scale(Pair.Value.Position)));
-            }
+        }
+        public static void UpdateScaleAuto()
+        {
+            //UIScale = main;
         }
         public static Point Scale(Point Value)
         {
-            return new Point(Convert.ToInt32((float)Value.X * UIScale), Convert.ToInt32((float)Value.Y * UIScale));
+            return new Point(Convert.ToInt32((double)Value.X * UIScale), Convert.ToInt32((double)Value.Y * UIScale));
         }
         public static Vector2 Scale(Vector2 Value)
         {
-            return new Vector2(Value.X * UIScale, Value.Y * UIScale);
+            return new Vector2((float)(Value.X * UIScale), (float)(Value.Y * UIScale));
         }
         public static float Scale(float Value)
         {
-            return Value * UIScale;
+            return (float)(Value * UIScale);
         }
+
+
     }
 
-    public class LayoutData
+    /*
+    public class ColorScheme
     {
-        public Point Bounds;
-        public Vector2 Position;
+        public Color HeaderColor = new Color(25, 27, 29);
+        public Color SubHeaderColor = new Color(38, 40, 44);
+        public Color BackgroundColor = new Color(30, 32, 34);
 
-        public LayoutData(Point bounds, Vector2 position)
-        {
-            Bounds = bounds;
-            Position = position;
-        }
+        public Color BrightAccentColor = new Color(64, 115, 255);
+        public Color DarkAccentColor = new Color(60, 60, 64);
+        public Color HighlightEdgeColorChange = new Color(30, 30, 30);
+
+        public Color FontColor = Color.White;
+        public Color FontGrayedOutColor = Color.White;
+
+        public Color TuringMachineActionColor = Color.White;
+        public Color TuringMachineSecondaryActionColor = Color.White;
+
+        public Color UIOverlayDebugColor1 = new Color(124, 0, 124);
+        public Color UIOverlayDebugColor2 = new Color(255, 124, 255);
+        public Color UIOverlayDebugColor3 = new Color(0, 145, 0);
+        public Color UIOverlayDebugColor4 = new Color(0, 255, 0);
     }
-
-    public enum UILayoutKey
+    */
+    public class ColorScheme
     {
-        FileExplorerTitle,
-        FileExplorerSearchbar,
-        FileExplorerLayoutbox,
-        
-        FIleIcon,
-        FileLabel,
-    }
+        public Color Header = new Color(25, 27, 29);
+        public Color SubHeader = new Color(38, 40, 44);
+        public Color Background = new Color(255, 255, 255);
 
+        // these are to be changed
+        public Color BrightAccent = new Color(64, 115, 255);
+        public Color DarkAccent = new Color(60, 60, 64);
+        public Color HighlightEdgeColorChange = new Color(30, 30, 30);
+        //
+
+        public Color DarkInteractableAccent = new Color(219, 219, 219);
+        public Color InteractableAccent = new Color(235, 235, 235);
+        public Color NonInteractableAccent = new Color(208, 208, 208);
+
+        public Color FontColor = Color.Black;
+        public Color FontGrayedOutColor = new Color(94, 94, 94);
+
+
+        public Color UIOverlayDebugColor1 = new Color(124, 0, 124);
+        public Color UIOverlayDebugColor2 = new Color(255, 124, 255);
+        public Color UIOverlayDebugColor3 = new Color(0, 145, 0);
+        public Color UIOverlayDebugColor4 = new Color(0, 255, 0);
+    }
 
 
     public enum UILookupKey
@@ -261,11 +248,7 @@ namespace TuringSimulatorDesktop
         LoadProjectButtonHightlight,
         HostProjectButtonHightlight,
         JoinProjectButtonHightlight,
-        Debug1,
-        Debug2,
-        Header,
-        SubHeader,
-        Background,
+        DebugTexture
     }
-    public enum AnchorPoint { TopLeft, TopRight, BottomLeft, BottomRight }
+
 }

@@ -65,8 +65,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         {
             MainPort = new Viewport();
 
-            Background = new Icon(GlobalRenderingData.DarkAccentColor);
-            Header = new Icon(GlobalRenderingData.HeaderColor);
+            Background = new Icon(GlobalInterfaceData.Scheme.DarkAccent);
+            Header = new Icon(GlobalInterfaceData.Scheme.Header);
             ButtonLayout = new HorizontalLayoutBox();
             ButtonLayout.Spacing = 2;
             ButtonLayout.ViewOffset = new Vector2(2, 0);
@@ -118,11 +118,11 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 int Index = Headers.IndexOf(ViewButton);
                 if (Index < Headers.Count - 1)
                 {
-                    Headers[Index + 1].Select();
+                    SetView(Headers[Index + 1]);
                 }
                 else if (Index > 0)
                 {                    
-                    Headers[Index - 1].Select();
+                    SetView(Headers[Index - 1]);
                 }
                 else
                 {

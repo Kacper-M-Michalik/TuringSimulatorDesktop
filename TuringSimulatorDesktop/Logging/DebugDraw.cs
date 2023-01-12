@@ -22,7 +22,7 @@ namespace TuringSimulatorDesktop
 
         static DebugManager()
         {
-            Group = InputManager.CreateActionGroup(0, 0, GlobalRenderingData.MinimumApplicationWindowWidth, GlobalRenderingData.MinimumApplicationWindowHeight);
+            Group = InputManager.CreateActionGroup(0, 0, GlobalInterfaceData.MinimumApplicationWindowWidth, GlobalInterfaceData.MinimumApplicationWindowHeight);
             Group.IsPersistant = true;
 
             //Menu = new DebugMenu(Group);
@@ -84,10 +84,10 @@ namespace TuringSimulatorDesktop
         {
             Group = group;
 
-            Background = new Icon(Width, Height, Vector2.Zero, GlobalRenderingData.DebugColor);
-            MouseLabel = new Label(Vector2.Zero, GlobalRenderingData.MediumRegularFont);
+            Background = new Icon(Width, Height, Vector2.Zero, GlobalInterfaceData.Scheme.UIOverlayDebugColor1);
+            MouseLabel = new Label(Vector2.Zero, GlobalInterfaceData.MediumRegularFont);
             MouseLabel.FontSize = 14;
-            ViewportLabel = new Label(Vector2.Zero, GlobalRenderingData.MediumRegularFont);
+            ViewportLabel = new Label(Vector2.Zero, GlobalInterfaceData.MediumRegularFont);
             ViewportLabel.FontSize = 14;
         }
 
@@ -105,7 +105,7 @@ namespace TuringSimulatorDesktop
             if (IsActive)
             {   
                 MouseLabel.Text = "Cur Mouse Pos: " + InputManager.MouseData.X.ToString() + ", " + InputManager.MouseData.Y.ToString();
-                ViewportLabel.Text = "ViewPort: Width: " + GlobalRenderingData.Device.Viewport.Width.ToString() + ", Y: " + GlobalRenderingData.Device.Viewport.Height.ToString();
+                ViewportLabel.Text = "ViewPort: Width: " + GlobalInterfaceData.Device.Viewport.Width.ToString() + ", Y: " + GlobalInterfaceData.Device.Viewport.Height.ToString();
                 Background.Draw();
                 MouseLabel.Draw();
                 ViewportLabel.Draw();

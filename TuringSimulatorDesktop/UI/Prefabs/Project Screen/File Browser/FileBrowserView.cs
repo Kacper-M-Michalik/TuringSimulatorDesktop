@@ -9,7 +9,7 @@ using TuringSimulatorDesktop.Input;
 
 namespace TuringSimulatorDesktop.UI.Prefabs
 {
-    public class FileBrowserView : IView
+    public class FileBrowserView : IView, IClickable
     {
         Vector2 position;
         public Vector2 Position 
@@ -44,7 +44,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 FileLayout.Group.IsActive = isActive;
             }
         }
-        public string Title => "File Browser";
+
         Window ownerWindow;
         public Window OwnerWindow
         {
@@ -52,21 +52,39 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             set => ownerWindow = value;
         }
 
-        Icon Background;
-        InputBox Searchbar;
-        VerticalLayoutBox FileLayout;
+        public string Title => "File Browser";
+
+        public bool IsMarkedForDeletion
+        {
+            get => false;
+            set
+            {
+
+            }
+        }
+
         ActionGroup Group;        
 
-        string DefaultText = "Search Folder";
+        Icon Background;
+        Icon Divider1;
+        Icon Divider2;
+        InputBox Searchbar;
+        Label HierarchyLabel;
+        VerticalLayoutBox FileLayout;
+
         int CurrentlyOpenedFolderID;
         List<FileDisplayItem> Files = new List<FileDisplayItem>();
+        FileCreationMenu OpenMenu;
+
+        string DefaultText = "Search:";
 
         public FileBrowserView()
         {
             Group = InputManager.CreateActionGroup();
+            Group.ClickableObjects.Add(this);
 
-            Background = new Icon(GlobalRenderingData.BackgroundColor);
-            Searchbar = new InputBox(0, 20, Group);
+            Background = new Icon(GlobalInterfaceData.Scheme.Background);
+            Searchbar = new InputBox(Group);
             Searchbar.Text = DefaultText;
             Searchbar.ClickEvent += ClearSearchbar;
             Searchbar.ClickAwayEvent += ResetSearchbar;
@@ -93,10 +111,19 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             if (Data.ReadInt() != CurrentlyOpenedFolderID)
             {
-                CustomLogging.Log("Cllient: File Browser Window Fatal Error, recived unwated folder data!");
+                CustomLogging.Log("Client: File Browser Window Fatal Error, recived unwated folder data!");
                 return;
             }
-            Data.ReadString();
+            
+            //To create hierarchy view
+            string FolderName = Data.ReadString();
+
+            int Max = Data.ReadInt();
+            for (int i = 0; i < Max; i++)
+            {
+                Data.ReadString();
+                Data.ReadInt();
+            }
 
             int FolderCount = Data.ReadInt();
             for (int i = 0; i < FolderCount; i++)
@@ -162,6 +189,47 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Searchbar.Text = "";
         }
 
+        public void CreateTransitionFile(Button Sender)
+        {
+            OpenMenu?.Close();
+            Client.SendTCPData(ClientSendPacketFunctions.CreateFile(CurrentlyOpenedFolderID, "Empty Transition File", CreateFileType.TransitionFile));
+        }
+        public void CreateSlateFile(Button Sender)
+        {
+            OpenMenu?.Close();
+            Client.SendTCPData(ClientSendPacketFunctions.CreateFile(CurrentlyOpenedFolderID, "Empty Slate File", CreateFileType.SlateFile));
+        }
+        public void CreateTapeFile(Button Sender)
+        {
+            OpenMenu?.Close();
+            Client.SendTCPData(ClientSendPacketFunctions.CreateFile(CurrentlyOpenedFolderID, "Empty Tape Preset", CreateFileType.Tape));
+        }
+        public void CreateAlphabetFile(Button Sender)
+        {
+            OpenMenu?.Close();
+            Client.SendTCPData(ClientSendPacketFunctions.CreateFile(CurrentlyOpenedFolderID, "Empty Alphabet", CreateFileType.Alphabet));
+        }
+
+        public void Clicked()
+        {
+            if (InputManager.RightMousePressed)
+            {
+                OpenMenu?.Close();
+                OpenMenu = new FileCreationMenu(this);
+                OpenMenu.Position = new Vector2(InputManager.MouseData.X, InputManager.MouseData.Y);
+            }
+        }
+
+        public void ClickedAway()
+        {
+            //remove the create window
+        }
+
+        public bool IsMouseOver()
+        {
+            return (IsActive && InputManager.MouseData.X >= Position.X && InputManager.MouseData.X <= Position.X + bounds.X && InputManager.MouseData.Y >= Position.Y && InputManager.MouseData.Y <= Position.Y + bounds.Y);
+        }
+
         void MoveLayout()
         {
             Group.X = UIUtils.ConvertFloatToInt(position.X);
@@ -189,13 +257,17 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 Background.Draw(BoundPort);
                 Searchbar.Draw(BoundPort);
                 FileLayout.Draw(BoundPort);
+
+                OpenMenu?.Draw();
             }
         }
 
         public void Close()
         {
+            OpenMenu?.Close();
             FileLayout.Close();
             Group.IsMarkedForDeletion = true;
         }
+
     }    
 }

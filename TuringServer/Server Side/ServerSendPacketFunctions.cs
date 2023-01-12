@@ -22,7 +22,7 @@ namespace TuringServer
         {
             Packet Data = new Packet();
 
-            CustomLogging.Log("SERVER: Error Notif COPY: " + ErrorString);
+            CustomLogging.Log("SERVER: Error Notif Copy - " + ErrorString);
 
             Data.Write((int)ServerSendPackets.ErrorNotification);
             Data.Write(ErrorString);
@@ -61,18 +61,39 @@ namespace TuringServer
             Packet Data = new Packet();
 
             Data.Write((int)ServerSendPackets.SentFolderData);
+
+            DirectoryFolder SendFolder = Server.LoadedProject.FolderDataLookup[FolderID];
+
             Data.Write(FolderID);
-            Data.Write(Server.LoadedProject.FolderDataLookup[FolderID].Name);
+            Data.Write(SendFolder.Name);
+
+            DirectoryFolder CurrentFolder = SendFolder;
+            List<DirectoryFolder> ParentFolders = new List<DirectoryFolder>();
+            int NumberOfParentFolders = 0;
+            while (CurrentFolder.ParentFolder != null)
+            {
+                ParentFolders.Add(CurrentFolder.ParentFolder);
+                CurrentFolder = CurrentFolder.ParentFolder;
+                NumberOfParentFolders++;
+            }
+
+            Data.Write(NumberOfParentFolders);
+            
+            for (int i = 0; i < ParentFolders.Count; i++)
+            {
+                Data.Write(ParentFolders[i].Name);
+                Data.Write(ParentFolders[i].ID);
+            }
 
             Data.Write(Server.LoadedProject.FolderDataLookup[FolderID].SubFolders.Count);
-            foreach (DirectoryFolder Folder in Server.LoadedProject.FolderDataLookup[FolderID].SubFolders)
+            foreach (DirectoryFolder Folder in SendFolder.SubFolders)
             {
                 Data.Write(Folder.Name);
                 Data.Write(Folder.ID);
             }
 
             Data.Write(Server.LoadedProject.FolderDataLookup[FolderID].SubFiles.Count);
-            foreach (DirectoryFile File in Server.LoadedProject.FolderDataLookup[FolderID].SubFiles)
+            foreach (DirectoryFile File in SendFolder.SubFiles)
             {
                 Data.Write(File.Name);
                 Data.Write(File.ID);

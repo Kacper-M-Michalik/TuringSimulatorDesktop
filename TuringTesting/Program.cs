@@ -91,7 +91,7 @@ namespace TuringTesting
                             break;
                         case ("REQFOLDER"):
                             int ReqID = Convert.ToInt32(Console.ReadLine());
-                            Client.SendTCPData(ClientSendPacketFunctions.RequestFolderData(ReqID));
+                            Client.SendTCPData(ClientSendPacketFunctions.RequestFolderData(ReqID, false));
                             break;
                         case ("CREATE"):
                             int BaseFolder = Convert.ToInt32(Console.ReadLine());
@@ -164,7 +164,7 @@ namespace TuringTesting
             Console.WriteLine("Successfully connected to server!");
             Client.SendTCPData(ClientSendPacketFunctions.RequestLogReceiverStatus());
             Client.SendTCPData(ClientSendPacketFunctions.LoadProject(Directory));
-            Client.SendTCPData(ClientSendPacketFunctions.RequestFolderData(0));
+            Client.SendTCPData(ClientSendPacketFunctions.RequestFolderData(0, true));
             UIEventManager.ClientSuccessConnecting = false;
             UIEventManager.ClientSuccessConnectingDelegate = null;
         }

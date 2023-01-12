@@ -20,12 +20,12 @@ namespace TuringCore
         public StateTable ActiveStateTable { get; private set; }
         public Tape ActiveTape { get; private set; }
 
-        public void Start(string StartState, int StartHeadPosition)
+        public int Start(string StartState, int StartHeadPosition)
         {
-            if (IsActive) throw new Exception("Machine already on");
-            if (ActiveStateTable == null) throw new Exception("No state table loaded");
-            if (ActiveAlphabet == null) throw new Exception("No alphabet loaded");
-            if (OriginalTape == null) throw new Exception("No tape loaded");
+            if (IsActive) return 1;//throw new Exception("Machine already on");
+            if (ActiveStateTable == null) return 2;//throw new Exception("No state table loaded");
+            if (ActiveAlphabet == null) return 3;//throw new Exception("No alphabet loaded");
+            if (OriginalTape == null) return 4;//throw new Exception("No tape loaded");
 
             ShallowClear();
 
@@ -35,7 +35,7 @@ namespace TuringCore
 
             ActiveTape = OriginalTape.Clone(ActiveAlphabet);
 
-            if (ActiveStateTable.DefenitionAlphabetID != OriginalTape.DefenitionAlphabetID)
+            if (ActiveStateTable.DefinitionAlphabetID != OriginalTape.DefinitionAlphabetID)
             {
                 CurrentState = HaltError;
                 NextInstruction = null;
@@ -44,7 +44,7 @@ namespace TuringCore
             {
                 NextInstruction = ActiveStateTable[CurrentState][ActiveTape[HeadPosition]];
             }
-
+            return 0;
         }
 
         public void StepProgram()
@@ -57,6 +57,7 @@ namespace TuringCore
                 return;
             }
 
+            //change so executes only one at time
             for (int i = 0; i < NextInstruction.Actions.Count; i++)
             {
                 NextInstruction.Actions[i].Execute(this);
@@ -95,7 +96,7 @@ namespace TuringCore
 
         public void SetActiveStateTable(StateTable Table, Alphabet Alphabet)
         {
-            if (ActiveStateTable.DefenitionAlphabetID != Alphabet.ID) throw new Exception("Wrong alphabet given");
+            if (ActiveStateTable.DefinitionAlphabetID != Alphabet.ID) throw new Exception("Wrong alphabet given");
             //if (OriginalTape != null && Table.DefenitionAlphabetID != OriginalTape.DefenitionAlphabetID) throw new Exception("Incompatible alphabets");
             ActiveAlphabet = Alphabet;
             ActiveStateTable = Table;

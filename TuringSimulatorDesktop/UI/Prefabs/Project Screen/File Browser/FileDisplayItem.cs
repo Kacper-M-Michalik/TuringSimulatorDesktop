@@ -41,7 +41,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             }
         }
 
-        Button Background;
+        TextureButton Background;
         Label NameLabel;
 
         public FileData Data;
@@ -53,14 +53,14 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Data = data;
             Browser = browser;
 
-            Background = new Button(group);
+            Background = new TextureButton(group);
             if (Data.Type == FileType.Folder)
             {
-                Background.BaseTexture = GlobalRenderingData.TextureLookup[UILookupKey.FolderIcon];
+                Background.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.FolderIcon];
             }
             else
             {
-                Background.BaseTexture = GlobalRenderingData.TextureLookup[UILookupKey.TransitionTableIcon];
+                Background.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.TransitionTableIcon];
             }
             Background.OnClickedEvent += Clicked;
             Background.OnClickedAwayEvent += ClickedAway;
@@ -69,7 +69,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Bounds = new Point(60, 60);
 
             NameLabel.FontSize = 14;
-            NameLabel.Text = Data.Name + " " + Data.ID.ToString();
+            NameLabel.Text = Data.Name;
         }
 
         public void Clicked(Button Sender)

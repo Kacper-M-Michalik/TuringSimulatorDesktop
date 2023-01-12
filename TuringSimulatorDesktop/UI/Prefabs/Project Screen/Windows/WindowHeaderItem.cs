@@ -42,7 +42,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         Icon Background;
         Icon SelectionStrip;
         Label Title;
-        Button CloseButton;
+        TextureButton CloseButton;
         ActionGroup Group;
         public bool IsMarkedForDeletion { get; set; }
 
@@ -58,14 +58,14 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             group.PollableObjects.Add(this);
             Group = group;
 
-            Background = new Icon(GlobalRenderingData.SubHeaderColor);
-            SelectionStrip = new Icon(GlobalRenderingData.BrightAccentColor);
+            Background = new Icon(GlobalInterfaceData.Scheme.SubHeader);
+            SelectionStrip = new Icon(GlobalInterfaceData.Scheme.BrightAccent);
             SelectionStrip.IsActive = false;
             Title = new Label();
             Title.Text = view.Title;
 
-            CloseButton = new Button(group);
-            CloseButton.BaseTexture = GlobalRenderingData.TextureLookup[UILookupKey.Debug1];
+            CloseButton = new TextureButton(group);
+            CloseButton.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.DebugTexture];
             CloseButton.Bounds = new Point(16, 16);
             CloseButton.OnClickedEvent += Remove;
             CloseButton.IsActive = false;
@@ -77,7 +77,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         {
             Selected = true;
             SelectionStrip.IsActive = true;
-            Title.Font = GlobalRenderingData.MediumRegularFont;
+            Title.Font = GlobalInterfaceData.MediumRegularFont;
             Title.UpdateLabel();
         }
 
@@ -85,7 +85,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         {
             Selected = false;
             SelectionStrip.IsActive = false;
-            Title.Font = GlobalRenderingData.StandardRegularFont;
+            Title.Font = GlobalInterfaceData.StandardRegularFont;
             Title.UpdateLabel();
         }
 

@@ -21,14 +21,14 @@ namespace TuringSimulatorDesktop.UI
         Icon Header;
         Icon Background;
 
-        Button CloseButton;
+        TextureButton CloseButton;
 
         Label Title;
         
-        Button NewProjectButton;
-        Button LoadProjectButton;
-        Button JoinProjectButton;
-        Button HostProjectButton;
+        TextureButton NewProjectButton;
+        TextureButton LoadProjectButton;
+        TextureButton JoinProjectButton;
+        TextureButton HostProjectButton;
 
         InputBox IPBox;
         RecentFilesViewer Viewer;
@@ -37,38 +37,46 @@ namespace TuringSimulatorDesktop.UI
         public MainScreenView()
         {          
             Group = InputManager.CreateActionGroup();
-            ViewResize(GlobalRenderingData.Device.PresentationParameters.BackBufferWidth, GlobalRenderingData.Device.PresentationParameters.BackBufferHeight);
+            ViewResize(GlobalInterfaceData.Device.PresentationParameters.BackBufferWidth, GlobalInterfaceData.Device.PresentationParameters.BackBufferHeight);
 
             //Background = new Icon(Width, Height, Vector2.Zero, GlobalInterfaceData.BackgroundColor);// UIMesh.CreateRectangle(Vector2.Zero, Width, Height, GlobalInterfaceData.BackgroundColor);
             //Header = new Icon(Width, GlobalInterfaceData.WindowTitleBarHeight, Vector2.Zero, GlobalInterfaceData.HeaderColor);//UIMesh.CreateRectangle(Vector2.Zero, Width, GlobalInterfaceData.WindowTitleBarHeight, GlobalInterfaceData.HeaderColor);
 
-            CloseButton = new Button(45, GlobalRenderingData.WindowTitleBarHeight, UILookupKey.Debug1, new Vector2(705, 0), Group);
+            CloseButton = new TextureButton(45, 32, new Vector2(705, 0), Group);
             CloseButton.OnClickedEvent += Close;
             CloseButton.HighlightOnMouseOver = true;
 
-            Title = new Label(new Vector2(0, 0), GlobalRenderingData.MediumRegularFont);
+            Title = new Label(new Vector2(0, 0), GlobalInterfaceData.MediumRegularFont);
             Title.FontSize = 20;
             Title.Text = "T";
 
             Viewer = new RecentFilesViewer(this);
-            Viewer.Bounds = new Point(470, GlobalRenderingData.MainMenuHeight - 52);
+            Viewer.Bounds = new Point(470, GlobalInterfaceData.MainMenuHeight - 52);
             Viewer.Position = new Vector2(10, 42);
             if (GlobalProjectAndUserData.UserData != null)
             {
                 Viewer.DisplayRecentFiles();
             }
 
-            NewProjectButton = new Button(250, 70, UILookupKey.NewProjectButton, UILookupKey.NewProjectButtonHightlight, new Vector2(490, 42), Group);
+            NewProjectButton = new TextureButton(250, 70, new Vector2(490, 42), Group);
+            NewProjectButton.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.NewProjectButton];
+            NewProjectButton.HighlightTexture = GlobalInterfaceData.TextureLookup[UILookupKey.NewProjectButtonHightlight];
             NewProjectButton.HighlightOnMouseOver = true;
 
-            LoadProjectButton = new Button(250, 70, UILookupKey.LoadProjectButton, UILookupKey.LoadProjectButtonHightlight, new Vector2(490, 122), Group);
+            LoadProjectButton = new TextureButton(250, 70, new Vector2(490, 122), Group);
+            NewProjectButton.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.LoadProjectButton];
+            NewProjectButton.HighlightTexture = GlobalInterfaceData.TextureLookup[UILookupKey.LoadProjectButtonHightlight];
             LoadProjectButton.HighlightOnMouseOver = true;
             LoadProjectButton.OnClickedEvent += SelectProjectLocation;
 
-            HostProjectButton = new Button(250, 70, UILookupKey.HostProjectButton, UILookupKey.HostProjectButtonHightlight, new Vector2(490, 202), Group);
+            HostProjectButton = new TextureButton(250, 70, new Vector2(490, 202), Group);
+            NewProjectButton.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.HostProjectButton];
+            NewProjectButton.HighlightTexture = GlobalInterfaceData.TextureLookup[UILookupKey.HostProjectButtonHightlight];
             HostProjectButton.HighlightOnMouseOver = true;
 
-            JoinProjectButton = new Button(250, 70, UILookupKey.JoinProjectButton, UILookupKey.JoinProjectButtonHightlight, new Vector2(490, 282), Group);
+            JoinProjectButton = new TextureButton(250, 70, new Vector2(490, 282), Group);
+            NewProjectButton.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.JoinProjectButton];
+            NewProjectButton.HighlightTexture = GlobalInterfaceData.TextureLookup[UILookupKey.JoinProjectButtonHightlight];
             JoinProjectButton.HighlightOnMouseOver = true;
             JoinProjectButton.OnClickedEvent += ConnectToOtherDevice;
 
@@ -149,23 +157,23 @@ namespace TuringSimulatorDesktop.UI
             ResetConnection(null, null);
 
             InputManager.DeleteAllActionGroups();
-            GlobalRenderingData.MainWindow.LeaveMainMenu();
+            GlobalInterfaceData.MainWindow.LeaveMainMenu();
             ProjectScreenView ProjectView = new ProjectScreenView();
             UIEventManager.RecievedProjectDataFromServerDelegate = ProjectView.UpdatedProject;
-            GlobalRenderingData.MainWindow.CurrentView = ProjectView;
+            GlobalInterfaceData.MainWindow.CurrentView = ProjectView;
         }
 
         public void Minimise(Button Sender)
         {
-            GlobalRenderingData.MainWindow.MinimiseWindow();
+            GlobalInterfaceData.MainWindow.MinimiseWindow();
         }
         public void Window(Button Sender)
         {
-            GlobalRenderingData.MainWindow.MaximiseWindow();
+            GlobalInterfaceData.MainWindow.MaximiseWindow();
         }
         public void Close(Button Sender)
         {
-            GlobalRenderingData.MainWindow.Exit();
+            GlobalInterfaceData.MainWindow.Exit();
         }
 
         public override void Draw()
@@ -196,8 +204,8 @@ namespace TuringSimulatorDesktop.UI
             Group.Width = NewWidth;
             Group.Height = NewHeight;
 
-            Background = new Icon(Width, Height, Vector2.Zero, GlobalRenderingData.BackgroundColor);
-            Header = new Icon(Width, GlobalRenderingData.WindowTitleBarHeight, Vector2.Zero, GlobalRenderingData.HeaderColor);
+            Background = new Icon(Width, Height, Vector2.Zero, GlobalInterfaceData.Scheme.Background);
+            Header = new Icon(Width, 32, Vector2.Zero, GlobalInterfaceData.Scheme.Header);
         }
 
         public override void ViewPositionSet(int X, int Y)

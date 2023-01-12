@@ -38,6 +38,7 @@ namespace TuringSimulatorDesktop.UI
         RichTextLayout RichText;
         RenderTarget2D RenderTexture;
         public FontSystem Font;
+        public Color FontColor = GlobalInterfaceData.Scheme.FontColor;
         public string Text 
         { 
             get => RichText.Text; 
@@ -56,7 +57,7 @@ namespace TuringSimulatorDesktop.UI
         {
             Background = new Icon();
             RichText = new RichTextLayout();
-            Font = GlobalRenderingData.StandardRegularFont;
+            Font = GlobalInterfaceData.StandardRegularFont;
 
             Bounds = new Point(width, height);
             Position = Vector2.Zero;
@@ -83,7 +84,7 @@ namespace TuringSimulatorDesktop.UI
         {
             Background = new Icon();
             RichText = new RichTextLayout();
-            Font = GlobalRenderingData.StandardRegularFont;
+            Font = GlobalInterfaceData.StandardRegularFont;
 
             Bounds = new Point(width, height);
             Position = position;
@@ -118,14 +119,14 @@ namespace TuringSimulatorDesktop.UI
 
         public void DrawTextToTexture()
         {
-            GlobalRenderingData.Device.SetRenderTarget(RenderTexture);
-            GlobalRenderingData.Device.Clear(Color.Transparent);
+            GlobalInterfaceData.Device.SetRenderTarget(RenderTexture);
+            GlobalInterfaceData.Device.Clear(Color.Transparent);
 
-            GlobalRenderingData.TextBatch.Begin();
-            RichText.Draw(GlobalRenderingData.TextBatch, Vector2.Zero, GlobalRenderingData.FontColor);
-            GlobalRenderingData.TextBatch.End();
+            GlobalInterfaceData.TextBatch.Begin();
+            RichText.Draw(GlobalInterfaceData.TextBatch, new Vector2(0, -2), FontColor);
+            GlobalInterfaceData.TextBatch.End();
 
-            GlobalRenderingData.Device.SetRenderTarget(null);
+            GlobalInterfaceData.Device.SetRenderTarget(null);
 
             Background.DrawTexture = RenderTexture;
         }
@@ -139,7 +140,7 @@ namespace TuringSimulatorDesktop.UI
             }
             else
             {
-                RenderTexture = new RenderTarget2D(GlobalRenderingData.Device, bounds.X, bounds.Y);
+                RenderTexture = new RenderTarget2D(GlobalInterfaceData.Device, bounds.X, bounds.Y);
                 return true;
             }
         }

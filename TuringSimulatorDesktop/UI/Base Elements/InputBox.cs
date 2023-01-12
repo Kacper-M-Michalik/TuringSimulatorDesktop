@@ -70,14 +70,27 @@ namespace TuringSimulatorDesktop.UI
         Icon Background;
         Label OutputLabel;
 
+        public InputBox(ActionGroup group)
+        {
+            Background = new Icon(GlobalInterfaceData.Scheme.UIOverlayDebugColor1);
+            OutputLabel = new Label(0, 0);
+            Bounds = Point.Zero;
+            Position = Vector2.Zero;
+
+            GlobalInterfaceData.OSWindow.TextInput += TextInput;
+
+            group.ClickableObjects.Add(this);
+            Group = group;
+        }
+
         public InputBox(int width, int height, ActionGroup group)
         {
-            Background = new Icon(GlobalRenderingData.DebugColor);
+            Background = new Icon(GlobalInterfaceData.Scheme.UIOverlayDebugColor1);
             OutputLabel = new Label(0, 0);
             Bounds = new Point(width, height);
             Position = Vector2.Zero;
 
-            GlobalRenderingData.OSWindow.TextInput += TextInput;
+            GlobalInterfaceData.OSWindow.TextInput += TextInput;
 
             group.ClickableObjects.Add(this);
             Group = group;
@@ -89,7 +102,7 @@ namespace TuringSimulatorDesktop.UI
             Bounds = new Point(width, height);
             Position = position;
 
-            GlobalRenderingData.OSWindow.TextInput += TextInput;
+            GlobalInterfaceData.OSWindow.TextInput += TextInput;
 
             group.ClickableObjects.Add(this);
         }

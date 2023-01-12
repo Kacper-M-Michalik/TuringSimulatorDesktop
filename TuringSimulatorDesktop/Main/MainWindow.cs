@@ -81,34 +81,36 @@ namespace TuringSimulatorDesktop
             //SDL_SetWindowBordered(Window.Handle, (byte)1U);
             // SDL_MaximizeWindow(Window.Handle);
             //MaximiseWindow();
-            GraphicsManager.PreferredBackBufferWidth = GlobalRenderingData.MainMenuWidth;
-            GraphicsManager.PreferredBackBufferHeight = GlobalRenderingData.MainMenuHeight;
+            GraphicsManager.PreferredBackBufferWidth = GlobalInterfaceData.MainMenuWidth;
+            GraphicsManager.PreferredBackBufferHeight = GlobalInterfaceData.MainMenuHeight;
             GraphicsManager.ApplyChanges();
 
             ScreenBatch = new SpriteBatch(GraphicsDevice);
             GraphicsDevice.BlendState = BlendState.AlphaBlend;
 
-            GlobalRenderingData.OSWindow = Window;
-            GlobalRenderingData.MainWindow = this;
-            GlobalRenderingData.FullscreenViewport = GraphicsDevice.Viewport;
+            GlobalInterfaceData.OSWindow = Window;
+            GlobalInterfaceData.MainWindow = this;
+            GlobalInterfaceData.FullscreenViewport = GraphicsDevice.Viewport;
 
-            GlobalRenderingData.Device = GraphicsDevice;
-            GlobalRenderingData.UIEffect = Content.Load<Effect>("UIShader");
+            GlobalInterfaceData.Device = GraphicsDevice;
+            GlobalInterfaceData.UIEffect = Content.Load<Effect>("UIShader");
 
             FontSystemDefaults.FontResolutionFactor = 1.0f;
             FontSystemDefaults.KernelWidth = 1;
             FontSystemDefaults.KernelHeight = 1;
             FontSystemDefaults.PremultiplyAlpha = true;
             FontSystemDefaults.FontLoader = new FreeTypeLoader();
-            GlobalRenderingData.TextBatch = new SpriteBatch(GraphicsDevice);
-            GlobalRenderingData.StandardRegularFont = new FontSystem();
-            GlobalRenderingData.StandardRegularFont.AddFont(File.ReadAllBytes(@"Assets/Fonts/Roboto-Regular.ttf"));
-            GlobalRenderingData.MediumRegularFont = new FontSystem();
-            GlobalRenderingData.MediumRegularFont.AddFont(File.ReadAllBytes(@"Assets/Fonts/Roboto-Medium.ttf"));
+            GlobalInterfaceData.TextBatch = new SpriteBatch(GraphicsDevice);
+            GlobalInterfaceData.StandardRegularFont = new FontSystem();
+            GlobalInterfaceData.StandardRegularFont.AddFont(File.ReadAllBytes(@"Assets/Fonts/Roboto-Regular.ttf"));
+            GlobalInterfaceData.StandardBoldFont = new FontSystem();
+            GlobalInterfaceData.StandardBoldFont.AddFont(File.ReadAllBytes(@"Assets/Fonts/Roboto-Bold.ttf"));
+            GlobalInterfaceData.MediumRegularFont = new FontSystem();
+            GlobalInterfaceData.MediumRegularFont.AddFont(File.ReadAllBytes(@"Assets/Fonts/Roboto-Medium.ttf"));
 
             DateTime Start = DateTime.UtcNow;
-            GlobalRenderingData.BakeTextures();
-            GlobalUIRenderer.Setup();
+            GlobalInterfaceData.BakeTextures();
+            GlobalMeshRenderer.Setup();
 
             DirectoryInfo Info = Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + Path.DirectorySeparatorChar + "Turing Machine - Desktop");
             string DataPath = Info.FullName + Path.DirectorySeparatorChar + "LocalUserData.txt";
@@ -149,7 +151,7 @@ namespace TuringSimulatorDesktop
 
             UIEventManager.WindowRequiresNextFrameResizeStep = UIEventManager.WindowRequiresNextFrameResize;
 
-            GlobalRenderingData.Time = gameTime;
+            GlobalInterfaceData.Time = gameTime;
 
             InputManager.Update();
 
@@ -169,19 +171,15 @@ namespace TuringSimulatorDesktop
             }
             */
 
-            if (GlobalRenderingData.UIRequiresRedraw)
-            {
-                GraphicsDevice.SetRenderTarget(null);
-                GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.SetRenderTarget(null);
+            GraphicsDevice.Clear(Color.CornflowerBlue);
 
-                CurrentView.Draw();       
+            CurrentView.Draw();       
 
-                ScreenBatch.Begin();
-                //DebugManager.Draw(GraphicsDevice, ScreenBatch, gameTime);
-                ScreenBatch.End();
-                //GlobalInterfaceData.UIRequiresRedraw = false;
-                
-            }
+            ScreenBatch.Begin();
+            //DebugManager.Draw(GraphicsDevice, ScreenBatch, gameTime);
+            ScreenBatch.End();
+            //GlobalInterfaceData.UIRequiresRedraw = false;                
 
             if (UIEventManager.WindowRequiresNextFrameResizeStep)
             {
@@ -221,11 +219,11 @@ namespace TuringSimulatorDesktop
 
         public void OnResize(object Sender, EventArgs Args)
         {
-            if (GraphicsDevice.PresentationParameters.BackBufferWidth < GlobalRenderingData.MinimumApplicationWindowWidth) GraphicsManager.PreferredBackBufferWidth = GlobalRenderingData.MinimumApplicationWindowWidth;
-            if (GraphicsDevice.PresentationParameters.BackBufferHeight < GlobalRenderingData.MinimumApplicationWindowHeight) GraphicsManager.PreferredBackBufferHeight = GlobalRenderingData.MinimumApplicationWindowHeight;
+            if (GraphicsDevice.PresentationParameters.BackBufferWidth < GlobalInterfaceData.MinimumApplicationWindowWidth) GraphicsManager.PreferredBackBufferWidth = GlobalInterfaceData.MinimumApplicationWindowWidth;
+            if (GraphicsDevice.PresentationParameters.BackBufferHeight < GlobalInterfaceData.MinimumApplicationWindowHeight) GraphicsManager.PreferredBackBufferHeight = GlobalInterfaceData.MinimumApplicationWindowHeight;
             GraphicsManager.ApplyChanges();
 
-            GlobalRenderingData.FullscreenViewport = new Viewport(0, 0, GraphicsManager.PreferredBackBufferWidth, GraphicsManager.PreferredBackBufferHeight);
+            GlobalInterfaceData.FullscreenViewport = new Viewport(0, 0, GraphicsManager.PreferredBackBufferWidth, GraphicsManager.PreferredBackBufferHeight);
             CurrentView.ViewResize(GraphicsManager.PreferredBackBufferWidth, GraphicsManager.PreferredBackBufferHeight);            
         }
 

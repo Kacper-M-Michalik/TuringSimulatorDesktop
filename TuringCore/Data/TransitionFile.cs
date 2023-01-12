@@ -12,24 +12,22 @@ namespace TuringCore
     public class TransitionFile : CompilableFile
     {
         [JsonInclude]
-        public string DefenitionAlphabetID;
-        [JsonInclude]
         public List<string> HaltStates;
         [JsonInclude]
         public List<Transition> Transitions;
 
         public TransitionFile()
         {
-            DefenitionAlphabetID = "";
+            DefinitionAlphabetID = "";
             HaltStates = new List<string>();
             Transitions = new List<Transition>();            
         }
 
-        public override StateTable Compile()
+        public override StateTable Compile(Alphabet DefinitionAlphabet)
         {
             StateTable Table = new StateTable();
             Table.ID = "NULL NAME";
-            Table.DefenitionAlphabetID = DefenitionAlphabetID;
+            Table.DefinitionAlphabetID = DefinitionAlphabetID;
 
             for (int i = 0; i < HaltStates.Count; i++)
             {
