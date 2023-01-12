@@ -111,13 +111,14 @@ namespace TuringSimulatorDesktop.UI
             BackendInterface.StartProjectServer(2, 28104);
             Location = location;
             UIEventManager.ClientSuccessConnectingDelegate = ConnectedToLocalServer;
-            //UIEventManager.ClientFailedConnecting//
+            UIEventManager.ClientFailedConnectingDelegate = ResetConnection;
             Client.ConnectToServer(System.Net.IPAddress.Parse("127.0.0.1"), 28104);
         }
         void ConnectedToLocalServer(object sender, EventArgs e)
         {
             UIEventManager.ClientSuccessConnecting = false;
             UIEventManager.ClientSuccessConnectingDelegate = null;
+            //add some sort of timeout to this
             UIEventManager.RecievedProjectDataFromServerDelegate = ServerSentProjectData;
             Client.SendTCPData(ClientSendPacketFunctions.LoadProject(Location));
         }
@@ -131,15 +132,21 @@ namespace TuringSimulatorDesktop.UI
         void ConnectToOtherDevice(Button Sender)
         {
             UIEventManager.RecievedProjectDataFromServerDelegate = FullyConnectedToServer;
-            //UIEventManager.ClientFailedConnecting//
+            UIEventManager.ClientFailedConnectingDelegate = ResetConnection;
             Client.ConnectToServer(System.Net.IPAddress.Parse(IPBox.Text), 28104);
         }
 
-
-        void FullyConnectedToServer(object sender, EventArgs e)
+        void ResetConnection(object sender, EventArgs e)
         {
             UIEventManager.ClientSuccessConnecting = false;
             UIEventManager.ClientSuccessConnectingDelegate = null;
+            UIEventManager.ClientFailedConnecting = false;
+            UIEventManager.ClientFailedConnectingDelegate = null;
+        }
+
+        void FullyConnectedToServer(object sender, EventArgs e)
+        {
+            ResetConnection(null, null);
 
             InputManager.DeleteAllActionGroups();
             GlobalRenderingData.MainWindow.LeaveMainMenu();

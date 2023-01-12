@@ -14,9 +14,9 @@ bool HasBaseTexture;
 Texture2D<float4> BaseTexture : register(t0);
 sampler BaseTextureSampler : register(s0);
 
-//bool HasOverlayTexture;
-//Texture2D<float4> OverlayTexture : register(t1);
-//sampler OverlayTextureSampler : register(s1);
+bool HasMaskTexture;
+Texture2D<float4> MaskTexture : register(t1);
+sampler MaskTextureSampler : register(s1);
 
 #define SAMPLE_TEXTURE(Name, texCoord)  Name.Sample(Name##Sampler, texCoord)
 
@@ -49,6 +49,10 @@ float4 MainPS(VertexShaderOutput input) : SV_Target
 	{
 		float4 Sample1 = SAMPLE_TEXTURE(BaseTexture, input.TexCoord);
 		Result = float4(Sample1.rgb + Result.rgb * Result.a, Sample1.a);
+		if (HasMaskTexture == true)
+		{
+			Result.a *= SAMPLE_TEXTURE(MaskTexture, input.TexCoord).a;
+		}
 	}
 	/*
 	if (HasOverlayTexture == true)

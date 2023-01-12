@@ -49,11 +49,13 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         public bool IsActive = true;
 
         Icon Header;
+        Icon HeaderStrip;
         Icon Background;
         HorizontalLayoutBox ButtonLayout;
 
 
         IView CurrentView;
+        WindowHeaderItem CurrentHeader;
         public bool IsMouseOverDraggableArea;
         public bool IsMarkedForDeletion;
         Viewport MainPort;
@@ -67,6 +69,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Header = new Icon(GlobalRenderingData.HeaderColor);
             ButtonLayout = new HorizontalLayoutBox();
             ButtonLayout.Spacing = 2;
+            ButtonLayout.ViewOffset = new Vector2(2, 0);
+            ButtonLayout.Centering = HorizontalCentering.Bottom;
 
             Position = position;
             Bounds = bounds;
@@ -96,6 +100,10 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         public void SetView(WindowHeaderItem ViewButton)
         {
+            if (CurrentHeader != null) CurrentHeader.Deselect();
+            CurrentHeader = ViewButton;
+            CurrentHeader.Select();
+
             if (CurrentView != null) CurrentView.IsActive = false;
             CurrentView = ViewButton.View;
             CurrentView.IsActive = true;
@@ -110,11 +118,11 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 int Index = Headers.IndexOf(ViewButton);
                 if (Index < Headers.Count - 1)
                 {
-                    SetView(Headers[Index + 1]);
+                    Headers[Index + 1].Select();
                 }
                 else if (Index > 0)
-                {
-                    SetView(Headers[Index - 1]);
+                {                    
+                    Headers[Index - 1].Select();
                 }
                 else
                 {
@@ -125,6 +133,11 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             ViewButton.Close();
             Headers.Remove(ViewButton);
             ButtonLayout.RemoveElement(ViewButton);
+            ButtonLayout.UpdateLayout();
+        }
+
+        public void UpdateHeader()
+        {
             ButtonLayout.UpdateLayout();
         }
 

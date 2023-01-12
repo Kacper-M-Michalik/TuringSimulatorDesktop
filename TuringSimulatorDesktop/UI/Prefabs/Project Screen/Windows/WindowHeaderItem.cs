@@ -20,8 +20,9 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             {
                 position = value;
                 Background.Position = position;
+                SelectionStrip.Position = new Vector2(position.X, position.Y - 2);
                 Title.Position = new Vector2(position.X + 4, position.Y);
-                CloseButton.Position = new Vector2(position.X + Title.Bounds.X + 4, position.Y);
+                CloseButton.Position = new Vector2(position.X + Title.Bounds.X + 8, position.Y);
             }
         }
 
@@ -33,11 +34,13 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             {
                 bounds = value;
                 Background.Bounds = bounds;
+                SelectionStrip.Bounds = new Point(bounds.X, 2);
                 CloseButton.Position = new Vector2(position.X + Title.Bounds.X + 4, position.Y);
             }
         }
 
         Icon Background;
+        Icon SelectionStrip;
         Label Title;
         Button CloseButton;
         ActionGroup Group;
@@ -45,6 +48,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         public IView View;
         Window OwnerWindow;
+        bool Selected;
 
         public WindowHeaderItem(IView view, Window window, ActionGroup group)
         {
@@ -55,6 +59,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Group = group;
 
             Background = new Icon(GlobalRenderingData.SubHeaderColor);
+            SelectionStrip = new Icon(GlobalRenderingData.BrightAccentColor);
+            SelectionStrip.IsActive = false;
             Title = new Label();
             Title.Text = view.Title;
 
@@ -64,7 +70,23 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             CloseButton.OnClickedEvent += Remove;
             CloseButton.IsActive = false;
 
-            Bounds = Title.Bounds + new Point(21, 0);
+            Bounds = new Point(25 + Title.Bounds.X, 18);
+        }
+
+        public void Select()
+        {
+            Selected = true;
+            SelectionStrip.IsActive = true;
+            Title.Font = GlobalRenderingData.MediumRegularFont;
+            Title.UpdateLabel();
+        }
+
+        public void Deselect()
+        {
+            Selected = false;
+            SelectionStrip.IsActive = false;
+            Title.Font = GlobalRenderingData.StandardRegularFont;
+            Title.UpdateLabel();
         }
 
         public void Clicked()
@@ -92,11 +114,11 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             if (View.Title != Title.Text)
             {
                 Title.Text = View.Title;
-                Bounds = Title.Bounds + new Point(21, 0);
-                
+                Bounds = new Point(25 + Title.Bounds.X, 18);
+                OwnerWindow.UpdateHeader();
             }
 
-            if (IsInActionGroupFrame && IsMouseOver())
+            if (Selected || (IsInActionGroupFrame && IsMouseOver()))
             {
                 CloseButton.IsActive = true;
                 //do background highlight
@@ -111,6 +133,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         {
             Background.Draw(BoundPort);
             Title.Draw(BoundPort);
+            SelectionStrip.Draw(BoundPort);
             CloseButton.Draw(BoundPort);
         }
 

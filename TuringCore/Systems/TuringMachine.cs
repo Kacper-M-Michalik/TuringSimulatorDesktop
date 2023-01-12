@@ -23,6 +23,9 @@ namespace TuringCore
         public void Start(string StartState, int StartHeadPosition)
         {
             if (IsActive) throw new Exception("Machine already on");
+            if (ActiveStateTable == null) throw new Exception("No state table loaded");
+            if (ActiveAlphabet == null) throw new Exception("No alphabet loaded");
+            if (OriginalTape == null) throw new Exception("No tape loaded");
 
             ShallowClear();
 
@@ -84,15 +87,16 @@ namespace TuringCore
             }
         }
 
-        public void SetActiveTape(TapeTemplate NewTape, Alphabet Alphabet)
+        public void SetActiveTape(TapeTemplate NewTape)
         {
+            //if (ActiveStateTable != null && NewTape.DefenitionAlphabetID != ActiveStateTable.DefenitionAlphabetID) throw new Exception("Incompatible alphabets");
             OriginalTape = NewTape;
-            ActiveTape = NewTape.Clone(Alphabet);
         }
 
         public void SetActiveStateTable(StateTable Table, Alphabet Alphabet)
         {
             if (ActiveStateTable.DefenitionAlphabetID != Alphabet.ID) throw new Exception("Wrong alphabet given");
+            //if (OriginalTape != null && Table.DefenitionAlphabetID != OriginalTape.DefenitionAlphabetID) throw new Exception("Incompatible alphabets");
             ActiveAlphabet = Alphabet;
             ActiveStateTable = Table;
         }
@@ -103,7 +107,6 @@ namespace TuringCore
             CurrentState = "Null";
             HeadPosition = 0;
             NextInstruction  = null;
-            ActiveStateTable = null;
             ActiveTape = null;
         }
     }

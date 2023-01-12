@@ -48,7 +48,12 @@ namespace TuringSimulatorDesktop
         public static Color BrightAccentColor = new Color(64, 115, 255);
         public static Color DarkAccentColor = new Color(60, 60, 64);
         public static Color HighlightEdgeColorChange = new Color(30, 30, 30);
+
         public static Color FontColor = Color.White;
+        public static Color FontGrayedOutColor = Color.White;
+
+        public static Color TuringMachineActionColor = Color.White;
+        public static Color TuringMachineSecondaryActionColor = Color.White;
 
         static Color UIOverlayDebugColor1 = new Color(124, 0, 124);
         static Color UIOverlayDebugColor2 = new Color(255, 124, 255);

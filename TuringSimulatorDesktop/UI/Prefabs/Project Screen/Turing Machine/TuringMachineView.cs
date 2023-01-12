@@ -50,16 +50,34 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             set => ownerWindow = value;
         }
 
+
+        Icon InfoBackground;
+        Label CurrentStateTableTitle;
+        Label CurrentStateTableLabel;
+        Label CurrentTapeTitle;
+        Label CurrentTapeLabel;
+
+        Label NotificationLabel;
+
+
         Icon Background;
 
-        Button RestartButton;
-        Button StepButton;
-
         Button ExecuteButton;
+        Button StepButton;
+        Button RestartButton;
+
+        Button AutoStepButton;
         Button PauseButton;
         Button Speed1Button;
         Button Speed2Button;
         Button Speed3Button;
+
+
+
+        Icon ReadHead;
+        Label CurrentStateLabel;
+        VerticalLayoutBox CurrentInstructionCollectionLayout;
+        Icon CurrentInstructionPointer;
 
         ActionGroup Group;
 
@@ -67,7 +85,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         public TuringMachineView()
         {
-
+            Machine = new TuringMachine();
         }
 
         public void LoadStateTableSource(int File)
@@ -101,17 +119,45 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
 
 
-        public void Step(Button Sender)
-        {
-
-        }
         public void Execute(Button Sender)
         {
+            Machine.Start(,);
+            while (Machine.IsActive) Machine.StepProgram();
 
+            //update ui here
+
+        }
+        public void Step(Button Sender)
+        {
+            if (Machine.IsActive)
+            {
+                Machine.StepProgram();
+            }
+            else
+            {
+                Machine.Start(,);
+            }
+            //update ui
+        }
+        public void Restart(Button Sender)
+        {
+            Machine.Start();
+        }
+        public void AutoStep(Button Sender)
+        {
+            if (Machine.IsActive)
+            {
+                //start stepping co routine
+            }
+            else
+            {
+                Machine.Start();
+                //start coroutine
+            }
         }
         public void Pause(Button Sender)
         {
-
+            //pause coroutine
         }
         public void SetSpeed1(Button Sender)
         {

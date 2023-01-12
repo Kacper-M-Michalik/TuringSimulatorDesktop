@@ -9,6 +9,13 @@ using TuringSimulatorDesktop.Input;
 
 namespace TuringSimulatorDesktop.UI
 {
+    public enum HorizontalCentering
+    {
+        Top, 
+        Middle, 
+        Bottom
+    }
+
     public class HorizontalLayoutBox : IVisualElement, IPollable
     {
         Vector2 position;
@@ -44,6 +51,7 @@ namespace TuringSimulatorDesktop.UI
 
         Viewport Port;
 
+        public HorizontalCentering Centering = HorizontalCentering.Top;
         Vector2 LayoutEndBound;
         public float Spacing;
         public bool UniformAreas;
@@ -131,7 +139,18 @@ namespace TuringSimulatorDesktop.UI
             {
                 for (int i = 0; i < Elements.Count; i++)
                 {
-                    Elements[i].Position = PlacementPosition;
+                    float Y = PlacementPosition.Y;
+                    if (Centering == HorizontalCentering.Middle)
+                    {
+                        Y += bounds.Y / 2f - Elements[i].Bounds.Y / 2f;
+                    }
+                    else if (Centering == HorizontalCentering.Bottom)
+                    {
+                        Y += bounds.Y - Elements[i].Bounds.Y;
+                    }
+
+                    Elements[i].Position = new Vector2(PlacementPosition.X, Y);                    
+
                     PlacementPosition = new Vector2(PlacementPosition.X + Elements[i].Bounds.X + Spacing, PlacementPosition.Y);
                 }
             }
@@ -151,8 +170,18 @@ namespace TuringSimulatorDesktop.UI
 
                 for (int i = 0; i < Elements.Count; i++)
                 {
-                    Elements[i].Position = PlacementPosition;
-                    PlacementPosition = new Vector2(PlacementPosition.X + UniformAreaSize + Spacing, PlacementPosition.Y);
+                    float Y = PlacementPosition.Y;
+                    if (Centering == HorizontalCentering.Middle)
+                    {
+                        Y += bounds.Y / 2f - Elements[i].Bounds.Y / 2f;
+                    }
+                    else if (Centering == HorizontalCentering.Bottom)
+                    {
+                        Y += bounds.Y - Elements[i].Bounds.Y;
+                    }
+                    Elements[i].Position = new Vector2(PlacementPosition.X, Y);
+
+                    PlacementPosition = new Vector2(PlacementPosition.X + UniformAreaSize + Spacing, Y);
                 }
 
             }
