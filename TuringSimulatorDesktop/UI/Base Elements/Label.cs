@@ -16,7 +16,7 @@ namespace TuringSimulatorDesktop.UI
             set
             {
                 position = value;
-                Background.Position = position;
+                Background.Position = position - new Vector2(0, RichText.Size.Y/2);
             }
         }
 

@@ -126,10 +126,10 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             CreateTapeFileButton.Position = Position + GlobalInterfaceData.Scale(new Vector2(0, 54));
             CreateAlphabetFileButton.Position = Position + GlobalInterfaceData.Scale(new Vector2(0, 79));
 
-            CreateTransitionFileLabel.Position = Position + GlobalInterfaceData.Scale(new Vector2(30, 12));
-            CreateSlateFileLabel.Position = Position + GlobalInterfaceData.Scale(new Vector2(30, 36));
-            CreateTapeFileLabel.Position = Position + GlobalInterfaceData.Scale(new Vector2(30, 61));
-            CreateAlphabetFileLabel.Position = Position + GlobalInterfaceData.Scale(new Vector2(30, 86));
+            CreateTransitionFileLabel.Position = Position + GlobalInterfaceData.Scale(new Vector2(30, 17));
+            CreateSlateFileLabel.Position = Position + GlobalInterfaceData.Scale(new Vector2(30, 41));
+            CreateTapeFileLabel.Position = Position + GlobalInterfaceData.Scale(new Vector2(30, 66));
+            CreateAlphabetFileLabel.Position = Position + GlobalInterfaceData.Scale(new Vector2(30, 91));
         }
 
         void ResizeLayout()
