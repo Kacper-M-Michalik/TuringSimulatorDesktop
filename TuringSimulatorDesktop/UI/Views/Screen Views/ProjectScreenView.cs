@@ -19,11 +19,9 @@ namespace TuringSimulatorDesktop.UI
 
         Icon Header;
         Icon Background;
+        Label AppTitle;
 
-        Label Title;
-
-        TextureButton AddFileButton;
-        InputBox FileName;
+        Label ProjectTitle;
 
        // FileBrowserView Browser;
 
@@ -53,22 +51,22 @@ namespace TuringSimulatorDesktop.UI
             //Temp.AddView();
             Windows.Add(Temp);
 
-            Title = new Label();
-            Title.FontSize = 14;
-            Title.Position = new Vector2(1920 / 2, 0);
+            AppTitle = new Label();
+            AppTitle.Font = GlobalInterfaceData.StandardBoldFont;
+            AppTitle.FontSize = 20;
+            AppTitle.Text = "T";
+            AppTitle.Position = Vector2.Zero;
 
-            AddFileButton = new TextureButton(20, 20, Group);
-            AddFileButton.Position = new Vector2(10, 10);
-            AddFileButton.OnClickedEvent += AddFile;
-            FileName = new InputBox(100, 20, Group);
-            FileName.Position = new Vector2(32, 10);
+            ProjectTitle = new Label();
+            ProjectTitle.FontSize = 14;
+            ProjectTitle.Position = new Vector2(1920 / 2, 0);
 
             Group.PollableObjects.Add(this);
         }
 
         public void UpdatedProject(object sender, EventArgs e)
         {
-            Title.Text = GlobalProjectAndUserData.ProjectData.ProjectName;
+            ProjectTitle.Text = GlobalProjectAndUserData.ProjectData.ProjectName;
             //do clearing etc here
         }
 
@@ -119,13 +117,6 @@ namespace TuringSimulatorDesktop.UI
             }
         }
 
-        public void AddFile(Button Sender)
-        {
-            //TEMP
-            Client.SendTCPData(ClientSendPacketFunctions.CreateFile(0, FileName.Text, CreateFileType.TransitionFile));
-        }
-
-
         public void CreateWindow()
         {
             WindowGroupData NewBaseGroup = new WindowGroupData();
@@ -145,10 +136,9 @@ namespace TuringSimulatorDesktop.UI
         {
             Background.Draw();
             Header.Draw();
-            Title.Draw();
-
-            AddFileButton.Draw();
-            FileName.Draw();
+            ProjectTitle.Draw();
+            AppTitle.DrawFrame = !AppTitle.DrawFrame;
+            AppTitle.Draw();
 
             for (int i = 0; i < Windows.Count; i++)
             {

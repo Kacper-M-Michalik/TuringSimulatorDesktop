@@ -52,11 +52,13 @@ namespace TuringSimulatorDesktop.UI
         public bool AutoSizeMesh = false;
 
         public Icon Background;
+        public bool DrawFrame;
 
         public Label(int width, int height)
         {
             Background = new Icon();
             RichText = new RichTextLayout();
+            RichText.VerticalSpacing = 0;
             Font = GlobalInterfaceData.StandardRegularFont;
 
             Bounds = new Point(width, height);
@@ -66,6 +68,7 @@ namespace TuringSimulatorDesktop.UI
         {
             Background = new Icon();
             RichText = new RichTextLayout();
+            RichText.VerticalSpacing = 0;
             Font = font;
 
             Bounds = new Point(width, height);
@@ -75,6 +78,7 @@ namespace TuringSimulatorDesktop.UI
         {
             Background = new Icon();
             RichText = new RichTextLayout();
+            RichText.VerticalSpacing = 0;
             Font = font;
 
             Bounds = new Point(width, height);
@@ -84,6 +88,7 @@ namespace TuringSimulatorDesktop.UI
         {
             Background = new Icon();
             RichText = new RichTextLayout();
+            RichText.VerticalSpacing = 0;
             Font = GlobalInterfaceData.StandardRegularFont;
 
             Bounds = new Point(width, height);
@@ -92,6 +97,7 @@ namespace TuringSimulatorDesktop.UI
         public Label() : this(0, 0)
         {
             AutoSizeMesh = true;
+            Background.DrawColor = GlobalInterfaceData.Scheme.UIOverlayDebugColor4;
         }
         public Label(FontSystem font) : this(0, 0, font)
         {
@@ -123,7 +129,7 @@ namespace TuringSimulatorDesktop.UI
             GlobalInterfaceData.Device.Clear(Color.Transparent);
 
             GlobalInterfaceData.TextBatch.Begin();
-            RichText.Draw(GlobalInterfaceData.TextBatch, new Vector2(0, -2), FontColor);
+            RichText.Draw(GlobalInterfaceData.TextBatch, new Vector2(0, 0), FontColor);
             GlobalInterfaceData.TextBatch.End();
 
             GlobalInterfaceData.Device.SetRenderTarget(null);
@@ -149,6 +155,8 @@ namespace TuringSimulatorDesktop.UI
         {
             if (IsActive)
             {
+                if (DrawFrame) Background.DrawTexture = null;
+                else Background.DrawTexture = RenderTexture;
                 Background.Draw(BoundPort);          
             }
         }
