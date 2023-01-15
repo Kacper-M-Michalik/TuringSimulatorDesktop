@@ -10,9 +10,9 @@ namespace TuringSimulatorDesktop.UI
     public static class UIUtils
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int ConvertFloatToMinInt(float Value)
+        public static int ConvertFloatToMinInt(float Value, float Min)
         {
-            return Convert.ToInt32(Math.Clamp(MathF.Round(Value /*, MidpointRounding.AwayFromZero*/), 1f, float.PositiveInfinity));
+            return Convert.ToInt32(Math.Clamp(MathF.Round(Value /*, MidpointRounding.AwayFromZero*/), Min, float.PositiveInfinity));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -32,7 +32,7 @@ namespace TuringSimulatorDesktop.UI
             }
         }
 
-        public bool IsActive = true;
+        public bool IsActive { get; set; } = true;
 
         public event OnButtonClick OnClickedEvent;
         public event OnButtonClickAway OnClickedAwayEvent;
@@ -87,7 +87,7 @@ namespace TuringSimulatorDesktop.UI
 
         public bool IsMouseOver()
         {
-            return (IsActive && InputManager.MouseData.X >= Position.X && InputManager.MouseData.X <= Position.X + bounds.X && InputManager.MouseData.Y >= Position.Y && InputManager.MouseData.Y <= Position.Y + bounds.Y);
+            return (IsActive && InputManager.MouseData.X >= Position.X && InputManager.MouseData.X < Position.X + bounds.X && InputManager.MouseData.Y >= Position.Y && InputManager.MouseData.Y < Position.Y + bounds.Y);
         }
 
         public void PollInput(bool IsInActionGroupFrame)

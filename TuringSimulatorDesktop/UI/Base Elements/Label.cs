@@ -15,8 +15,8 @@ namespace TuringSimulatorDesktop.UI
             get => position;
             set
             {
-                position = value;
-                Background.Position = position - new Vector2(0, RichText.Size.Y/2);
+                position = new Vector2(MathF.Round(value.X), MathF.Round(value.Y));
+                Background.Position = position - new Vector2(0, RichText.Size.Y/2f);
             }
         }
 
@@ -33,7 +33,7 @@ namespace TuringSimulatorDesktop.UI
             }
         }
 
-        public bool IsActive = true;
+        public bool IsActive { get; set; } = true;
 
         RichTextLayout RichText;
         RenderTarget2D RenderTexture;
@@ -48,8 +48,10 @@ namespace TuringSimulatorDesktop.UI
                 UpdateLabel();
             } 
         }
+
         public float FontSize = 12;
         public bool AutoSizeMesh = false;
+        public bool DrawCentered = false;
 
         public Icon Background;
         public bool DrawFrame;
@@ -129,7 +131,14 @@ namespace TuringSimulatorDesktop.UI
             GlobalInterfaceData.Device.Clear(Color.Transparent);
 
             GlobalInterfaceData.TextBatch.Begin();
-            RichText.Draw(GlobalInterfaceData.TextBatch, new Vector2(0, 0), FontColor);
+            if (DrawCentered)
+            {
+                RichText.Draw(GlobalInterfaceData.TextBatch, new Vector2(MathF.Round(bounds.X/2f - RichText.Size.X/2f), 0), FontColor);
+            }
+            else
+            {
+                RichText.Draw(GlobalInterfaceData.TextBatch, new Vector2(0, 0), FontColor);
+            }
             GlobalInterfaceData.TextBatch.End();
 
             GlobalInterfaceData.Device.SetRenderTarget(null);

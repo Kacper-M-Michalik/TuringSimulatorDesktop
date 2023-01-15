@@ -37,7 +37,6 @@ namespace TuringSimulatorDesktop.UI
         public MainScreenView()
         {          
             Group = InputManager.CreateActionGroup();
-            ViewResize(GlobalInterfaceData.Device.PresentationParameters.BackBufferWidth, GlobalInterfaceData.Device.PresentationParameters.BackBufferHeight);
 
             //Background = new Icon(Width, Height, Vector2.Zero, GlobalInterfaceData.BackgroundColor);// UIMesh.CreateRectangle(Vector2.Zero, Width, Height, GlobalInterfaceData.BackgroundColor);
             //Header = new Icon(Width, GlobalInterfaceData.WindowTitleBarHeight, Vector2.Zero, GlobalInterfaceData.HeaderColor);//UIMesh.CreateRectangle(Vector2.Zero, Width, GlobalInterfaceData.WindowTitleBarHeight, GlobalInterfaceData.HeaderColor);
@@ -59,30 +58,32 @@ namespace TuringSimulatorDesktop.UI
             }
 
             NewProjectButton = new TextureButton(250, 70, new Vector2(490, 42), Group);
-            NewProjectButton.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.NewProjectButton];
-            NewProjectButton.HighlightTexture = GlobalInterfaceData.TextureLookup[UILookupKey.NewProjectButtonHightlight];
+            //NewProjectButton.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.NewProjectButton];
+            //NewProjectButton.HighlightTexture = GlobalInterfaceData.TextureLookup[UILookupKey.NewProjectButtonHightlight];
             NewProjectButton.HighlightOnMouseOver = true;
 
             LoadProjectButton = new TextureButton(250, 70, new Vector2(490, 122), Group);
-            NewProjectButton.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.LoadProjectButton];
-            NewProjectButton.HighlightTexture = GlobalInterfaceData.TextureLookup[UILookupKey.LoadProjectButtonHightlight];
+            //NewProjectButton.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.LoadProjectButton];
+            //NewProjectButton.HighlightTexture = GlobalInterfaceData.TextureLookup[UILookupKey.LoadProjectButtonHightlight];
             LoadProjectButton.HighlightOnMouseOver = true;
             LoadProjectButton.OnClickedEvent += SelectProjectLocation;
 
             HostProjectButton = new TextureButton(250, 70, new Vector2(490, 202), Group);
-            NewProjectButton.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.HostProjectButton];
-            NewProjectButton.HighlightTexture = GlobalInterfaceData.TextureLookup[UILookupKey.HostProjectButtonHightlight];
+            //NewProjectButton.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.HostProjectButton];
+            //NewProjectButton.HighlightTexture = GlobalInterfaceData.TextureLookup[UILookupKey.HostProjectButtonHightlight];
             HostProjectButton.HighlightOnMouseOver = true;
 
             JoinProjectButton = new TextureButton(250, 70, new Vector2(490, 282), Group);
-            NewProjectButton.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.JoinProjectButton];
-            NewProjectButton.HighlightTexture = GlobalInterfaceData.TextureLookup[UILookupKey.JoinProjectButtonHightlight];
+            //NewProjectButton.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.JoinProjectButton];
+            //NewProjectButton.HighlightTexture = GlobalInterfaceData.TextureLookup[UILookupKey.JoinProjectButtonHightlight];
             JoinProjectButton.HighlightOnMouseOver = true;
             JoinProjectButton.OnClickedEvent += ConnectToOtherDevice;
 
 
             IPBox = new InputBox(100, 20, Group);
             IPBox.Position = Vector2.Zero;
+
+            ScreenResize();
            // Menu = new DropDownMenu(60, 20, new Vector2(45, 6), Group);
         }
 
@@ -197,20 +198,17 @@ namespace TuringSimulatorDesktop.UI
             IPBox.Draw();
         }
 
-        public override void ViewResize(int NewWidth, int NewHeight)
+        public override void ScreenResize()
         {
-            Width = NewWidth;
-            Height = NewHeight;
-            Group.Width = NewWidth;
-            Group.Height = NewHeight;
+            int Width = GlobalInterfaceData.Device.PresentationParameters.BackBufferWidth;
+            int Height = GlobalInterfaceData.Device.PresentationParameters.BackBufferHeight;
+
+            Group.Width = Width;
+            Group.Height = Height;
 
             Background = new Icon(Width, Height, Vector2.Zero, GlobalInterfaceData.Scheme.Background);
             Header = new Icon(Width, 32, Vector2.Zero, GlobalInterfaceData.Scheme.Header);
         }
 
-        public override void ViewPositionSet(int X, int Y)
-        {
-
-        }
     }
 }

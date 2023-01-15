@@ -24,7 +24,7 @@ namespace TuringSimulatorDesktop.UI
             {
                 position = value;
                 Background.Position = position;
-                OutputLabel.Position = position;
+                OutputLabel.Position = position + Labeloffset + new Vector2(0, OutputLabel.Bounds.Y/2);
             }
         }
 
@@ -40,7 +40,7 @@ namespace TuringSimulatorDesktop.UI
             }
         }
 
-        public bool IsActive = true;
+        public bool IsActive { get; set; } = true;
         ActionGroup Group;
         public bool IsMarkedForDeletion { get; set; }
 
@@ -68,7 +68,8 @@ namespace TuringSimulatorDesktop.UI
         }
 
         Icon Background;
-        Label OutputLabel;
+        public Label OutputLabel;
+        public Vector2 Labeloffset;
 
         public InputBox(ActionGroup group)
         {
@@ -97,7 +98,7 @@ namespace TuringSimulatorDesktop.UI
         }
         public InputBox(int width, int height, Vector2 position, ActionGroup group)
         {
-            Background = new Icon();
+            Background = new Icon(GlobalInterfaceData.Scheme.UIOverlayDebugColor1);
             OutputLabel = new Label(0,0);
             Bounds = new Point(width, height);
             Position = position;

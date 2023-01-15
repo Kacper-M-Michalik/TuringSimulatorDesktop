@@ -44,13 +44,16 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             }
         }
         public string Title => "Turing Machine";
+        public int OpenFileID => -1;
+
         Window ownerWindow;
         public Window OwnerWindow
         {
             get => ownerWindow;
             set => ownerWindow = value;
         }
-        public bool IsMarkedForDeletion { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+        public bool IsMarkedForDeletion { get; set; }
 
         Icon InfoBackground;
         Label CurrentStateTableTitle;
@@ -89,6 +92,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         CompilableFile TempFile;
         Alphabet TempAlphabet;
+        StateTable TempStateTable;
+        bool IsStateTableOutdated;
 
         bool IsAutoStepActive;
         double TimeLeftToNextStep;
@@ -146,9 +151,9 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 return;
             }
 
-            CreateFileType File = ((CreateFileType)Data.ReadInt());
+            CoreFileType File = ((CoreFileType)Data.ReadInt());
 
-            if (File != CreateFileType.TransitionFile && File != CreateFileType.SlateFile)
+            if (File != CoreFileType.TransitionFile && File != CoreFileType.SlateFile)
             {
                 //diosplay error to UI HERE
                 CustomLogging.Log("Client: Turing Machine Window Fatal Error, received an unexpected non table source data!");
@@ -162,7 +167,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             //deserialize on seperate thread later
             try
             {
-                if (File == CreateFileType.TransitionFile)
+                if (File == CoreFileType.TransitionFile)
                 {
                     TempFile = JsonSerializer.Deserialize<TransitionFile>(Data.ReadByteArray());                
                 }
@@ -192,9 +197,9 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 return;
             }
 
-            CreateFileType File = ((CreateFileType)Data.ReadInt());
+            CoreFileType File = ((CoreFileType)Data.ReadInt());
 
-            if (File != CreateFileType.Alphabet)
+            if (File != CoreFileType.Alphabet)
             {
                 CustomLogging.Log("Client: Turing Machine Window Fatal Error, received an unexpected non alphabet!");
                 return;
@@ -219,15 +224,14 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         public void CompileSourceFile()
         {
-            StateTable TempTable = TempFile.Compile(TempAlphabet);
-            if (TempTable == null)
+            TempStateTable = TempFile.Compile(TempAlphabet);
+            if (TempStateTable == null)
             {
                 NotificationLabel.Text = "Failed to compile state table: Check it programmed correctly!";
                 CustomLogging.Log("Cllient: Failed to compile file, invalid transition/slate file!");
                 return;
             }
-
-            Machine.SetActiveStateTable(TempTable, TempAlphabet);
+            IsStateTableOutdated = true;
         }
 
         public void LoadTape(int FileID)
@@ -251,9 +255,9 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 return;
             }
 
-            CreateFileType File = ((CreateFileType)Data.ReadInt());
+            CoreFileType File = ((CoreFileType)Data.ReadInt());
 
-            if (File != CreateFileType.Tape)
+            if (File != CoreFileType.Tape)
             {
                 CustomLogging.Log("Client: Turing Machine Window Fatal Error, received an unexpected non tape!");
                 return;
@@ -297,6 +301,12 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         {
             //Add Checks HERE
             //read input boxs for input
+
+            if (IsStateTableOutdated)
+            {
+                Machine.SetActiveStateTable(TempStateTable, TempAlphabet);
+                IsStateTableOutdated = false;
+            }
 
             int Code = 0;//Machine.Start();
             if (Code == 1)

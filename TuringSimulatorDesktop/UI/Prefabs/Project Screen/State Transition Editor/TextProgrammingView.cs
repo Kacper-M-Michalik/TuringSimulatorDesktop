@@ -56,6 +56,9 @@ namespace TuringSimulatorDesktop.UI
 
         string title = "Empty Programming View";
         public string Title => title;
+
+        public int OpenFileID => CurrentlyOpenedFileID;
+
         Window ownerWindow;
         public Window OwnerWindow 
         { 
@@ -89,7 +92,7 @@ namespace TuringSimulatorDesktop.UI
             //file id
             Data.ReadInt();
 
-            if ((CreateFileType)Data.ReadInt() != CreateFileType.TransitionFile) throw new Exception("Opened File is not a transition file!");
+            if ((CoreFileType)Data.ReadInt() != CoreFileType.TransitionFile) throw new Exception("Opened File is not a transition file!");
 
             title = Data.ReadString();
             FileVersion = Data.ReadInt();
@@ -127,6 +130,7 @@ namespace TuringSimulatorDesktop.UI
 
             Background.Position = position;
             TransitionLayout.Position = new Vector2(position.X, position.Y + 20);
+            //update this
             TestLabel.Position = position;
         }
 

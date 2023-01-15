@@ -44,6 +44,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             }
         }
 
+        public bool IsActive { get; set; } = true;
+
         Icon Background;
         Icon Header;
         Icon ForeGround;
@@ -121,6 +123,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 return;
             } 
         }
+
+        public bool IsActive { get; set; } = true;
 
         ColorButton Background;
         Label FileName;

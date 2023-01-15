@@ -162,13 +162,13 @@ namespace TuringServer
 
             int FolderID;
             string FileName;
-            CreateFileType FileType;
+            CoreFileType FileType;
 
             try
             {
                 FolderID = Data.ReadInt();
                 FileName = Data.ReadString();
-                FileType = (CreateFileType)Data.ReadInt();
+                FileType = (CoreFileType)Data.ReadInt();
             }
             catch
             {
@@ -176,7 +176,7 @@ namespace TuringServer
                 return;
             }
 
-            if (FileType == CreateFileType.Other)
+            if (FileType == CoreFileType.Other)
             {
                 Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to create file - Cannot create file with unknown extension."));
                 return;
@@ -221,16 +221,16 @@ namespace TuringServer
                 FileStream Fs = File.Create(NewFileLocation); 
                 switch (FileType)
                 {
-                    case CreateFileType.Alphabet:
+                    case CoreFileType.Alphabet:
                         Fs.Write(JsonSerializer.SerializeToUtf8Bytes(new Alphabet()));
                         break;
-                    case CreateFileType.Tape:
+                    case CoreFileType.Tape:
                         Fs.Write(JsonSerializer.SerializeToUtf8Bytes(new TapeTemplate()));
                         break;
-                    case CreateFileType.TransitionFile:
+                    case CoreFileType.TransitionFile:
                         Fs.Write(JsonSerializer.SerializeToUtf8Bytes(new TransitionFile()));
                         break;
-                    case CreateFileType.SlateFile:
+                    case CoreFileType.SlateFile:
                         Fs.Write(JsonSerializer.SerializeToUtf8Bytes(new SlateFile()));
                         break;
                 }

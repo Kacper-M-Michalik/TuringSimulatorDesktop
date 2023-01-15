@@ -44,34 +44,34 @@ namespace TuringServer
             return FilePath.Substring(FilePath.LastIndexOf('.'));
         }        
 
-        public static CreateFileType ExtensionToFileType(string Extension)
+        public static CoreFileType ExtensionToFileType(string Extension)
         {
             switch (Extension)
             {
                 case ".alph":
-                    return CreateFileType.Alphabet;
+                    return CoreFileType.Alphabet;
                 case ".tape":
-                    return CreateFileType.Tape;
+                    return CoreFileType.Tape;
                 case ".trt":
-                    return CreateFileType.TransitionFile;
+                    return CoreFileType.TransitionFile;
                 case ".slt":
-                    return CreateFileType.SlateFile;
+                    return CoreFileType.SlateFile;
                 default:
-                    return CreateFileType.Other;
+                    return CoreFileType.Other;
             }
         }
 
-        public static string FileTypeToExtension(CreateFileType FileType)
+        public static string FileTypeToExtension(CoreFileType FileType)
         {
             switch (FileType)
             {
-                case CreateFileType.Alphabet:
+                case CoreFileType.Alphabet:
                     return ".alph";
-                case CreateFileType.Tape:
+                case CoreFileType.Tape:
                     return ".tape";
-                case CreateFileType.TransitionFile:
+                case CoreFileType.TransitionFile:
                     return ".trt";
-                case CreateFileType.SlateFile:
+                case CoreFileType.SlateFile:
                     return ".slt";
                 default:
                     return "";
@@ -154,7 +154,7 @@ namespace TuringServer
                     string Name = GetFileNameFromPath(Files[i]);
                     string Extension = GetFileExtensionFromPath(Files[i]);
 
-                    if (ExtensionToFileType(Extension) == CreateFileType.Alphabet) NewProjectAlphabetLookup.Add(Name, ID);
+                    //if (ExtensionToFileType(Extension) == CreateFileType.Alphabet) NewProjectAlphabetLookup.Add(Name, ID);
 
                     DirectoryFile NewFileData = new DirectoryFile(ID, Name, Extension, NewFolder);
                     NewFileDataLookup.Add(NewFileData.ID, NewFileData);

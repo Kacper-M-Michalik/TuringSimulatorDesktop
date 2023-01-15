@@ -7,12 +7,12 @@ namespace TuringCore
     [Serializable]
     public class TapeTemplate
     {
+        //[JsonInclude]
+        //public string ID;
+        //[JsonInclude]
+        //public string DefinitionAlphabetID;
         [JsonInclude]
-        public string ID;
-        [JsonInclude]
-        public string DefinitionAlphabetID;
-        [JsonInclude]
-        Dictionary<int, string> Data = new Dictionary<int, string>();
+        public Dictionary<int, string> Data = new Dictionary<int, string>();
         [JsonInclude]
         public int HighestIndex;
         [JsonInclude]
@@ -20,8 +20,8 @@ namespace TuringCore
 
         public TapeTemplate() 
         {
-            ID = "";
-            DefinitionAlphabetID = "";
+            //ID = "";
+            //DefinitionAlphabetID = "";
             Data = new Dictionary<int, string>();
             HighestIndex = 0;
             LowestIndex = 0;
@@ -46,7 +46,7 @@ namespace TuringCore
         public Tape Clone(Alphabet Alphabet)
         {
             Tape CloneTape = new Tape();
-            CloneTape.ID = ID;
+            //CloneTape.ID = ID;
             CloneTape.DefinitionAlphabet = Alphabet;
             CloneTape.Data = new Dictionary<int, string>(Data);
             CloneTape.HighestIndex = HighestIndex;
@@ -57,7 +57,7 @@ namespace TuringCore
 
     public class Tape
     {
-        public string ID;
+        ///public string ID;
         public Alphabet DefinitionAlphabet;
         public Dictionary<int, string> Data = new Dictionary<int, string>();
         public int HighestIndex;

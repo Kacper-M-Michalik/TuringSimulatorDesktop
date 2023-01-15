@@ -35,7 +35,7 @@ namespace TuringSimulatorDesktop.UI
             }
         }
 
-        public bool IsActive = true;
+        public bool IsActive { get; set; } = true;
 
         public event OnCheckBoxClick OnClickedEvent;
         public ActionGroup Group { get; private set; }

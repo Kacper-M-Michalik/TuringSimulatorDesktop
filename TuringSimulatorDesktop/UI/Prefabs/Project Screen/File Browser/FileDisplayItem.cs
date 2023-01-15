@@ -1,10 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using TuringCore;
 using TuringSimulatorDesktop.Input;
 
 namespace TuringSimulatorDesktop.UI.Prefabs
 {
-    public class FileDisplayItem : IVisualElement
+    public class FileDisplayItem : IVisualElement, IClickable
     {
         Vector2 position;
         public Vector2 Position
@@ -13,8 +14,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             set
             {
                 position = value;
-                Background.Position = position;
-                NameLabel.Position = position;
+                MoveLayout();
             }
         }
 
@@ -24,77 +24,125 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             get => bounds;
             set
             {
-                bounds = value;
-                Background.Bounds = bounds;
-                NameLabel.Bounds = bounds;
+                bounds = new Point(value.X, UIUtils.ConvertFloatToMinInt(GlobalInterfaceData.Scale(ReferenceHeight), 1f));
+                ResizeLayout();
             }
         }
 
-        bool isActive;
-        public bool IsActive 
-        { 
-            get => isActive;
+        public bool IsActive { get; set; } = true;
+
+        public bool IsMarkedForDeletion
+        {
+            get => false;
             set
             {
-                isActive = value;
-                Background.IsActive = isActive;
             }
         }
 
-        TextureButton Background;
-        Label NameLabel;
+        Icon Background;
+        Icon FileIcon;
+        Label FileLabel;
+
+        public const int ReferenceHeight = 32;
 
         public FileData Data;
         FileBrowserView Browser;
         bool ClickedOnce;
+        bool DisplayingMenu;
 
         public FileDisplayItem(FileData data, FileBrowserView browser, ActionGroup group)
         {            
             Data = data;
             Browser = browser;
+            group.ClickableObjects.Add(this);
 
-            Background = new TextureButton(group);
-            if (Data.Type == FileType.Folder)
+            Background = new Icon(GlobalInterfaceData.Scheme.Background);
+
+            FileIcon = new Icon();
+
+            if (data.IsFolder)
             {
-                Background.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.FolderIcon];
+                FileIcon.DrawTexture = GlobalInterfaceData.TextureLookup[UILookupKey.FolderIcon];
             }
             else
             {
-                Background.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.TransitionTableIcon];
+                switch (Data.Type)
+                {
+                    case CoreFileType.Alphabet:
+                        FileIcon.DrawTexture = GlobalInterfaceData.TextureLookup[UILookupKey.AlphabetIcon];
+                        break;
+                    case CoreFileType.Tape:
+                        FileIcon.DrawTexture = GlobalInterfaceData.TextureLookup[UILookupKey.AlphabetIcon];
+                        break;
+                    case CoreFileType.TransitionFile:
+                        FileIcon.DrawTexture = GlobalInterfaceData.TextureLookup[UILookupKey.AlphabetIcon];
+                        break;
+                    case CoreFileType.SlateFile:
+                        FileIcon.DrawTexture = GlobalInterfaceData.TextureLookup[UILookupKey.AlphabetIcon];
+                        break;
+                    case CoreFileType.Other:
+                        FileIcon.DrawTexture = GlobalInterfaceData.TextureLookup[UILookupKey.DebugTexture];
+                        break;
+                }
             }
-            Background.OnClickedEvent += Clicked;
-            Background.OnClickedAwayEvent += ClickedAway;
-            NameLabel = new Label();
 
-            Bounds = new Point(60, 60);
-
-            NameLabel.FontSize = 14;
-            NameLabel.Text = Data.Name;
+            FileLabel = new Label();
+            FileLabel.FontColor = GlobalInterfaceData.Scheme.FontColor;
+            FileLabel.Font = GlobalInterfaceData.StandardRegularFont;
+            FileLabel.FontSize = GlobalInterfaceData.Scale(12);
+            FileLabel.Text = data.Name;
         }
 
-        public void Clicked(Button Sender)
+        public void Clicked()
         {
-            if (!ClickedOnce)
+            if (InputManager.RightMousePressed)
             {
-                ClickedOnce = true;
+                    //make menu appear
+                    return;
+            }
+
+            if (ClickedOnce && InputManager.LeftMousePressed)
+            {               
+                ClickedOnce = false;
+
+                if (Data.IsFolder)
+                {
+                    Browser.SwitchOpenedFolder(Data.ID);
+                }
+                else
+                {
+                    Browser.OpenFile(Data);
+                }
+
                 return;
             }
-
-            ClickedOnce = false;
-
-            if (Data.Type == FileType.Folder)
-            {
-                Browser.SwitchOpenedFolder(Data.ID);
-            }
-            else
-            {
-                Browser.OwnerWindow.AddView(new TextProgrammingView(Data.ID));
-            }
+                          
+            ClickedOnce = true;            
+            Background.DrawColor = GlobalInterfaceData.Scheme.InteractableAccent;      
         }
 
-        public void ClickedAway(Button Sender)
+        public void ClickedAway()
         {
             ClickedOnce = false;
+            Background.DrawColor = GlobalInterfaceData.Scheme.Background;
+        }
+
+        public bool IsMouseOver()
+        {
+            return (IsActive && InputManager.MouseData.X >= Position.X && InputManager.MouseData.X <= Position.X + bounds.X && InputManager.MouseData.Y >= Position.Y && InputManager.MouseData.Y <= Position.Y + bounds.Y);
+        }
+
+        void MoveLayout()
+        {
+            Background.Position = Position;
+            FileIcon.Position = Position + GlobalInterfaceData.Scale(new Vector2(18, bounds.Y/2f - FileIcon.Bounds.Y/2f));
+            FileLabel.Position = Position + GlobalInterfaceData.Scale(new Vector2(68, bounds.Y/2f));
+        }
+
+        void ResizeLayout()
+        {
+            Background.Bounds = bounds;
+            FileIcon.Bounds = GlobalInterfaceData.Scale(new Point(30, 30));
         }
 
         public void Draw(Viewport? BoundPort = null)
@@ -102,24 +150,33 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             if (IsActive)
             {
                 Background.Draw(BoundPort);
-                NameLabel.Draw(BoundPort);
+                FileIcon.Draw(BoundPort);
+                FileLabel.Draw(BoundPort);
             }
         }
     }
-
-    public enum FileType { File, Folder };
 
     public class FileData
     {
         public string Name;
         public int ID;
-        public FileType Type;
+        public CoreFileType Type;
+        public bool IsFolder;
 
-        public FileData(string SetName, int SetID, FileType SetType)
+        public FileData(string SetName, int SetID, CoreFileType SetType)
         {
             Name = SetName;
             ID = SetID;
             Type = SetType;
+            IsFolder = false;
+        }
+
+        public FileData(string SetName, int SetID)
+        {
+            Name = SetName;
+            ID = SetID;
+            Type = CoreFileType.Other;
+            IsFolder = true;
         }
     }
 }

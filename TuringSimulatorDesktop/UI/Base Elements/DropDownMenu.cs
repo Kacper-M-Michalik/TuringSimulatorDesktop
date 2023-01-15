@@ -16,7 +16,7 @@ namespace TuringSimulatorDesktop.UI
         public Vector2 GetBounds { get => new Vector2(); }
         public Point Bounds { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
-        public bool IsActive = true;
+        public bool IsActive { get; set; } = true;
 
         public int HeaderWidth, HeaderHeight;
         public int MenuWidth, MenuHeight;

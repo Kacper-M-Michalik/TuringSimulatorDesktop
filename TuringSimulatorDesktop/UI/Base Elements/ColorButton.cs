@@ -33,7 +33,7 @@ namespace TuringSimulatorDesktop.UI
             }
         }
 
-        public bool IsActive = true;
+        public bool IsActive { get; set; } = true;
 
         public event OnButtonClick OnClickedEvent;
         public event OnButtonClickAway OnClickedAwayEvent;

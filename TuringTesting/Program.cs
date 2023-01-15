@@ -96,7 +96,7 @@ namespace TuringTesting
                         case ("CREATE"):
                             int BaseFolder = Convert.ToInt32(Console.ReadLine());
                             string CreateName = Console.ReadLine();
-                            Client.SendTCPData(ClientSendPacketFunctions.CreateFile(BaseFolder, CreateName, CreateFileType.TransitionFile));
+                            Client.SendTCPData(ClientSendPacketFunctions.CreateFile(BaseFolder, CreateName, CoreFileType.TransitionFile));
                             break;
                         case ("REQUEST"):
                             int RequestID = Convert.ToInt32(Console.ReadLine());

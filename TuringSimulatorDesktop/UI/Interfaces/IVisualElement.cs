@@ -12,6 +12,7 @@ namespace TuringSimulatorDesktop.UI
     {
         public Vector2 Position { get; set; }
         public Point Bounds { get; set; }
+        public bool IsActive { get; set; }
         public void Draw(Viewport? BoundPort = null);
         //public void Close();
     }

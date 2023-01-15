@@ -44,7 +44,7 @@ namespace TuringServer
 
         public string Name;
         public string Extension;
-        public CreateFileType FileType;
+        public CoreFileType FileType;
         public DirectoryFolder ParentFolder;
 
         public DirectoryFile(int SetID, string SetName, string SetExtension, DirectoryFolder SetParentFolder)
@@ -58,7 +58,7 @@ namespace TuringServer
             ParentFolder = SetParentFolder;
             SubscriberIDs = new HashSet<int>();
         }
-        public DirectoryFile(int SetID, string SetName, CreateFileType SetType, DirectoryFolder SetParentFolder)
+        public DirectoryFile(int SetID, string SetName, CoreFileType SetType, DirectoryFolder SetParentFolder)
         {
             ID = SetID;
             Name = SetName;

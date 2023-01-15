@@ -47,7 +47,6 @@
   <ItemGroup>
     <Folder Include="Assets\SVG\" />
     <Folder Include="Content\bin\DesktopGL\Content\" />
-    <Folder Include="UI\Prefabs\Project Screen\Visual Editor\" />
   </ItemGroup>
   <ItemGroup>
     <None Update="Assets\Fonts\LICENSE.txt">
@@ -104,6 +103,9 @@
     <None Update="Assets\SVG\LoadProjectButton.svg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Assets\SVG\MouseIcon.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Assets\SVG\NewProjectButton.svg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -114,6 +116,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Assets\SVG\TransitionTableIcon.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\SVG\TypingIcon.svg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

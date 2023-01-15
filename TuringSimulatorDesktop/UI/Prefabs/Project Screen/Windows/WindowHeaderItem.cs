@@ -39,6 +39,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             }
         }
 
+        public bool IsActive { get; set; } = true;
+
         Icon Background;
         Icon SelectionStrip;
         Label Title;

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TuringCore
 {
-    public enum CreateFileType
+    public enum CoreFileType
     {
         Alphabet,
         Tape,

@@ -59,7 +59,7 @@ namespace TuringCore
             return Data;
         }
 
-        public static Packet CreateFile(int Folder, string NewName, CreateFileType FileType)
+        public static Packet CreateFile(int Folder, string NewName, CoreFileType FileType)
         {
             Packet Data = new Packet();
 

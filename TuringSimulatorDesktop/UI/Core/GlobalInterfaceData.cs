@@ -12,6 +12,7 @@ using Svg;
 using Bitmap = System.Drawing.Bitmap;
 using Image = System.Drawing.Image;
 using System.IO;
+using TuringSimulatorDesktop.UI;
 
 namespace TuringSimulatorDesktop
 {
@@ -45,12 +46,12 @@ namespace TuringSimulatorDesktop
         public static Texture2D SVGToTexture(string Path)
         {
             SvgDocument svgDoc = SvgDocument.Open<SvgDocument>(Path, null);
-            Bitmap Image = svgDoc.Draw();
+            Bitmap Image = svgDoc.Draw(UIUtils.ConvertFloatToMinInt(svgDoc.Width.Value * (float)UIScale, 1f), UIUtils.ConvertFloatToMinInt(svgDoc.Width.Value * (float)UIScale, 1f));
             int bufferSize = Image.Height * Image.Width * 4;
             System.IO.MemoryStream memoryStream = new MemoryStream(bufferSize);
             Image.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Png);
 
-            Texture2D Texture = Texture2D.FromStream(GlobalInterfaceData.Device, memoryStream);
+            Texture2D Texture = Texture2D.FromStream(Device, memoryStream);
             return Texture;
         }
 
@@ -61,14 +62,11 @@ namespace TuringSimulatorDesktop
             System.IO.MemoryStream memoryStream = new MemoryStream(bufferSize);
             image.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Png);
 
-            Texture2D Texture = Texture2D.FromStream(GlobalInterfaceData.Device, memoryStream);
+            Texture2D Texture = Texture2D.FromStream(Device, memoryStream);
             return Texture;
         }
 
-        const int ManuallyGeneratedMaxEnum = 8;
-        //REMEMBER TO UPDATE
-        const int MaxEnumValue = 14;
-        //
+        const int ManuallyGeneratedMaxEnum = 6;
         public static void BakeTextures()
         {
             for (int i = 0; i < ManuallyGeneratedMaxEnum + 1; i++)
@@ -77,10 +75,6 @@ namespace TuringSimulatorDesktop
                 TextureLookup.Add(Key, SVGToTexture(Environment.CurrentDirectory + @"\Assets\SVG\" + Key.ToString() + @".svg"));
             }
 
-            TextureLookup.Add(UILookupKey.NewProjectButtonHightlight, ApplyBorderHighlight(CopyTexture(UILookupKey.NewProjectButton)));
-            TextureLookup.Add(UILookupKey.LoadProjectButtonHightlight, ApplyBorderHighlight(CopyTexture(UILookupKey.LoadProjectButton)));
-            TextureLookup.Add(UILookupKey.HostProjectButtonHightlight, ApplyBorderHighlight(CopyTexture(UILookupKey.HostProjectButton)));
-            TextureLookup.Add(UILookupKey.JoinProjectButtonHightlight, ApplyBorderHighlight(CopyTexture(UILookupKey.JoinProjectButton)));
             TextureLookup.Add(UILookupKey.DebugTexture, GenerateFilledTexture(1,1, Scheme.UIOverlayDebugColor1));
 
             //manually implement per ui
@@ -171,6 +165,10 @@ namespace TuringSimulatorDesktop
         {
             return new Point(Convert.ToInt32((double)Value.X * UIScale), Convert.ToInt32((double)Value.Y * UIScale));
         }
+        public static Point ScaleMin(Point Value, double Min)
+        {
+            return new Point(Convert.ToInt32(Math.Clamp((double)Value.X * UIScale, Min, double.PositiveInfinity)), Convert.ToInt32(Math.Clamp((double)Value.Y * UIScale, Min, double.PositiveInfinity)));
+        }
         public static Vector2 Scale(Vector2 Value)
         {
             return new Vector2((float)(Value.X * UIScale), (float)(Value.Y * UIScale));
@@ -235,19 +233,13 @@ namespace TuringSimulatorDesktop
 
     public enum UILookupKey
     {
+        MouseIcon,
+        TypingIcon,
         AlphabetIcon,
         FolderIcon,
         SlateFileTCIcon,
         SlateFileTICIcon,
         TransitionTableIcon,
-        NewProjectButton,
-        LoadProjectButton,
-        HostProjectButton,
-        JoinProjectButton,
-        NewProjectButtonHightlight,
-        LoadProjectButtonHightlight,
-        HostProjectButtonHightlight,
-        JoinProjectButtonHightlight,
         DebugTexture
     }
 

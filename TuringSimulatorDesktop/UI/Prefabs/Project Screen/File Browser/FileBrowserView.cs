@@ -41,7 +41,9 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             {
                 isActive = value;
                 Group.IsActive = isActive;
+                HierarchyLayout.Group.IsActive = isActive;
                 FileLayout.Group.IsActive = isActive;
+                OpenMenu?.Close();
             }
         }
 
@@ -53,13 +55,13 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         }
 
         public string Title => "File Browser";
+        public int OpenFileID => -1;
 
         public bool IsMarkedForDeletion
         {
             get => false;
             set
             {
-
             }
         }
 
@@ -69,9 +71,9 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         Icon Divider1;
         Icon Divider2;
         InputBox Searchbar;
-        Label HierarchyLabel;
+        public HorizontalLayoutBox HierarchyLayout;
         VerticalLayoutBox FileLayout;
-
+        
         int CurrentlyOpenedFolderID;
         List<FileDisplayItem> Files = new List<FileDisplayItem>();
         FileCreationMenu OpenMenu;
@@ -85,23 +87,47 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             Background = new Icon(GlobalInterfaceData.Scheme.Background);
             Searchbar = new InputBox(Group);
+            Searchbar.Labeloffset = GlobalInterfaceData.Scale(new Vector2(FolderHierarchyItem.ReferencePadding/2f, 0));
+            Searchbar.BackgroundColor = GlobalInterfaceData.Scheme.Background;
+            Searchbar.OutputLabel.FontSize = GlobalInterfaceData.Scale(12);
+            Searchbar.OutputLabel.FontColor = GlobalInterfaceData.Scheme.FontGrayedOutColor;
             Searchbar.Text = DefaultText;
             Searchbar.ClickEvent += ClearSearchbar;
             Searchbar.ClickAwayEvent += ResetSearchbar;
             Searchbar.EditEvent += FilterFiles;
             Searchbar.Modifiers.AllowsNewLine = false;
 
+            Divider1 = new Icon(GlobalInterfaceData.Scheme.NonInteractableAccent);
+
+            HierarchyLayout = new HorizontalLayoutBox();
+            HierarchyLayout.Scrollable = false;
+            HierarchyLayout.Centering = HorizontalCentering.Middle;
+            HierarchyLayout.Spacing = GlobalInterfaceData.Scale(-1);
+            //HierarchyLayout.Spacing = 5;
+            //HierarchyLayout.ViewOffset = new Vector2(5, 0);
+
+            Divider2 = new Icon(GlobalInterfaceData.Scheme.NonInteractableAccent);
+
             FileLayout = new VerticalLayoutBox();
             FileLayout.Scrollable = true;
-            FileLayout.Spacing = 10f;
-            FileLayout.UniformAreas = true;
-            FileLayout.UniformAreaSize = 60f;
+            FileLayout.Spacing = GlobalInterfaceData.Scale(11f);
+            FileLayout.ViewOffset = GlobalInterfaceData.Scale(new Vector2(0, 13f));
+            FileLayout.ViewOffsetBoundsMin = GlobalInterfaceData.Scale(new Vector2(0, 13f));
 
             IsActive = false;
 
             SwitchOpenedFolder(0);
         }
         
+        public void SwitchOpenedFolder(int ID)
+        {
+            UIEventManager.Unsubscribe(CurrentlyOpenedFolderID, FolderUpdated);
+            Client.SendTCPData(ClientSendPacketFunctions.UnsubscribeFromFolderUpdates(CurrentlyOpenedFolderID));
+            CurrentlyOpenedFolderID = ID;
+            UIEventManager.Subscribe(CurrentlyOpenedFolderID, FolderUpdated);
+            Client.SendTCPData(ClientSendPacketFunctions.RequestFolderData(ID,true));
+        }
+
         public void FolderUpdated(Packet Data)
         {
             CustomLogging.Log("CLIENT: Window received Folder Data");
@@ -114,40 +140,62 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 CustomLogging.Log("Client: File Browser Window Fatal Error, recived unwated folder data!");
                 return;
             }
-            
-            //To create hierarchy view
+
+            HierarchyLayout.Clear();
+
             string FolderName = Data.ReadString();
+            List<IVisualElement> Items = new List<IVisualElement>();
 
             int Max = Data.ReadInt();
             for (int i = 0; i < Max; i++)
             {
-                Data.ReadString();
-                Data.ReadInt();
+                Label TransitionLabel = new Label();
+                TransitionLabel.FontSize = GlobalInterfaceData.Scale(12);
+                TransitionLabel.Font = GlobalInterfaceData.StandardBoldFont;
+                TransitionLabel.FontColor = GlobalInterfaceData.Scheme.FontGrayedOutColor;
+                TransitionLabel.Text = " > ";
+                TransitionLabel.DrawCentered = true;
+                TransitionLabel.Bounds = TransitionLabel.Bounds + GlobalInterfaceData.Scale(new Point(FolderHierarchyItem.ReferencePadding, 0));
+                Items.Add(TransitionLabel);
+                Items.Add(new FolderHierarchyItem(new FileData(Data.ReadString(), Data.ReadInt()), this, HierarchyLayout.Group));
             }
+
+            for (int i = Items.Count - 1; i > -1; i--)
+            {
+                HierarchyLayout.AddElement(Items[i]);
+            }
+
+            Label CurrentFolderLabel = new Label();
+            CurrentFolderLabel.FontSize = GlobalInterfaceData.Scale(12);
+            CurrentFolderLabel.FontColor = GlobalInterfaceData.Scheme.FontGrayedOutColor;
+            CurrentFolderLabel.Font = GlobalInterfaceData.StandardBoldFont;
+            CurrentFolderLabel.Text = FolderName;
+            CurrentFolderLabel.DrawCentered = true;
+            CurrentFolderLabel.Bounds = CurrentFolderLabel.Bounds + GlobalInterfaceData.Scale(new Point(FolderHierarchyItem.ReferencePadding, 0));
+            HierarchyLayout.AddElement(CurrentFolderLabel);
+
+
+            HierarchyLayout.UpdateLayout();
 
             int FolderCount = Data.ReadInt();
             for (int i = 0; i < FolderCount; i++)
             {
-                FileDisplayItem Item = new FileDisplayItem(new FileData(Data.ReadString(), Data.ReadInt(), FileType.Folder), this, FileLayout.Group);
-                Files.Add(Item);                
+                FileDisplayItem Item = new FileDisplayItem(new FileData(Data.ReadString(), Data.ReadInt()), this, FileLayout.Group);
+                Item.Bounds = new Point(FileLayout.Bounds.X, 0);
+                Files.Add(Item);
+                FileLayout.AddElement(Item);
             }
             int FileCount = Data.ReadInt();
             for (int i = 0; i < FileCount; i++)
             {
-                FileDisplayItem Item = new FileDisplayItem(new FileData(Data.ReadString(), Data.ReadInt(), FileType.File), this, FileLayout.Group);
+                FileDisplayItem Item = new FileDisplayItem(new FileData(Data.ReadString(), Data.ReadInt(), (CoreFileType)Data.ReadInt()), this, FileLayout.Group);
+                Item.Bounds = new Point(FileLayout.Bounds.X, 0);
                 Files.Add(Item);
+                FileLayout.AddElement(Item);
             }
 
             FilterFiles(null);
-        }
-
-        public void SwitchOpenedFolder(int ID)
-        {
-            UIEventManager.Unsubscribe(CurrentlyOpenedFolderID, FolderUpdated);
-            Client.SendTCPData(ClientSendPacketFunctions.UnsubscribeFromFolderUpdates(CurrentlyOpenedFolderID));
-            CurrentlyOpenedFolderID = ID;
-            UIEventManager.Subscribe(CurrentlyOpenedFolderID, FolderUpdated);
-            Client.SendTCPData(ClientSendPacketFunctions.RequestFolderData(ID,true));
+            
         }
 
         void FilterFiles(InputBox Sender)
@@ -156,12 +204,11 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             {
                 Files[i].IsActive = false;
             }
-            FileLayout.Clear();
+
             if (Searchbar.Text == "" || Searchbar.Text == DefaultText)
             {
                 for (int i = 0; i < Files.Count; i++)
                 {
-                    FileLayout.AddElement(Files[i]);
                     Files[i].IsActive = true;
                 }
             }
@@ -169,9 +216,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             {
                 for (int i = 0; i < Files.Count; i++)
                 {
-                    if (Files[i].Data.Name.Contains(Searchbar.Text))
+                    if (Files[i].Data.Name.Contains(Searchbar.Text, StringComparison.OrdinalIgnoreCase))
                     {
-                        FileLayout.AddElement(Files[i]);
                         Files[i].IsActive = true;
                     }
                 }
@@ -182,32 +228,67 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         void ResetSearchbar(InputBox Sender)
         {
             if (Searchbar.Text == "") Searchbar.Text = DefaultText;
+            FilterFiles(null);
         }
 
         void ClearSearchbar(InputBox Sender)
         {
             Searchbar.Text = "";
+            FilterFiles(null);
         }
 
         public void CreateTransitionFile(Button Sender)
         {
             OpenMenu?.Close();
-            Client.SendTCPData(ClientSendPacketFunctions.CreateFile(CurrentlyOpenedFolderID, "Empty Transition File", CreateFileType.TransitionFile));
+            Client.SendTCPData(ClientSendPacketFunctions.CreateFile(CurrentlyOpenedFolderID, "Empty Transition File", CoreFileType.TransitionFile));
         }
         public void CreateSlateFile(Button Sender)
         {
             OpenMenu?.Close();
-            Client.SendTCPData(ClientSendPacketFunctions.CreateFile(CurrentlyOpenedFolderID, "Empty Slate File", CreateFileType.SlateFile));
+            Client.SendTCPData(ClientSendPacketFunctions.CreateFile(CurrentlyOpenedFolderID, "Empty Slate File", CoreFileType.SlateFile));
         }
         public void CreateTapeFile(Button Sender)
         {
             OpenMenu?.Close();
-            Client.SendTCPData(ClientSendPacketFunctions.CreateFile(CurrentlyOpenedFolderID, "Empty Tape Preset", CreateFileType.Tape));
+            Client.SendTCPData(ClientSendPacketFunctions.CreateFile(CurrentlyOpenedFolderID, "Empty Tape Preset", CoreFileType.Tape));
         }
         public void CreateAlphabetFile(Button Sender)
         {
             OpenMenu?.Close();
-            Client.SendTCPData(ClientSendPacketFunctions.CreateFile(CurrentlyOpenedFolderID, "Empty Alphabet", CreateFileType.Alphabet));
+            Client.SendTCPData(ClientSendPacketFunctions.CreateFile(CurrentlyOpenedFolderID, "Empty Alphabet", CoreFileType.Alphabet));
+        }
+
+        public void OpenFile(FileData Data)
+        {
+            IView ViewToAdd = null;
+            switch (Data.Type)
+            {
+                case CoreFileType.Alphabet:
+                    ViewToAdd = new AlphabetEditorView(Data.ID);
+                    break;
+                case CoreFileType.Tape:
+                    ViewToAdd = new TapeEditorView(Data.ID);
+                    break;
+                case CoreFileType.TransitionFile:
+                    ViewToAdd = new TextProgrammingView(Data.ID);
+                    break;
+                case CoreFileType.SlateFile:
+                    ViewToAdd = new VisualProgrammingView(Data.ID);
+                    break;
+                case CoreFileType.Other:
+                    //display error
+                    return;
+            }
+
+            if (ownerWindow.OwnerScreen.LastActiveEditorWindow == null) 
+            {
+                ownerWindow.AddView(ViewToAdd);
+                ownerWindow.OwnerScreen.LastActiveEditorWindow = ownerWindow;
+            }
+            else
+            {
+                ownerWindow.OwnerScreen.LastActiveEditorWindow.AddView(ViewToAdd);
+            }
         }
 
         public void Clicked()
@@ -237,7 +318,11 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             Background.Position = Position;
             Searchbar.Position = Position;
-            FileLayout.Position = new Vector2(Position.X, Position.Y + 20);
+            Divider1.Position = Position + new Vector2(0, Searchbar.Bounds.Y);
+            HierarchyLayout.Position = Divider1.Position + new Vector2(0, Divider1.Bounds.Y);
+            Divider2.Position = HierarchyLayout.Position + new Vector2(0, HierarchyLayout.Bounds.Y);
+
+            FileLayout.Position = Divider2.Position + new Vector2(0, Divider2.Bounds.Y);
         }
 
         void ResizeLayout()
@@ -246,8 +331,19 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Group.Height = bounds.Y;
 
             Background.Bounds = bounds;
-            Searchbar.Bounds = new Point(bounds.X, 20);
-            FileLayout.Bounds = new Point(bounds.X, bounds.Y - 20);
+
+            Divider1.Bounds = new Point(bounds.X, UIUtils.ConvertFloatToMinInt(GlobalInterfaceData.Scale(1), 1));
+            Divider2.Bounds = new Point(bounds.X, UIUtils.ConvertFloatToMinInt(GlobalInterfaceData.Scale(1), 1));
+
+            Searchbar.Bounds = new Point(bounds.X, UIUtils.ConvertFloatToInt(GlobalInterfaceData.Scale(28)));
+            HierarchyLayout.Bounds = new Point(bounds.X, UIUtils.ConvertFloatToInt(GlobalInterfaceData.Scale(28)));
+            FileLayout.Bounds = new Point(bounds.X, bounds.Y - Searchbar.Bounds.Y - HierarchyLayout.Bounds.Y - Divider1.Bounds.Y - Divider2.Bounds.Y);
+
+            foreach (FileDisplayItem Item in Files)
+            {
+                Item.Bounds = new Point(FileLayout.Bounds.X, 0);
+            }
+
         }
 
         public void Draw(Viewport? BoundPort = null)
@@ -256,6 +352,9 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             {
                 Background.Draw(BoundPort);
                 Searchbar.Draw(BoundPort);
+                Divider1.Draw(BoundPort);
+                HierarchyLayout.Draw(BoundPort);
+                Divider2.Draw(BoundPort);
                 FileLayout.Draw(BoundPort);
 
                 OpenMenu?.Draw();

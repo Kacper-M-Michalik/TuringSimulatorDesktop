@@ -129,6 +129,30 @@ namespace TuringSimulatorDesktop.Input
             }
         }
 
+        public static void DrawActionGroups()
+        {
+            for (int i = 0; i < ActionGroups.Count; i++)
+            {
+                Icon debug = new Icon();
+                if (i % 3 == 0)
+                {
+                    debug.DrawColor = new Color(new Color(GlobalInterfaceData.Scheme.UIOverlayDebugColor4.ToVector3()), 20);
+                }
+                else if (i % 2 == 0)
+                {
+                    debug.DrawColor = new Color(new Color(GlobalInterfaceData.Scheme.UIOverlayDebugColor1.ToVector3()), 20);
+                }
+                else
+                {
+                    debug.DrawColor = new Color(new Color(GlobalInterfaceData.Scheme.UIOverlayDebugColor3.ToVector3()), 20);
+                }
+
+                debug.Bounds = new Point(ActionGroups[i].Width, ActionGroups[i].Height);
+                debug.Position = new Vector2(ActionGroups[i].X, ActionGroups[i].Y);
+                debug.Draw();
+            }
+        }
+
         public static ActionGroup CreateActionGroup(int X, int Y, int Width, int Height)
         {
             ActionGroup NewGroup = new ActionGroup(X, Y, Width, Height);

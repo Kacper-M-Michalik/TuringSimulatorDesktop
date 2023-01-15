@@ -37,7 +37,7 @@ namespace TuringSimulatorDesktop.UI
             }
         }
 
-        public bool IsActive = true;
+        public bool IsActive { get; set; } = true;
 
         Viewport Port;
 
@@ -115,6 +115,17 @@ namespace TuringSimulatorDesktop.UI
 
         public void Clear()
         {
+            Group.IsDirtyClickable = true;
+            foreach (IClickable Clickable in Group.ClickableObjects)
+            {
+                Clickable.IsMarkedForDeletion = true;
+            }
+            Group.IsDirtyPollable = true;
+            foreach (IPollable Pollable in Group.PollableObjects)
+            {
+                if (Pollable != this) Pollable.IsMarkedForDeletion = true;
+            }
+
             Elements.Clear();
             UpdateLayout();
         }
@@ -127,8 +138,11 @@ namespace TuringSimulatorDesktop.UI
             {
                 for (int i = 0; i < Elements.Count; i++)
                 {
-                    Elements[i].Position = PlacementPosition;
-                    PlacementPosition = new Vector2(PlacementPosition.X, PlacementPosition.Y + Elements[i].Bounds.Y + Spacing);
+                    if (Elements[i].IsActive)
+                    {
+                        Elements[i].Position = PlacementPosition;
+                        PlacementPosition = new Vector2(PlacementPosition.X, PlacementPosition.Y + Elements[i].Bounds.Y + Spacing);
+                    }
                 }
             }
             else
@@ -147,8 +161,11 @@ namespace TuringSimulatorDesktop.UI
                
                 for (int i = 0; i < Elements.Count; i++)
                 {
-                    Elements[i].Position = PlacementPosition;
-                    PlacementPosition = new Vector2(PlacementPosition.X, PlacementPosition.Y + UniformAreaSize + Spacing);
+                    if (Elements[i].IsActive)
+                    {
+                        Elements[i].Position = PlacementPosition;
+                        PlacementPosition = new Vector2(PlacementPosition.X, PlacementPosition.Y + UniformAreaSize + Spacing);
+                    }
                 }
                 
             }

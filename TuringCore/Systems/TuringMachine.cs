@@ -35,6 +35,16 @@ namespace TuringCore
 
             ActiveTape = OriginalTape.Clone(ActiveAlphabet);
 
+            if (ActiveStateTable.ContainsInstructionForState(CurrentState))
+            {
+                NextInstruction = ActiveStateTable[CurrentState][ActiveTape[HeadPosition]];
+            }
+            else
+            {
+                CurrentState = HaltError;
+                NextInstruction = null;
+            }
+            /*
             if (ActiveStateTable.DefinitionAlphabetID != OriginalTape.DefinitionAlphabetID)
             {
                 CurrentState = HaltError;
@@ -44,6 +54,7 @@ namespace TuringCore
             {
                 NextInstruction = ActiveStateTable[CurrentState][ActiveTape[HeadPosition]];
             }
+            */
             return 0;
         }
 

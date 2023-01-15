@@ -97,6 +97,7 @@ namespace TuringServer
             {
                 Data.Write(File.Name);
                 Data.Write(File.ID);
+                Data.Write((int)File.FileType);
             }
 
             return Data;

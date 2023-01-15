@@ -16,15 +16,15 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             {
                 position = value;
                 Background.Position = position;
-                Header.Position = new Vector2(position.X + 1, position.Y + 1);
-                ButtonLayout.Position = new Vector2(position.X + 1, position.Y + 1);
-                if (CurrentView != null) CurrentView.Position = new Vector2(position.X + 1, position.Y + 25);
+                Header.Position = position;
+                ButtonLayout.Position = position;
+                if (CurrentView != null) CurrentView.Position = new Vector2(position.X, position.Y + 24);
                 
                 int X = UIUtils.ConvertFloatToInt(position.X);
                 int Y = UIUtils.ConvertFloatToInt(position.Y);
 
                 MainPort.X = X + 1;
-                MainPort.Y = Y + 25;
+                MainPort.Y = Y + 24;
 
             }
         }
@@ -37,16 +37,16 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             {
                 bounds = value;
                 Background.Bounds = bounds;
-                Header.Bounds = new Point(bounds.X - 2, 24);
-                ButtonLayout.Bounds = new Point(bounds.X - 2, 24);
-                if (CurrentView != null) CurrentView.Bounds = new Point(bounds.X - 2, bounds.Y - 26);
+                Header.Bounds = new Point(bounds.X, 24);
+                ButtonLayout.Bounds = new Point(bounds.X , 24);
+                if (CurrentView != null) CurrentView.Bounds = new Point(bounds.X, bounds.Y - 24);
 
                 MainPort.Width = bounds.X;
-                MainPort.Height = bounds.Y - 26;
+                MainPort.Height = bounds.Y - 24;
             }
         }
 
-        public bool IsActive = true;
+        public bool IsActive { get; set; } = true;
 
         Icon Header;
         Icon HeaderStrip;
@@ -61,11 +61,14 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         Viewport MainPort;
         List<WindowHeaderItem> Headers = new List<WindowHeaderItem>();
 
-        public Window(Vector2 position, Point bounds)
+        public ProjectScreenView OwnerScreen;
+
+        public Window(Vector2 position, Point bounds, ProjectScreenView ownerScreen)
         {
             MainPort = new Viewport();
+            OwnerScreen = ownerScreen;
 
-            Background = new Icon(GlobalInterfaceData.Scheme.DarkAccent);
+            Background = new Icon(GlobalInterfaceData.Scheme.Background);
             Header = new Icon(GlobalInterfaceData.Scheme.Header);
             ButtonLayout = new HorizontalLayoutBox();
             ButtonLayout.Spacing = 2;
@@ -90,6 +93,15 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         public void AddView(IView View)
         {
+            foreach (WindowHeaderItem Header in Headers)
+            {
+                if (View.OpenFileID != -1 && Header.View.OpenFileID == View.OpenFileID)
+                {
+                    SetView(Header);
+                    return;
+                }
+            }
+
             WindowHeaderItem HB = new WindowHeaderItem(View, this, ButtonLayout.Group);
             View.OwnerWindow = this;
             Headers.Add(HB);
@@ -107,8 +119,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             if (CurrentView != null) CurrentView.IsActive = false;
             CurrentView = ViewButton.View;
             CurrentView.IsActive = true;
-            CurrentView.Position = new Vector2(position.X + 1, position.Y + 25);
-            CurrentView.Bounds = new Point(bounds.X - 2, bounds.Y - 26);
+            CurrentView.Bounds = new Point(bounds.X, bounds.Y - 24);
+            CurrentView.Position = new Vector2(position.X, position.Y + 24);
         }
 
         public void RemoveView(WindowHeaderItem ViewButton)

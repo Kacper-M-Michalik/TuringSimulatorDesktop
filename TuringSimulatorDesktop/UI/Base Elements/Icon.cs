@@ -32,7 +32,7 @@ namespace TuringSimulatorDesktop.UI
             }
         }
 
-        public bool IsActive = true;
+        public bool IsActive { get; set; } = true;
 
         Matrix PositionMatrix;
         public Mesh MeshData;

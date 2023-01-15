@@ -27,9 +27,9 @@ namespace TuringSimulatorDesktop.UI
                 position = value;
                 Group.X = UIUtils.ConvertFloatToInt(position.X);
                 Group.Y = UIUtils.ConvertFloatToInt(position.Y);
-                UpdateLayout();
                 Port.X = UIUtils.ConvertFloatToInt(Position.X);
                 Port.Y = UIUtils.ConvertFloatToInt(Position.Y);
+                UpdateLayout();
             }
         }
 
@@ -47,7 +47,7 @@ namespace TuringSimulatorDesktop.UI
             }
         }
 
-        public bool IsActive = true;
+        public bool IsActive { get; set; } = true;
 
         Viewport Port;
 
@@ -121,12 +121,24 @@ namespace TuringSimulatorDesktop.UI
 
         public void RemoveElement(IVisualElement Element)
         {
+            //add removal from group later
             Elements.Remove(Element);
             UpdateLayout();
         }
 
         public void Clear()
         {
+            Group.IsDirtyClickable = true;
+            foreach (IClickable Clickable in Group.ClickableObjects)
+            {
+                Clickable.IsMarkedForDeletion = true;
+            }
+            Group.IsDirtyPollable = true;
+            foreach (IPollable Pollable in Group.PollableObjects)
+            {
+                Pollable.IsMarkedForDeletion = true;
+            }
+
             Elements.Clear();
             UpdateLayout();
         }
@@ -139,19 +151,28 @@ namespace TuringSimulatorDesktop.UI
             {
                 for (int i = 0; i < Elements.Count; i++)
                 {
-                    float Y = PlacementPosition.Y;
-                    if (Centering == HorizontalCentering.Middle)
+                    if (Elements[i].IsActive)
                     {
-                        Y += bounds.Y / 2f - Elements[i].Bounds.Y / 2f;
-                    }
-                    else if (Centering == HorizontalCentering.Bottom)
-                    {
-                        Y += bounds.Y - Elements[i].Bounds.Y;
-                    }
+                        float Y = PlacementPosition.Y;
+                        if (Centering == HorizontalCentering.Middle)
+                        {
+                            if (Elements[i] is Label)
+                            {
+                                Y += bounds.Y / 2f;
+                            }
+                            else
+                            {
+                                Y += bounds.Y / 2f - Elements[i].Bounds.Y / 2f;
+                            }
+                        }
+                        else if (Centering == HorizontalCentering.Bottom)
+                        {
+                            Y += bounds.Y - Elements[i].Bounds.Y;
+                        }
 
-                    Elements[i].Position = new Vector2(PlacementPosition.X, Y);                    
-
-                    PlacementPosition = new Vector2(PlacementPosition.X + Elements[i].Bounds.X + Spacing, PlacementPosition.Y);
+                        Elements[i].Position = new Vector2(PlacementPosition.X, Y);
+                        PlacementPosition = new Vector2(PlacementPosition.X + Elements[i].Bounds.X + Spacing, PlacementPosition.Y);
+                    }
                 }
             }
             else
@@ -170,18 +191,28 @@ namespace TuringSimulatorDesktop.UI
 
                 for (int i = 0; i < Elements.Count; i++)
                 {
-                    float Y = PlacementPosition.Y;
-                    if (Centering == HorizontalCentering.Middle)
+                    if (Elements[i].IsActive)
                     {
-                        Y += bounds.Y / 2f - Elements[i].Bounds.Y / 2f;
-                    }
-                    else if (Centering == HorizontalCentering.Bottom)
-                    {
-                        Y += bounds.Y - Elements[i].Bounds.Y;
-                    }
-                    Elements[i].Position = new Vector2(PlacementPosition.X, Y);
+                        float Y = PlacementPosition.Y;
+                        if (Centering == HorizontalCentering.Middle)
+                        {
+                            if (Elements[i] is Label)
+                            {
+                                Y += bounds.Y / 2f;
+                            }
+                            else
+                            {
+                                Y += bounds.Y / 2f - Elements[i].Bounds.Y / 2f;
+                            }
+                        }
+                        else if (Centering == HorizontalCentering.Bottom)
+                        {
+                            Y += bounds.Y - Elements[i].Bounds.Y;
+                        }
 
-                    PlacementPosition = new Vector2(PlacementPosition.X + UniformAreaSize + Spacing, Y);
+                        Elements[i].Position = new Vector2(PlacementPosition.X, Y);
+                        PlacementPosition = new Vector2(PlacementPosition.X + UniformAreaSize + Spacing, Y);
+                    }
                 }
 
             }

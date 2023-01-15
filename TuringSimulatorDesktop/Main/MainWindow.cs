@@ -65,6 +65,7 @@ namespace TuringSimulatorDesktop
             Window.AllowUserResizing = false;
             Window.ClientSizeChanged += OnResize;
             Window.AllowAltF4 = true;
+            //IsMouseVisible = false;            
 
             IsFixedTimeStep = false;            
         }
@@ -179,7 +180,8 @@ namespace TuringSimulatorDesktop
             ScreenBatch.Begin();
             //DebugManager.Draw(GraphicsDevice, ScreenBatch, gameTime);
             ScreenBatch.End();
-            //GlobalInterfaceData.UIRequiresRedraw = false;                
+            //GlobalInterfaceData.UIRequiresRedraw = false;       
+            //InputManager.DrawActionGroups();         
 
             if (UIEventManager.WindowRequiresNextFrameResizeStep)
             {
@@ -224,7 +226,7 @@ namespace TuringSimulatorDesktop
             GraphicsManager.ApplyChanges();
 
             GlobalInterfaceData.FullscreenViewport = new Viewport(0, 0, GraphicsManager.PreferredBackBufferWidth, GraphicsManager.PreferredBackBufferHeight);
-            CurrentView.ViewResize(GraphicsManager.PreferredBackBufferWidth, GraphicsManager.PreferredBackBufferHeight);            
+            CurrentView.ScreenResize();            
         }
 
         protected override void OnExiting(Object sender, EventArgs args)

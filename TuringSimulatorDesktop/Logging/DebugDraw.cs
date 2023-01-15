@@ -22,8 +22,8 @@ namespace TuringSimulatorDesktop
 
         static DebugManager()
         {
-            Group = InputManager.CreateActionGroup(0, 0, GlobalInterfaceData.MinimumApplicationWindowWidth, GlobalInterfaceData.MinimumApplicationWindowHeight);
-            Group.IsPersistant = true;
+            //Group = InputManager.CreateActionGroup(0, 0, GlobalInterfaceData.MinimumApplicationWindowWidth, GlobalInterfaceData.MinimumApplicationWindowHeight);
+            //Group.IsPersistant = true;
 
             //Menu = new DebugMenu(Group);
         }
@@ -68,7 +68,7 @@ namespace TuringSimulatorDesktop
 
     public class DebugMenu : IVisualElement, IPollable
     {
-        bool IsActive = true;
+        public bool IsActive { get; set; } = true;
         int Width = 200;
         int Height = 100;
 

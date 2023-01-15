@@ -56,7 +56,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         Label CreateTapeFileLabel;
         Label CreateAlphabetFileLabel;
 
-        public FileCreationMenu(FileBrowserView Browser)
+        public FileCreationMenu(FileBrowserView browser)
         {
             Group = InputManager.CreateActionGroup();
 
@@ -69,25 +69,25 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             CreateTransitionFileButton.BaseColor = GlobalInterfaceData.Scheme.InteractableAccent;
             CreateTransitionFileButton.HighlightColor = GlobalInterfaceData.Scheme.DarkInteractableAccent;
             CreateTransitionFileButton.HighlightOnMouseOver = true;
-            CreateTransitionFileButton.OnClickedEvent += Browser.CreateTransitionFile;
+            CreateTransitionFileButton.OnClickedEvent += browser.CreateTransitionFile;
 
             CreateSlateFileButton = new ColorButton(Group);
             CreateSlateFileButton.BaseColor = GlobalInterfaceData.Scheme.InteractableAccent;
             CreateSlateFileButton.HighlightColor = GlobalInterfaceData.Scheme.DarkInteractableAccent;
             CreateSlateFileButton.HighlightOnMouseOver = true;
-            CreateSlateFileButton.OnClickedEvent += Browser.CreateSlateFile;
+            CreateSlateFileButton.OnClickedEvent += browser.CreateSlateFile;
 
             CreateTapeFileButton = new ColorButton(Group);
             CreateTapeFileButton.BaseColor = GlobalInterfaceData.Scheme.InteractableAccent;
             CreateTapeFileButton.HighlightColor = GlobalInterfaceData.Scheme.DarkInteractableAccent;
             CreateTapeFileButton.HighlightOnMouseOver = true;
-            CreateTapeFileButton.OnClickedEvent += Browser.CreateTapeFile;
+            CreateTapeFileButton.OnClickedEvent += browser.CreateTapeFile;
 
             CreateAlphabetFileButton = new ColorButton(Group);
             CreateAlphabetFileButton.BaseColor = GlobalInterfaceData.Scheme.InteractableAccent;
             CreateAlphabetFileButton.HighlightColor = GlobalInterfaceData.Scheme.DarkInteractableAccent;
             CreateAlphabetFileButton.HighlightOnMouseOver = true;
-            CreateAlphabetFileButton.OnClickedEvent += Browser.CreateAlphabetFile;
+            CreateAlphabetFileButton.OnClickedEvent += browser.CreateAlphabetFile;
 
             CreateTransitionFileLabel = new Label();
             CreateTransitionFileLabel.FontSize = 12;
@@ -108,7 +108,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             bounds = GlobalInterfaceData.Scale(new Point(225, 108));
             ResizeLayout();
-            Position = new Vector2(0, 0);
+            Position = Vector2.Zero;
         }
 
         void MoveLayout()

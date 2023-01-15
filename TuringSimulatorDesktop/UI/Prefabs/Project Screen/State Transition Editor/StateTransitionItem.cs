@@ -33,6 +33,8 @@ namespace TuringSimulatorDesktop.UI
             }
         }
 
+        public bool IsActive { get; set; } = true;
+
         Icon Background;
         public InputBox CurrentStateTextBox;
         public InputBox TapeValueTextBox;
