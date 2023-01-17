@@ -5,10 +5,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TuringSimulatorDesktop.Input;
 
 namespace TuringSimulatorDesktop.UI.Prefabs
 {
-    public class TapeItem : IVisualElement
+    public class TapeCell : IVisualElement
     {
         Vector2 position;
         public Vector2 Position
@@ -42,20 +43,35 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             }
         }
 
-        HorizontalLayoutBox TapeContents;
-        public float CameraMin, CameraMax;
+        public Icon Seperator;
+        public InputBox InputOutputLabel;
+
+        public TapeCell(ActionGroup Group)
+        {
+            Seperator = new Icon(GlobalInterfaceData.Scheme.NonInteractableAccent);
+            InputOutputLabel = new InputBox(Group);
+        }
 
         void MoveLayout()
         {
+            InputOutputLabel.Position = position;
+            Seperator.Position = InputOutputLabel.Position + new Vector2(1, 0);
         }
 
         void ResizeLayout()
         {
+            InputOutputLabel.Bounds = bounds;            
+            Seperator.Bounds = new Point(1, bounds.Y);
         }
 
         public void Draw(Viewport? BoundPort = null)
         {
-            throw new NotImplementedException();
+            if (IsActive)
+            {
+                //Background.Draw(BoundPort);
+                Seperator.Draw(BoundPort);
+                InputOutputLabel.Draw(BoundPort);
+            }
         }
     }
 }

@@ -44,7 +44,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 isActive = value;
                 Group.IsActive = isActive;
 
-                if (IsActive && OwnerWindow != null)
+                if (IsActive)
                 {
                     //OwnerWindow.OwnerScreen.
                 }
