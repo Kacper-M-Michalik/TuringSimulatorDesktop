@@ -83,6 +83,18 @@ namespace TuringCore
             return Data;
         }
 
+        public static Packet UpdateFile(int FileID, int Version, byte[] NewContents)
+        {
+            Packet Data = new Packet();
+
+            Data.Write((int)ClientSendPackets.UpdateFile);
+            Data.Write(FileID);
+            Data.Write(Version);
+            Data.Write(NewContents);
+
+            return Data;
+        }
+
         public static Packet RenameFile(int FileID, string NewFileName)
         {
             Packet Data = new Packet();

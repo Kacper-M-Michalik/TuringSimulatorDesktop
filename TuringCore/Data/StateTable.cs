@@ -5,7 +5,7 @@ namespace TuringCore
 {
     public class StateTable
     {
-        public string ID;
+        //public string ID;
         public string DefinitionAlphabetID;
         Dictionary<string, InstructionCollection> Instructions = new Dictionary<string, InstructionCollection>();
         HashSet<string> HaltStates = new HashSet<string>();

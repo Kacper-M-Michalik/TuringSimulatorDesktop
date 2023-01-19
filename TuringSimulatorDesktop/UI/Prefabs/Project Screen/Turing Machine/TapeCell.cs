@@ -46,10 +46,15 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         public Icon Seperator;
         public InputBox InputOutputLabel;
 
+        public static int ReferenceWidth = 90;
+        public static int ReferenceHeight = 90;
+
         public TapeCell(ActionGroup Group)
         {
             Seperator = new Icon(GlobalInterfaceData.Scheme.NonInteractableAccent);
             InputOutputLabel = new InputBox(Group);
+
+            Bounds = new Point(60, 60);
         }
 
         void MoveLayout()

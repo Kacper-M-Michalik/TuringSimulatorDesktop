@@ -11,7 +11,7 @@ using TuringSimulatorDesktop.Input;
 
 namespace TuringSimulatorDesktop.UI.Prefabs
 {
-    public class AlphabetEditorView : IView
+    public class AlphabetEditorView : IView, ISaveable
     {
         Vector2 position;
         public Vector2 Position
@@ -146,14 +146,14 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         public void SwitchOpenedAlphabet(int ID)
         {
-            UIEventManager.Unsubscribe(CurrentlyOpenedFileID, AlphabetUpdated);
+            UIEventManager.Unsubscribe(CurrentlyOpenedFileID, ReceivedAlphabetData);
             Client.SendTCPData(ClientSendPacketFunctions.UnsubscribeFromFolderUpdates(CurrentlyOpenedFileID));
             CurrentlyOpenedFileID = ID;
-            UIEventManager.Subscribe(CurrentlyOpenedFileID, AlphabetUpdated);
+            UIEventManager.Subscribe(CurrentlyOpenedFileID, ReceivedAlphabetData);
             Client.SendTCPData(ClientSendPacketFunctions.RequestFolderData(ID, true));
         }
 
-        public void AlphabetUpdated(Packet Data)
+        public void ReceivedAlphabetData(Packet Data)
         {
             CustomLogging.Log("CLIENT: Window received Alphabet Data");
             
@@ -175,6 +175,30 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 CustomLogging.Log("CLIENT: Window - Invalid Alphabet recieved");
                 return;
             }
+
+            DefenitionIDInputBox.Text = OpenedFile.ID;
+            EmptyCharacterInputBox.Text = OpenedFile.EmptyCharacter;
+            WildcardCharacterInputBox.Text = OpenedFile.WildcardCharacter;
+
+            StringBuilder Builder = new StringBuilder();
+            foreach (string Character in OpenedFile.Characters)
+            {
+                Builder.Append(Character);
+                Builder.Append("/n");
+            }
+
+            AllowedCharactersInputBox.Text = Builder.ToString();
+        }
+
+        public void Save()
+        {
+            Alphabet NewAlphabet = new Alphabet();
+            NewAlphabet.ID = DefenitionIDInputBox.Text;
+            NewAlphabet.EmptyCharacter = EmptyCharacterInputBox.Text;
+            NewAlphabet.WildcardCharacter = WildcardCharacterInputBox.Text;
+            NewAlphabet.Characters = AllowedCharactersInputBox.Text.Split("/n").ToHashSet();
+
+            Client.SendTCPData(ClientSendPacketFunctions.UpdateFile(CurrentlyOpenedFileID, FileVersion, JsonSerializer.SerializeToUtf8Bytes(NewAlphabet, GlobalProjectAndUserData.JsonOptions)));
         }
 
         void MoveLayout()
@@ -228,9 +252,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         public void Close()
         {
-            
+            Group.IsMarkedForDeletion = true;
         }
-
-
     }
 }

@@ -26,29 +26,46 @@ namespace TuringCore
         public override StateTable Compile(Alphabet DefinitionAlphabet)
         {
             StateTable Table = new StateTable();
-            Table.ID = "NULL NAME";
+            //Table.ID = "NULL NAME";
             Table.DefinitionAlphabetID = DefinitionAlphabetID;
 
             for (int i = 0; i < HaltStates.Count; i++)
             {
                 Table.AddHaltState(HaltStates[i]);
             }
-            /*
-                Dictionary<string, InstructionCollection> Collections = new Dictionary<string, InstructionCollection>();
 
             for (int i = 0; i < Transitions.Count; i++)
             {
-                if (!Collections.ContainsKey(Transitions[i].CurrentState))
+                if (!Table.ContainsInstructionForState(Transitions[i].CurrentState))
                 {
-                    Collections.Add(Transitions[i].CurrentState, new InstructionCollection());
+                    Table.AddInstruction(Transitions[i].CurrentState, new InstructionCollection());
                 }
             }
 
-            InstructionVariant Variant = new InstructionVariant();
-            Variant.Actions.Add(new ChangeStateAction());
-            Variant.Actions.Add(new WriteAction());
-            Variant.Actions.Add(new MoveHeadAction());
-            */
+            for (int i = 0; i < Transitions.Count; i++)
+            {
+                if (!DefinitionAlphabet.Characters.Contains(Transitions[i].TapeValue) || Table[Transitions[i].CurrentState].ContainsVariant(Transitions[i].TapeValue))
+                {
+                    //return error codes?
+                    return null;
+                }
+
+                InstructionVariant Variant = new InstructionVariant();
+                Variant.Actions.Add(new ChangeStateAction(Transitions[i].NewState));
+                Variant.Actions.Add(new WriteAction(Transitions[i].NewTapeValue));
+
+                if (Transitions[i].MoveDirection == MoveHeadDirection.Left)
+                {
+                    Variant.Actions.Add(new MoveHeadAction(-1));
+                }
+                else
+                {
+                    Variant.Actions.Add(new MoveHeadAction(1));
+                }
+
+                Table[Transitions[i].CurrentState].AddVariant(Transitions[i].TapeValue, Variant);
+            }
+
             return Table;
         }
     }
@@ -66,6 +83,10 @@ namespace TuringCore
         public string NewTapeValue;
         [JsonInclude]
         public MoveHeadDirection MoveDirection;
+
+        public Transition()
+        {
+        }
 
         public Transition(string currentState, string tapeValue, string newState, string newTapeValue, MoveHeadDirection moveDirection)
         {

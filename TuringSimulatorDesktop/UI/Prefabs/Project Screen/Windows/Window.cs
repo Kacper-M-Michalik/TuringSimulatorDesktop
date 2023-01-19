@@ -54,12 +54,12 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         HorizontalLayoutBox ButtonLayout;
 
 
-        IView CurrentView;
+        public IView CurrentView;
         WindowHeaderItem CurrentHeader;
         public bool IsMouseOverDraggableArea;
         public bool IsMarkedForDeletion;
         Viewport MainPort;
-        List<WindowHeaderItem> Headers = new List<WindowHeaderItem>();
+        public List<WindowHeaderItem> Headers = new List<WindowHeaderItem>();
 
         public ProjectScreenView OwnerScreen;
 

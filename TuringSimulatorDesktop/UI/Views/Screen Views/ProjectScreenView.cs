@@ -195,17 +195,23 @@ namespace TuringSimulatorDesktop.UI
 
         public void Save(Button Sender)
         {
-
+            if (LastActiveEditorWindow.CurrentView is ISaveable) ((ISaveable)LastActiveEditorWindow.CurrentView).Save();            
         }
 
         public void SaveAll(Button Sender)
         {
-
+            for (int i = 0; i < Windows.Count; i++)
+            {
+                for (int j = 0; j < Windows[i].Headers.Count; j++)
+                {
+                    if (Windows[i].Headers[j].View is ISaveable) ((ISaveable)Windows[i].Headers[j].View).Save();
+                }
+            }
         }
 
         public void Run(Button Sender)
         {
-
+            //if (LastActiveEditorWindow.CurrentView is TextProgrammingView) ((ISaveable)LastActiveEditorWindow.CurrentView).Save();
         }
 
         public override void Draw()

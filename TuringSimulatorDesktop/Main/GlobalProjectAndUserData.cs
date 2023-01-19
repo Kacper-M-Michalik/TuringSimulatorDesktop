@@ -12,7 +12,7 @@ namespace TuringSimulatorDesktop
 {
     public static class GlobalProjectAndUserData
     {
-        static readonly JsonSerializerOptions Options = new JsonSerializerOptions() { WriteIndented = false };
+        public static readonly JsonSerializerOptions JsonOptions = new JsonSerializerOptions() { WriteIndented = true };
 
         public static string UserDataPath;
         public static LocalUserData UserData;
@@ -38,7 +38,7 @@ namespace TuringSimulatorDesktop
         {
             try
             {
-                File.WriteAllBytes(UserDataPath, JsonSerializer.SerializeToUtf8Bytes(UserData, Options));
+                File.WriteAllBytes(UserDataPath, JsonSerializer.SerializeToUtf8Bytes(UserData, JsonOptions));
             }
             catch (Exception E)
             {
