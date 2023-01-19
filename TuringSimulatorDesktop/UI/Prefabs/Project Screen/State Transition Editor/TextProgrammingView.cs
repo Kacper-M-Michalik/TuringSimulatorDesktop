@@ -78,7 +78,7 @@ namespace TuringSimulatorDesktop.UI
         VerticalLayoutBox TransitionLayout;
         List<StateTransitionItem> TransitionItems;
 
-
+        bool FullyLoadedFile;
         int CurrentlyOpenedFileID;
         int FileVersion;
         TransitionFile OpenedFile;
@@ -98,6 +98,16 @@ namespace TuringSimulatorDesktop.UI
 
             CurrentlyOpenedFileID = FileToDisplay;
             SwitchOpenedFile(FileToDisplay);
+        }
+
+        public void SwitchOpenedFile(int ID)
+        {
+            FullyLoadedFile = false;
+            UIEventManager.Unsubscribe(CurrentlyOpenedFileID, ReceivedStateTransitionTable);
+            Client.SendTCPData(ClientSendPacketFunctions.UnsubscribeFromFileUpdates(CurrentlyOpenedFileID));
+            CurrentlyOpenedFileID = ID;
+            UIEventManager.Subscribe(CurrentlyOpenedFileID, ReceivedStateTransitionTable);
+            Client.SendTCPData(ClientSendPacketFunctions.RequestFile(ID, true));
         }
 
         public void ReceivedStateTransitionTable(Packet Data)
@@ -144,15 +154,7 @@ namespace TuringSimulatorDesktop.UI
             }
 
             TransitionLayout.UpdateLayout();
-        }
-
-        public void SwitchOpenedFile(int ID)
-        {
-            UIEventManager.Unsubscribe(CurrentlyOpenedFileID, ReceivedStateTransitionTable);
-            Client.SendTCPData(ClientSendPacketFunctions.UnsubscribeFromFileUpdates(CurrentlyOpenedFileID));
-            CurrentlyOpenedFileID = ID;
-            UIEventManager.Subscribe(CurrentlyOpenedFileID, ReceivedStateTransitionTable);
-            Client.SendTCPData(ClientSendPacketFunctions.RequestFile(ID, true));
+            FullyLoadedFile = true;
         }
 
         void MoveLayout()
@@ -178,6 +180,11 @@ namespace TuringSimulatorDesktop.UI
 
         public void Save()
         {
+            if (!FullyLoadedFile)
+            {
+                return;
+            }
+
             TransitionFile NewFile = new TransitionFile();
 
             for (int i = 0; i < HaltStateInputBoxes.Count; i++)

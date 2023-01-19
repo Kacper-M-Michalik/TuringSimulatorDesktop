@@ -76,6 +76,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         InputBox WildcardCharacterInputBox;
         InputBox AllowedCharactersInputBox;
 
+        bool FullyLoadedFile;
         int CurrentlyOpenedFileID;
         int FileVersion;
         Alphabet OpenedFile;
@@ -146,6 +147,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         public void SwitchOpenedAlphabet(int ID)
         {
+            FullyLoadedFile = false;
             UIEventManager.Unsubscribe(CurrentlyOpenedFileID, ReceivedAlphabetData);
             Client.SendTCPData(ClientSendPacketFunctions.UnsubscribeFromFolderUpdates(CurrentlyOpenedFileID));
             CurrentlyOpenedFileID = ID;
@@ -188,10 +190,16 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             }
 
             AllowedCharactersInputBox.Text = Builder.ToString();
+            FullyLoadedFile = true;
         }
 
         public void Save()
         {
+            if (!FullyLoadedFile)
+            {
+                return;
+            }
+
             Alphabet NewAlphabet = new Alphabet();
             NewAlphabet.ID = DefenitionIDInputBox.Text;
             NewAlphabet.EmptyCharacter = EmptyCharacterInputBox.Text;
