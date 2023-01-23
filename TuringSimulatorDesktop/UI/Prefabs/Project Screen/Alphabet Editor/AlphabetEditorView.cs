@@ -149,7 +149,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         {
             FullyLoadedFile = false;
             UIEventManager.Unsubscribe(CurrentlyOpenedFileID, ReceivedAlphabetData);
-            Client.SendTCPData(ClientSendPacketFunctions.UnsubscribeFromFolderUpdates(CurrentlyOpenedFileID));
+            Client.SendTCPData(ClientSendPacketFunctions.UnsubscribeFromFileUpdates(CurrentlyOpenedFileID));
             CurrentlyOpenedFileID = ID;
             UIEventManager.Subscribe(CurrentlyOpenedFileID, ReceivedAlphabetData);
             Client.SendTCPData(ClientSendPacketFunctions.RequestFile(ID, true));

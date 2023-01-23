@@ -45,6 +45,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         public void SetProjectionMatrix(Matrix projectionMatrix, Matrix inverseProjectionMatrix)
         {
+            //might not wanan draw like this tough
             Seperator.SetProjectionMatrix(projectionMatrix, inverseProjectionMatrix);
             InputOutputLabel.SetProjectionMatrix(projectionMatrix, inverseProjectionMatrix);
         }
@@ -85,6 +86,12 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 //Background.Draw(BoundPort);
                 Seperator.Draw(BoundPort);
             }
+        }
+
+        public void Close()
+        {
+            InputOutputLabel.IsMarkedForDeletion = true;
+            IsActive = false;
         }
     }
 }

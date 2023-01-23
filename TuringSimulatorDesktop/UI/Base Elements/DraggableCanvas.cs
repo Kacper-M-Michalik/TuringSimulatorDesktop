@@ -51,6 +51,8 @@ namespace TuringSimulatorDesktop.UI
         public Matrix ZoomMatrix;
         public Matrix InverseMatrix;
 
+        public Matrix PositionMatrix;
+
         public List<ICanvasInteractable> Elements;
 
         public DraggableCanvas()
@@ -88,13 +90,7 @@ namespace TuringSimulatorDesktop.UI
                 Zoom += (InputManager.ScrollWheelDelta/120)*ZoomFactor;
                 ZoomMatrix = Matrix.CreateScale(Zoom);
 
-                Matrix ResultMatrix = OffsetMatrix * ZoomMatrix;
-                InverseMatrix = Matrix.Invert(ResultMatrix);
-
-                foreach (ICanvasInteractable InteractableItem in Elements)
-                {
-                    InteractableItem.SetProjectionMatrix(ResultMatrix, InverseMatrix);
-                }
+                ApplyMatrices();
             }
         }
 
@@ -104,6 +100,21 @@ namespace TuringSimulatorDesktop.UI
             Group.Y = UIUtils.ConvertFloatToInt(position.Y);
             Port.X = UIUtils.ConvertFloatToInt(Position.X);
             Port.Y = UIUtils.ConvertFloatToInt(Position.Y);
+
+            PositionMatrix = Matrix.CreateTranslation(Position.X, Position.Y, 0);
+
+            ApplyMatrices();
+        }
+
+        public void ApplyMatrices()
+        {
+            Matrix ResultMatrix = PositionMatrix * OffsetMatrix * ZoomMatrix;
+            InverseMatrix = Matrix.Invert(ResultMatrix);
+
+            foreach (ICanvasInteractable InteractableItem in Elements)
+            {
+                InteractableItem.SetProjectionMatrix(ResultMatrix, InverseMatrix);
+            }
         }
 
         public void ResizeLayout()

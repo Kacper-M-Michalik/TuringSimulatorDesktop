@@ -17,9 +17,6 @@ namespace TuringSimulatorDesktop
 {
     public static class Program
     {
-        /// <summary>
-        /// The main entry point for the application.
-        /// </summary>
         [STAThread]
         static void Main()
         {
@@ -72,7 +69,6 @@ namespace TuringSimulatorDesktop
 
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
             base.Initialize();
         }
 
@@ -180,7 +176,7 @@ namespace TuringSimulatorDesktop
             ScreenBatch.Begin();
             //DebugManager.Draw(GraphicsDevice, ScreenBatch, gameTime);
             ScreenBatch.End();
-            //GlobalInterfaceData.UIRequiresRedraw = false;       
+
             //InputManager.DrawActionGroups();         
 
             if (UIEventManager.WindowRequiresNextFrameResizeStep)

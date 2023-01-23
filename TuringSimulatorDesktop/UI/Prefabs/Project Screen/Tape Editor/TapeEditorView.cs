@@ -4,11 +4,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
+using TuringCore;
 
 namespace TuringSimulatorDesktop.UI.Prefabs
 {
-    public class TapeEditorView : IView
+    public class TapeEditorView : IView, ISaveable
     {
         Vector2 position;
         public Vector2 Position
@@ -39,6 +41,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             set
             {
                 isActive = value;
+                Canvas.IsActive = value;
             }
         }
 
@@ -49,15 +52,6 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             set => ownerWindow = value;
         }
 
-        string title = "Empty Tape Editor View";
-        public string Title => title;
-        public int OpenFileID => CurrentlyOpenedFileID;
-
-        int CurrentlyOpenedFileID;
-
-        DraggableCanvas Canvas;
-        TapeVisualItem Tape;
-
         public bool IsMarkedForDeletion
         {
             get => false;
@@ -66,45 +60,80 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             }
         }
 
+        string title = "Empty Tape Editor View";
+        public string Title => title;
+        public int OpenFileID => CurrentlyOpenedFileID;
+
+        bool FullyLoadedFile;
+        int CurrentlyOpenedFileID;
+        int FileVersion;
+        TapeTemplate OpenedFile;
+
+        DraggableCanvas Canvas;
+        TapeVisualItem VisualTape;
+
+
         public TapeEditorView(int FileToDisplay)
         {
             Canvas = new DraggableCanvas();
-            Icon Icon1 = new Icon(Color.Aquamarine);
-            Icon1.Bounds = new Point(10, 10);
-            Icon1.Position = new Vector2(20, 30);
-            Icon Icon2 = new Icon(Color.YellowGreen);
-            Icon2.Bounds = new Point(100, 10);
-            Icon2.Position = new Vector2(0, 50);
-            Icon Icon3 = new Icon(Color.Red);
-            Icon3.Bounds = new Point(5, 35);
-            Icon3.Position = new Vector2(-10, -20);
 
-            Tape = new TapeVisualItem();
+            VisualTape = new TapeVisualItem(Canvas.Group);
 
-            InputBox TestBox = new InputBox(Canvas.Group);
-            TestBox.Bounds = new Point(100, 100);
-            TestBox.Position = Vector2.Zero;
-
-            Canvas.Elements.Add(Icon1);
-            Canvas.Elements.Add(Icon2);
-            Canvas.Elements.Add(Icon3);
-            Canvas.Elements.Add(Tape);
-            Canvas.Elements.Add(TestBox);
-
+            Canvas.Elements.Add(VisualTape);
 
             IsActive = false;
-
 
             CurrentlyOpenedFileID = FileToDisplay;
             //call switch here
         }
 
+        public void SwitchOpenedTape(int ID)
+        {
+            FullyLoadedFile = false;
+            UIEventManager.Unsubscribe(CurrentlyOpenedFileID, ReceivedTapeData);
+            Client.SendTCPData(ClientSendPacketFunctions.UnsubscribeFromFileUpdates(CurrentlyOpenedFileID));
+            CurrentlyOpenedFileID = ID;
+            UIEventManager.Subscribe(CurrentlyOpenedFileID, ReceivedTapeData);
+            Client.SendTCPData(ClientSendPacketFunctions.RequestFile(ID, true));
+        }
+
+        public void ReceivedTapeData(Packet Data)
+        {
+            CustomLogging.Log("CLIENT: Window received Tape Template Data");
+
+            if (Data.ReadInt() != CurrentlyOpenedFileID)
+            {
+                CustomLogging.Log("CLIENT: Tape Editor Window Fatal Error, recived unwanted file data!");
+                return;
+            }
+
+            Data.ReadInt();
+            title = Data.ReadString();
+            FileVersion = Data.ReadInt();
+
+            try
+            {
+                OpenedFile = JsonSerializer.Deserialize<TapeTemplate>(Data.ReadByteArray());
+            }
+            catch
+            {
+                CustomLogging.Log("CLIENT: Window - Invalid Tape Template recieved");
+                return;
+            }
+
+            //VisualTape.SetTapeData(OpenedFile.Clone());
+
+            FullyLoadedFile = true;
+        }
+
+        public void Save()
+        {
+
+        }
+
         void MoveLayout()
         {
             Canvas.Position = position;
-
-            Tape.Position = Position + new Vector2(100, 100);
-
         }
 
         void ResizeLayout()
@@ -116,9 +145,9 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         {
             if (IsActive)
             {
-                Tape.CameraMin = (Matrix.CreateTranslation(Position.X, 0, 0) * Canvas.InverseMatrix).Translation.X;
-                Tape.CameraMax = (Matrix.CreateTranslation(Position.X + Bounds.X, 0, 0) * Canvas.InverseMatrix).Translation.X;
-                Tape.UpdateLayout();
+                VisualTape.CameraMin = (Matrix.CreateTranslation(Position.X, 0, 0) * Canvas.InverseMatrix).Translation.X;
+                VisualTape.CameraMax = (Matrix.CreateTranslation(Position.X + Bounds.X, 0, 0) * Canvas.InverseMatrix).Translation.X;
+                VisualTape.UpdateLayout();
 
                 Canvas.Draw();
             }
@@ -126,8 +155,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         public void Close()
         {
-
+            Canvas.Close();
+            IsActive = false;
         }
-
     }
 }

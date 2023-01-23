@@ -171,6 +171,5 @@ namespace TuringSimulatorDesktop.UI
                 Background.Draw(BoundPort);          
             }
         }
-
     }
 }

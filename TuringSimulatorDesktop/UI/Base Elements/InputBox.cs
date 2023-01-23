@@ -81,36 +81,24 @@ namespace TuringSimulatorDesktop.UI
 
         public InputBox(ActionGroup group)
         {
+            Group = group;
+            group.ClickableObjects.Add(this);
+            GlobalInterfaceData.OSWindow.TextInput += TextInput;
+
             OutputLabel = new Label(0, 0);
             Bounds = Point.Zero;
             Position = Vector2.Zero;
-
-            GlobalInterfaceData.OSWindow.TextInput += TextInput;
-
-            group.ClickableObjects.Add(this);
-            Group = group;
         }
 
         public InputBox(int width, int height, ActionGroup group)
         {
+            Group = group;
+            group.ClickableObjects.Add(this);
+            GlobalInterfaceData.OSWindow.TextInput += TextInput;
+
             OutputLabel = new Label(0, 0);
             Bounds = new Point(width, height);
             Position = Vector2.Zero;
-
-            GlobalInterfaceData.OSWindow.TextInput += TextInput;
-
-            group.ClickableObjects.Add(this);
-            Group = group;
-        }
-        public InputBox(int width, int height, Vector2 position, ActionGroup group)
-        {
-            OutputLabel = new Label(0,0);
-            Bounds = new Point(width, height);
-            Position = position;
-
-            GlobalInterfaceData.OSWindow.TextInput += TextInput;
-
-            group.ClickableObjects.Add(this);
         }
 
         public void Clicked()
@@ -166,13 +154,7 @@ namespace TuringSimulatorDesktop.UI
         {
             if (IsActive)
             {
-
-                GlobalMeshRenderer.Draw(BackgroundMesh, WorldSpaceMatrix * ProjectionMatrix, BackgroundColor, BoundPort);
-                
-                if (IsMouseOver())
-                {
-                    GlobalMeshRenderer.Draw(BackgroundMesh, WorldSpaceMatrix * ProjectionMatrix, GlobalInterfaceData.Scheme.UIOverlayDebugColor1, BoundPort);
-                }
+                GlobalMeshRenderer.Draw(BackgroundMesh, WorldSpaceMatrix * ProjectionMatrix, BackgroundColor, BoundPort);                
                 OutputLabel.Draw(BoundPort);
             }
         }

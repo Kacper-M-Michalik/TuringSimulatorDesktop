@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TuringCore;
+using TuringSimulatorDesktop.Input;
 
 namespace TuringSimulatorDesktop.UI.Prefabs
 {
@@ -27,8 +29,6 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             get => bounds;
             set
             {
-                bounds = value;
-                ResizeLayout();
             }
         }
 
@@ -39,6 +39,10 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             set
             {
                 isActive = value;
+                for (int i = 0; i < Cells.Count; i++)
+                {
+                    Cells[i].IsActive = value;
+                }
             }
         }
 
@@ -50,17 +54,29 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             }
         }
 
-        HorizontalLayoutBox TapeContents;
+        ActionGroup Group;
+
+        HorizontalLayoutBox CellLayoutBox;
+        
         List<TapeCell> Cells;
         public float CameraMin, CameraMax;
+        public Tape SourceTape = null;
 
-        public TapeVisualItem()
+        public TapeVisualItem(ActionGroup group)
         {
-            IsActive = true;
+            Group = group;
+            CellLayoutBox = new HorizontalLayoutBox();
+            CellLayoutBox.DrawBounded = false;
 
-            TapeContents = new HorizontalLayoutBox();
-            TapeContents.DrawBounded = false;
             Cells = new List<TapeCell>();
+
+            IsActive = true;
+        }
+
+        public void SetTapeData(Tape Data)
+        {
+            SourceTape = Data;
+            UpdateLayout();
         }
 
         public void UpdateLayout()
@@ -72,49 +88,45 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             {
                 while (Cells.Count < TargetCellCount)
                 {
-                    TapeCell NewCell = new TapeCell(TapeContents.Group);
+                    TapeCell NewCell = new TapeCell(Group);
                     NewCell.IsActive = true;
                     Cells.Add(NewCell);
-                    TapeContents.AddElement(NewCell);
+                    CellLayoutBox.AddElement(NewCell);
                 }
             }
             else if (Cells.Count > TargetCellCount)
             {
                 while (Cells.Count > TargetCellCount)
                 {
-                    TapeContents.RemoveElement(Cells[Cells.Count - 1]);
+                    Cells[Cells.Count - 1].Close();
+                    CellLayoutBox.RemoveElement(Cells[Cells.Count - 1]);
                     Cells.RemoveAt(Cells.Count - 1);
                 }
             }
 
-            for (int i = 0; i < Cells.Count; i++)
+            if (SourceTape != null)
             {
+                for (int i = 0; i < Cells.Count; i++)
+                {
 
+                }
             }
 
-            TapeContents.Position = new Vector2(CameraMin - (TapeCell.ReferenceWidth - ((Position.X - CameraMin) % TapeCell.ReferenceWidth)), position.Y);
-
-            TapeContents.Bounds = new Point((Cells.Count) * TapeCell.ReferenceWidth, TapeCell.ReferenceHeight);
-
-            TapeContents.UpdateLayout();
-
+            CellLayoutBox.Position = new Vector2(CameraMin - (TapeCell.ReferenceWidth - ((Position.X - CameraMin) % TapeCell.ReferenceWidth)), position.Y);
+            CellLayoutBox.UpdateLayout();
         }
 
 
         void MoveLayout()
         {
-            TapeContents.Position = position;
-        }
-
-        void ResizeLayout()
-        {
+            CellLayoutBox.Position = position;
         }
 
         public void Draw(Viewport? BoundPort = null)
         {
             if (IsActive)
             {
-                TapeContents.Draw(BoundPort);
+                CellLayoutBox.Draw(BoundPort);
             }
         }
     }
