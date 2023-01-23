@@ -7,7 +7,7 @@ using FontStashSharp.RichText;
 
 namespace TuringSimulatorDesktop.UI
 {
-    public class Label : IVisualElement
+    public class Label : IVisualElement, ICanvasInteractable
     {
         Vector2 position;
         public Vector2 Position
@@ -37,16 +37,16 @@ namespace TuringSimulatorDesktop.UI
 
         RichTextLayout RichText;
         RenderTarget2D RenderTexture;
-        public FontSystem Font;
+        public FontSystem Font = GlobalInterfaceData.StandardRegularFont;
         public Color FontColor = GlobalInterfaceData.Scheme.FontColor;
-        public string Text 
-        { 
-            get => RichText.Text; 
-            set 
-            { 
-                RichText.Text = value; 
+        public string Text
+        {
+            get => RichText.Text;
+            set
+            {
+                RichText.Text = value;
                 UpdateLabel();
-            } 
+            }
         }
 
         public float FontSize = 12;
@@ -56,12 +56,16 @@ namespace TuringSimulatorDesktop.UI
         public Icon Background;
         public bool DrawFrame;
 
+        public void SetProjectionMatrix(Matrix projectionMatrix, Matrix inverseProjectionMatrix)
+        {
+            Background.SetProjectionMatrix(projectionMatrix, inverseProjectionMatrix);
+        }
+
         public Label(int width, int height)
         {
             Background = new Icon();
             RichText = new RichTextLayout();
             RichText.VerticalSpacing = 0;
-            Font = GlobalInterfaceData.StandardRegularFont;
 
             Bounds = new Point(width, height);
             Position = Vector2.Zero;
@@ -91,7 +95,6 @@ namespace TuringSimulatorDesktop.UI
             Background = new Icon();
             RichText = new RichTextLayout();
             RichText.VerticalSpacing = 0;
-            Font = GlobalInterfaceData.StandardRegularFont;
 
             Bounds = new Point(width, height);
             Position = position;
@@ -99,7 +102,6 @@ namespace TuringSimulatorDesktop.UI
         public Label() : this(0, 0)
         {
             AutoSizeMesh = true;
-            Background.DrawColor = GlobalInterfaceData.Scheme.UIOverlayDebugColor4;
         }
         public Label(FontSystem font) : this(0, 0, font)
         {

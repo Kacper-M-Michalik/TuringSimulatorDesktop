@@ -33,19 +33,19 @@ namespace TuringSimulatorDesktop.UI
         TextureButton SaveButton;
         TextureButton SaveAllButton;
 
-        TextureButton RunStateTableSourceButton;
-        Label SelectedStateTableSourceLabel;
+        RunProjectItem RunProjectButton;
 
         Label ProjectTitle;
-
-
-        List<Window> Windows;
-        Window CurrentlyFocusedWindow;
         
+        List<Window> Windows;
+
+
+        Window CurrentlyFocusedWindow;        
         bool IsDragging;
 
+        public Window LastActiveWindow;
+        public IRunnable ActiveEditorView;
 
-        public Window LastActiveEditorWindow;
 
         public ProjectScreenView()
         {
@@ -56,7 +56,7 @@ namespace TuringSimulatorDesktop.UI
 
             Window Temp = new Window(new Vector2(0, 60), new Point(1200, 900), this);
             Windows.Add(Temp);
-            LastActiveEditorWindow = Temp;
+            LastActiveWindow = Temp;
             Temp = new Window(new Vector2(1210, 60), new Point(400, 900), this);
             Temp.AddView(new FileBrowserView());
             Windows.Add(Temp);
@@ -66,7 +66,7 @@ namespace TuringSimulatorDesktop.UI
             Header = new Icon(GlobalInterfaceData.Scheme.Header);
 
             AppTitle = new Label();
-            AppTitle.FontColor = GlobalInterfaceData.Scheme.FontColor;
+            AppTitle.FontColor = Color.White;//GlobalInterfaceData.Scheme.w;
             AppTitle.Font = GlobalInterfaceData.StandardBoldFont;
             AppTitle.FontSize = GlobalInterfaceData.Scale(20);
             AppTitle.Text = "T";
@@ -76,15 +76,18 @@ namespace TuringSimulatorDesktop.UI
             ToolbarLayout.Spacing = 0;
 
             UndoButton = new TextureButton(Group);
+            UndoButton.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.UndoIcon];
             //UndoButton.HighlightTexture
             UndoButton.HighlightOnMouseOver = true;
             UndoButton.OnClickedEvent += Undo;
 
             RedoButton = new TextureButton(Group);
+            RedoButton.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.RedoIcon];
             RedoButton.HighlightOnMouseOver = true;
             RedoButton.OnClickedEvent += Redo;
 
             SaveButton = new TextureButton(Group);
+            SaveButton.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.SaveIcon];
             SaveButton.HighlightOnMouseOver = true;
             SaveButton.OnClickedEvent += Save;
 
@@ -92,17 +95,13 @@ namespace TuringSimulatorDesktop.UI
             SaveAllButton.HighlightOnMouseOver = true;
             SaveAllButton.OnClickedEvent += SaveAll;
 
+            RunProjectButton = new RunProjectItem(this, Group);
+
             ToolbarLayout.AddElement(UndoButton);
             ToolbarLayout.AddElement(RedoButton);
             ToolbarLayout.AddElement(SaveButton);
             ToolbarLayout.AddElement(SaveAllButton);
-
-            RunStateTableSourceButton = new TextureButton(Group);
-            RunStateTableSourceButton.HighlightOnMouseOver = true;
-            RunStateTableSourceButton.OnClickedEvent += Run;
-
-            SelectedStateTableSourceLabel = new Label();
-            SelectedStateTableSourceLabel.Text = "example source name";
+            ToolbarLayout.AddElement(RunProjectButton);
 
             ProjectTitle = new Label();
             ProjectTitle.AutoSizeMesh = false;
@@ -169,19 +168,11 @@ namespace TuringSimulatorDesktop.UI
 
         public void CreateWindow()
         {
-            //WindowGroupData NewBaseGroup = new WindowGroupData();
-                
-            //WindowGroupData NewWindowGroup = new WindowGroupData();
             Window NewWindow = new Window(new Vector2(100, 100), new Point(300, 400), this);
-            //NewWindowGroup.ChildWindow = NewWindow;
-
-            //if (BaseGroup != null) NewBaseGroup.SubGroups.Add(BaseGroup);
-            //NewBaseGroup.SubGroups.Add(NewWindowGroup);
-
-           // BaseGroup = NewBaseGroup;
 
             Windows.Add(NewWindow);
         }
+
 
         public void Undo(Button Sender)
         {
@@ -195,7 +186,7 @@ namespace TuringSimulatorDesktop.UI
 
         public void Save(Button Sender)
         {
-            if (LastActiveEditorWindow.CurrentView is ISaveable) ((ISaveable)LastActiveEditorWindow.CurrentView).Save();            
+            if (LastActiveWindow.CurrentView is ISaveable) ((ISaveable)LastActiveWindow.CurrentView).Save();            
         }
 
         public void SaveAll(Button Sender)
@@ -209,9 +200,19 @@ namespace TuringSimulatorDesktop.UI
             }
         }
 
+        public void SetActiveEditorWindow(IRunnable RunnableView)
+        {
+            //set button to clickable here
+            RunProjectButton.UpdateTarget(RunnableView.Title);
+            ActiveEditorView = RunnableView;
+        }
+
         public void Run(Button Sender)
         {
-            //if (LastActiveEditorWindow.CurrentView is TextProgrammingView) ((ISaveable)LastActiveEditorWindow.CurrentView).Save();
+            if (ActiveEditorView != null)
+            {
+                LastActiveWindow.AddView(new TuringMachineView(ActiveEditorView.OpenFileID));
+            }
         }
 
         public override void Draw()
@@ -229,8 +230,7 @@ namespace TuringSimulatorDesktop.UI
             SaveButton.Draw();
             SaveAllButton.Draw();
 
-            RunStateTableSourceButton.Draw();
-            SelectedStateTableSourceLabel.Draw();
+            RunProjectButton.Draw();
             
             for (int i = 0; i < Windows.Count; i++)
             {
@@ -262,7 +262,7 @@ namespace TuringSimulatorDesktop.UI
             ToolbarLayout.Position = GlobalInterfaceData.Scale(new Vector2(16, 36));
             ToolbarLayout.UpdateLayout();
 
-            RunStateTableSourceButton.Bounds = new Point(1,1);
+            RunProjectButton.ResizeLayout();
 
             AppTitle.Bounds = GlobalInterfaceData.Scale(new Point(45, 32));
             AppTitle.Position = new Vector2(0,AppTitle.Bounds.Y / 2f);

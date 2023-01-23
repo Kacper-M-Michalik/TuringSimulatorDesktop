@@ -15,6 +15,8 @@ namespace TuringSimulatorDesktop.Input
 
         public static MouseState MouseData;
 
+        public static Matrix MousePositionMatrix;
+
         public static int MouseDeltaX;
         public static int MouseDeltaY;
         public static int PreviousMouseX;
@@ -33,6 +35,8 @@ namespace TuringSimulatorDesktop.Input
         public static void Update()
         {
             MouseData = Mouse.GetState();
+
+            MousePositionMatrix = Matrix.CreateTranslation(MouseData.X, MouseData.Y, 0);
 
             LeftMousePressed = false;
             LeftMouseReleased = false;

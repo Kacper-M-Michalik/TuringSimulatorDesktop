@@ -13,7 +13,7 @@ using System.Text.Json.Serialization;
 
 namespace TuringSimulatorDesktop.UI
 {    
-    public class TextProgrammingView : IView, ISaveable
+    public class TextProgrammingView : IView, IPollable, IRunnable, ISaveable
     {
         Vector2 position;
         public Vector2 Position
@@ -61,8 +61,16 @@ namespace TuringSimulatorDesktop.UI
         
         public int OpenFileID => CurrentlyOpenedFileID;
 
+        public bool IsMarkedForDeletion
+        {
+            get => false;
+            set
+            {
+            }
+        }
 
         ActionGroup Group;
+
         Icon Background;
 
         Label DefenitionAlphabetTitle;
@@ -70,34 +78,77 @@ namespace TuringSimulatorDesktop.UI
 
         Label HaltStatesTitle;
 
-        VerticalLayoutBox HaltStatesLayout;
-        List<InputBox> HaltStateInputBoxes;
+        //VerticalLayoutBox HaltStatesLayout;
+        //List<InputBox> HaltStateInputBoxes;
+        InputBox HaltStateInputBox;
 
         Label TransitionsTitle;
+        ColorButton AddTransitionButton;
 
         VerticalLayoutBox TransitionLayout;
         List<StateTransitionItem> TransitionItems;
+
 
         bool FullyLoadedFile;
         int CurrentlyOpenedFileID;
         int FileVersion;
         TransitionFile OpenedFile;
 
+
         public TextProgrammingView(int FileToDisplay)
         {
             Group = InputManager.CreateActionGroup();
+            Group.PollableObjects.Add(this);
 
             Background = new Icon(GlobalInterfaceData.Scheme.Background);
+
+            DefenitionAlphabetTitle = new Label();
+            DefenitionAlphabetTitle.Text = "Defenition Alphabet ID:";
+
+            DefenitionAlphabetInputBox = new InputBox(Group);
+
+
+            HaltStatesTitle = new Label();
+            HaltStatesTitle.Text = "Halt States:";
+
+            HaltStateInputBox = new InputBox(Group);
+
+            TransitionsTitle = new Label();
+            TransitionsTitle.Text = "Transitions:";
+
+            AddTransitionButton = new ColorButton(Group);
+            AddTransitionButton.BaseColor = GlobalInterfaceData.Scheme.InteractableAccent;
+            AddTransitionButton.OnClickedEvent += AddTransitionItem;
+
             TransitionLayout = new VerticalLayoutBox();
             TransitionLayout.Scrollable = true;
             TransitionLayout.Spacing = 5f;
-
-
 
             IsActive = false;
 
             CurrentlyOpenedFileID = FileToDisplay;
             SwitchOpenedFile(FileToDisplay);
+        }
+
+        public void PollInput(bool IsInActionGroupFrame)
+        {
+            if ((InputManager.LeftMousePressed || InputManager.RightMousePressed) && OwnerWindow.OwnerScreen.ActiveEditorView != this && IsMouseOver())
+            {
+                OwnerWindow.OwnerScreen.SetActiveEditorWindow(this);
+            }
+        }
+
+        public bool IsMouseOver()
+        {
+            return (IsActive && InputManager.MouseData.X >= Position.X && InputManager.MouseData.X <= Position.X + bounds.X && InputManager.MouseData.Y >= Position.Y && InputManager.MouseData.Y <= Position.Y + bounds.Y);
+        }
+
+        public void AddTransitionItem(Button Sender)
+        {
+            StateTransitionItem Item = new StateTransitionItem(TransitionLayout.Group);
+            TransitionLayout.AddElement(Item);
+            TransitionItems.Add(Item);
+            TransitionLayout.UpdateLayout();    
         }
 
         public void SwitchOpenedFile(int ID)
@@ -111,7 +162,9 @@ namespace TuringSimulatorDesktop.UI
         }
 
         public void ReceivedStateTransitionTable(Packet Data)
-        {            
+        {
+            TransitionItems = new List<StateTransitionItem>();
+
             //file id
             Data.ReadInt();
 
@@ -145,37 +198,21 @@ namespace TuringSimulatorDesktop.UI
                 {
                     Item.CurrentStateTextBox.Text = "L";
                 }
-                else
+                else if (OpenedFile.Transitions[i].MoveDirection == MoveHeadDirection.Right)
                 {
                     Item.CurrentStateTextBox.Text = "R";
                 }
-
+                else
+                {
+                    Item.CurrentStateTextBox.Text = "";
+                }
+                
                 TransitionLayout.AddElement(Item);
+                TransitionItems.Add(Item);
             }
 
             TransitionLayout.UpdateLayout();
             FullyLoadedFile = true;
-        }
-
-        void MoveLayout()
-        {
-            Group.X = UIUtils.ConvertFloatToInt(position.X);
-            Group.Y = UIUtils.ConvertFloatToInt(position.Y);
-
-            Background.Position = position;
-            TransitionLayout.Position = new Vector2(position.X, position.Y + 20);
-            //update this
-
-        }
-
-        void ResizeLayout()
-        {
-            Group.Width = bounds.X;
-            Group.Height = bounds.Y;
-
-            Background.Bounds = bounds;
-            TransitionLayout.Bounds = new Point(bounds.X, bounds.Y - 20);
-            
         }
 
         public void Save()
@@ -187,41 +224,94 @@ namespace TuringSimulatorDesktop.UI
 
             TransitionFile NewFile = new TransitionFile();
 
-            for (int i = 0; i < HaltStateInputBoxes.Count; i++)
-            {
-                NewFile.HaltStates.Add(HaltStateInputBoxes[i].Text);
-            }
+            //NewFile.DefinitionAlphabetID = DefenitionAlphabetInputBox.Text;
+
+            NewFile.HaltStates.AddRange(HaltStateInputBox.Text.Split("/n"));
+
+            //for (int i = 0; i < HaltStateInputBoxes.Count; i++)
+            //{
+            //    NewFile.HaltStates.Add(HaltStateInputBoxes[i].Text);
+           // }
 
             for (int i = 0; i < TransitionItems.Count; i++)
             {
                 Transition NewTransition = new Transition();
 
                 NewTransition.CurrentState = TransitionItems[i].CurrentStateTextBox.Text;
-                NewTransition.TapeValue = TransitionItems[i].CurrentStateTextBox.Text;
-                NewTransition.NewState = TransitionItems[i].CurrentStateTextBox.Text;
-                NewTransition.NewTapeValue = TransitionItems[i].CurrentStateTextBox.Text;
+                NewTransition.TapeValue = TransitionItems[i].TapeValueTextBox.Text;
+                NewTransition.NewState = TransitionItems[i].NewStateTextBox.Text;
+                NewTransition.NewTapeValue = TransitionItems[i].NewTapeValueTextBox.Text;
 
                 if (TransitionItems[i].CurrentStateTextBox.Text == "L")
                 {
                     NewTransition.MoveDirection = MoveHeadDirection.Left;
                 }
-                else
+                else if (TransitionItems[i].CurrentStateTextBox.Text == "R")
                 {
                     NewTransition.MoveDirection = MoveHeadDirection.Right;
+                }
+                else
+                {
+                    NewTransition.MoveDirection = MoveHeadDirection.Empty;
                 }
 
                 NewFile.Transitions.Add(NewTransition);
             }
 
-            Client.SendTCPData(ClientSendPacketFunctions.UpdateFile(CurrentlyOpenedFileID, FileVersion, JsonSerializer.SerializeToUtf8Bytes(OpenedFile, GlobalProjectAndUserData.JsonOptions)));
+            Client.SendTCPData(ClientSendPacketFunctions.UpdateFile(CurrentlyOpenedFileID, FileVersion, JsonSerializer.SerializeToUtf8Bytes(NewFile, GlobalProjectAndUserData.JsonOptions)));
+        }
+
+        void MoveLayout()
+        {
+            Group.X = UIUtils.ConvertFloatToInt(position.X);
+            Group.Y = UIUtils.ConvertFloatToInt(position.Y);
+
+            Background.Position = position;
+
+            DefenitionAlphabetTitle.Position = new Vector2(position.X + 10, position.Y + 10);
+            DefenitionAlphabetInputBox.Position = new Vector2(position.X + 10, position.Y + 30);
+
+            HaltStatesTitle.Position = new Vector2(position.X + 10, position.Y + 60);
+            //HaltStatesLayout.Position = new Vector2(position.X + 10, position.Y + 80);
+            HaltStateInputBox.Position = new Vector2(position.X + 10, position.Y + 80);
+
+            TransitionsTitle.Position = new Vector2(position.X + 100, position.Y + 10); 
+            AddTransitionButton.Position = new Vector2(position.X + 100, position.Y+5);
+            TransitionLayout.Position = new Vector2(position.X + 100, position.Y + 30);
+        }
+
+        void ResizeLayout()
+        {
+            Group.Width = bounds.X;
+            Group.Height = bounds.Y;
+
+            Background.Bounds = bounds;
+
+            DefenitionAlphabetTitle.Bounds = new Point(70, 15);
+            DefenitionAlphabetInputBox.Bounds = new Point(70, 15);
+
+            HaltStatesTitle.Bounds = new Point(70, 15);
+            //HaltStatesLayout.Bounds = new Point(45, 80);
+            HaltStateInputBox.Bounds = new Point(70, 80);
+
+            TransitionsTitle.Bounds = new Point(70, 15); 
+            AddTransitionButton.Bounds = new Point(15, 15);
+            TransitionLayout.Bounds = new Point(300, 300);            
         }
 
         public void Draw(Viewport? BoundPort = null)
         {
             if (IsActive)
             {
-                Background.Draw(BoundPort);
-                //TestLabel.Draw(BoundPort);
+                Background.Draw(BoundPort); 
+                DefenitionAlphabetTitle.Draw(BoundPort);
+                DefenitionAlphabetInputBox.Draw(BoundPort);
+
+                HaltStatesTitle.Draw(BoundPort);
+                HaltStateInputBox.Draw(BoundPort);
+
+                TransitionsTitle.Draw(BoundPort);
+                AddTransitionButton.Draw(BoundPort);
                 TransitionLayout.Draw(BoundPort);
             }
         }

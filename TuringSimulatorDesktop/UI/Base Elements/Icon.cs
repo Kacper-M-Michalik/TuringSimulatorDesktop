@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace TuringSimulatorDesktop.UI
 {
-    public class Icon : IVisualElement
+    public class Icon : IVisualElement, ICanvasInteractable
     {
         Vector2 position;
         public Vector2 Position 
@@ -16,8 +16,8 @@ namespace TuringSimulatorDesktop.UI
             get => position; 
             set 
             { 
-                position = value; 
-                PositionMatrix = UIUtils.CreateTranslation(position); 
+                position = value;
+                WorldSpaceMatrix = Matrix.CreateTranslation(new Vector3(Position, 0));
             } 
         }
 
@@ -32,15 +32,21 @@ namespace TuringSimulatorDesktop.UI
             }
         }
 
+        public void SetProjectionMatrix(Matrix projectionMatrix, Matrix inverseProjectionMatrix)
+        {
+            ProjectionMatrix = projectionMatrix;
+        }
+
         public bool IsActive { get; set; } = true;
 
-        Matrix PositionMatrix;
-        public Mesh MeshData;
-        public Color DrawColor;
+        Matrix ProjectionMatrix = Matrix.Identity;
+        Matrix WorldSpaceMatrix = Matrix.Identity;
+        public Mesh MeshData = Mesh.CreateRectangle(Vector2.Zero, new Point(10, 10));
+        public Color DrawColor = GlobalInterfaceData.Scheme.UIOverlayDebugColor1;
         public Texture2D DrawTexture;
 
         public Icon() 
-        {             
+        {
         }
         public Icon(Texture2D texture)
         {
@@ -51,7 +57,7 @@ namespace TuringSimulatorDesktop.UI
             DrawColor = color;
         }
         Icon(int width, int height)
-        {            
+        {
             Bounds = new Point(width, height);
         }
         public Icon(int width, int height, Texture2D texture) : this(width, height)
@@ -79,8 +85,8 @@ namespace TuringSimulatorDesktop.UI
         {    
             if (IsActive)
             {
-                if (DrawTexture != null) GlobalMeshRenderer.Draw(MeshData, PositionMatrix, DrawTexture, BoundPort);
-                else GlobalMeshRenderer.Draw(MeshData, PositionMatrix, DrawColor, BoundPort);   
+                if (DrawTexture != null) GlobalMeshRenderer.Draw(MeshData, WorldSpaceMatrix * ProjectionMatrix, DrawTexture, BoundPort);
+                else GlobalMeshRenderer.Draw(MeshData, WorldSpaceMatrix * ProjectionMatrix, DrawColor, BoundPort);   
             }         
         }
     }

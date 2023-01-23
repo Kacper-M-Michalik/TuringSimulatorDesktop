@@ -55,27 +55,27 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         public bool IsMarkedForDeletion { get; set; }
 
+        ActionGroup Group;
+
         Icon InfoBackground;
         Label CurrentStateTableTitle;
         Label CurrentStateTableLabel;
         Label CurrentTapeTitle;
         Label CurrentTapeLabel;
-
         Label NotificationLabel;
 
 
         Icon Background;
 
-        TextureButton ExecuteButton;
-        TextureButton StepButton;
-        TextureButton RestartButton;
-
         TextureButton AutoStepButton;
         TextureButton PauseButton;
+        TextureButton StepButton;
         TextureButton Speed1Button;
         TextureButton Speed2Button;
         TextureButton Speed3Button;
 
+        TextureButton ExecuteButton;
+        TextureButton RestartButton;
 
 
         Icon ReadHead;
@@ -83,15 +83,13 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         VerticalLayoutBox CurrentInstructionCollectionLayout;
         Icon CurrentInstructionPointer;
 
-        ActionGroup Group;
 
         int CurrentlyOpenedFileID = -1;
-        int CurrentlyOpenedAlphabetID = -1;
+        //int CurrentlyOpenedAlphabetID = -1;
         int CurrentlyOpenedTapeID = -1;
         TuringMachine Machine;
 
         CompilableFile TempFile;
-        Alphabet TempAlphabet;
         StateTable TempStateTable;
         bool IsStateTableOutdated;
 
@@ -100,14 +98,22 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         const double BaseTimeBetweenSteps = 1000;
         double TimeBetweenStepsMS;
 
-        public TuringMachineView()
+        public TuringMachineView(int FileID)
         {
+            Group = InputManager.CreateActionGroup();
+
+            Background = new Icon(GlobalInterfaceData.Scheme.Background);
+
+
             Machine = new TuringMachine();
             TimeBetweenStepsMS = BaseTimeBetweenSteps;
+
+            LoadStateTableSource(FileID);
         }
 
         public void LoadStateTableSource(int FileID)
         {
+            /*
             if (CurrentlyOpenedAlphabetID != -1)
             {
                 UIEventManager.Unsubscribe(CurrentlyOpenedAlphabetID, ReceivedAlphabetData);
@@ -115,6 +121,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 CurrentlyOpenedAlphabetID = -1;
                 TempAlphabet = null;
             }
+            */
             if (CurrentlyOpenedFileID != -1)
             {
                 UIEventManager.Unsubscribe(CurrentlyOpenedFileID, ReceivedStateTableSourceData);
@@ -183,12 +190,10 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 return;
             }
 
-            //FIGURE OUT LINKED ALPHABET ----
-            //CurrentlyOpenedAlphabetID = FileID;
-            UIEventManager.Subscribe(CurrentlyOpenedAlphabetID, ReceivedAlphabetData);
-            Client.SendTCPData(ClientSendPacketFunctions.RequestFile(CurrentlyOpenedAlphabetID, true));
+            CompileSourceFile();
         }
 
+        /*
         public void ReceivedAlphabetData(Packet Data)
         {
             if (CurrentlyOpenedAlphabetID != Data.ReadInt())
@@ -219,12 +224,12 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 return;
             }
 
-            CompileSourceFile();
         }
+        */
 
         public void CompileSourceFile()
         {
-            TempStateTable = TempFile.Compile(TempAlphabet);
+            TempStateTable = TempFile.Compile();
             if (TempStateTable == null)
             {
                 NotificationLabel.Text = "Failed to compile state table: Check it programmed correctly!";
@@ -304,7 +309,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             if (IsStateTableOutdated)
             {
-                Machine.SetActiveStateTable(TempStateTable, TempAlphabet);
+                Machine.SetActiveStateTable(TempStateTable);
                 IsStateTableOutdated = false;
             }
 
@@ -404,8 +409,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         {
             if (IsActive)
             {
-                Background.Draw(BoundPort);
-                
+                Background.Draw(BoundPort);                
             }
         }
         public void Close()

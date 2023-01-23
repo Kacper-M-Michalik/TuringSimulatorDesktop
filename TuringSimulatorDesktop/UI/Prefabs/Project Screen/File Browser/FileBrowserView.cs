@@ -271,23 +271,25 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                     break;
                 case CoreFileType.TransitionFile:
                     ViewToAdd = new TextProgrammingView(Data.ID);
+                    OwnerWindow.OwnerScreen.SetActiveEditorWindow((IRunnable)ViewToAdd);
                     break;
                 case CoreFileType.SlateFile:
                     ViewToAdd = new VisualProgrammingView(Data.ID);
+                    //OwnerWindow.OwnerScreen.SetActiveEditorWindow((IRunnable)ViewToAdd);
                     break;
                 case CoreFileType.Other:
                     //display error
                     return;
             }
 
-            if (ownerWindow.OwnerScreen.LastActiveEditorWindow == null) 
+            if (ownerWindow.OwnerScreen.LastActiveWindow == null) 
             {
                 ownerWindow.AddView(ViewToAdd);
-                ownerWindow.OwnerScreen.LastActiveEditorWindow = ownerWindow;
+                ownerWindow.OwnerScreen.LastActiveWindow = ownerWindow;
             }
             else
             {
-                ownerWindow.OwnerScreen.LastActiveEditorWindow.AddView(ViewToAdd);
+                ownerWindow.OwnerScreen.LastActiveWindow.AddView(ViewToAdd);
             }
         }
 

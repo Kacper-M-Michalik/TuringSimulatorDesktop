@@ -31,13 +31,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         public bool IsActive { get; set; } = true;
 
-        public bool IsMarkedForDeletion
-        {
-            get => false;
-            set
-            {
-            }
-        }
+        public bool IsMarkedForDeletion { get; set; }
 
         Icon Background;
         Icon FileIcon;

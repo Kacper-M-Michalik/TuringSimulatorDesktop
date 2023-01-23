@@ -23,7 +23,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 int X = UIUtils.ConvertFloatToInt(position.X);
                 int Y = UIUtils.ConvertFloatToInt(position.Y);
 
-                MainPort.X = X + 1;
+                MainPort.X = X;
                 MainPort.Y = Y + 24;
 
             }

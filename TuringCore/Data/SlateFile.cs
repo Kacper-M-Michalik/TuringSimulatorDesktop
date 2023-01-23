@@ -8,7 +8,7 @@ namespace TuringCore
 {
     public class SlateFile : CompilableFile
     {
-        public override StateTable Compile(Alphabet DefinitionAlphabet)
+        public override StateTable Compile()
         {
             throw new NotImplementedException();
         }

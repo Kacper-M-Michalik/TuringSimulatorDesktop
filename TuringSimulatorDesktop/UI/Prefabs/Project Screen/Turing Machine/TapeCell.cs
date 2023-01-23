@@ -9,7 +9,7 @@ using TuringSimulatorDesktop.Input;
 
 namespace TuringSimulatorDesktop.UI.Prefabs
 {
-    public class TapeCell : IVisualElement
+    public class TapeCell : IVisualElement, ICanvasInteractable
     {
         Vector2 position;
         public Vector2 Position
@@ -43,29 +43,37 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             }
         }
 
+        public void SetProjectionMatrix(Matrix projectionMatrix, Matrix inverseProjectionMatrix)
+        {
+            Seperator.SetProjectionMatrix(projectionMatrix, inverseProjectionMatrix);
+            InputOutputLabel.SetProjectionMatrix(projectionMatrix, inverseProjectionMatrix);
+        }
+
         public Icon Seperator;
         public InputBox InputOutputLabel;
 
-        public static int ReferenceWidth = 90;
+        public static int ReferenceWidth = 91;
         public static int ReferenceHeight = 90;
 
         public TapeCell(ActionGroup Group)
         {
             Seperator = new Icon(GlobalInterfaceData.Scheme.NonInteractableAccent);
             InputOutputLabel = new InputBox(Group);
+            InputOutputLabel.OutputLabel.DrawCentered = true;
+            InputOutputLabel.BackgroundColor = GlobalInterfaceData.Scheme.DarkInteractableAccent;
 
-            Bounds = new Point(60, 60);
+            Bounds = new Point(ReferenceWidth, ReferenceHeight);
         }
 
         void MoveLayout()
         {
             InputOutputLabel.Position = position;
-            Seperator.Position = InputOutputLabel.Position + new Vector2(1, 0);
+            Seperator.Position = InputOutputLabel.Position + new Vector2(InputOutputLabel.Bounds.X, 0);
         }
 
         void ResizeLayout()
         {
-            InputOutputLabel.Bounds = bounds;            
+            InputOutputLabel.Bounds = new Point(bounds.X - 1, bounds.Y);            
             Seperator.Bounds = new Point(1, bounds.Y);
         }
 
@@ -73,9 +81,9 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         {
             if (IsActive)
             {
+                InputOutputLabel.Draw(BoundPort);
                 //Background.Draw(BoundPort);
                 Seperator.Draw(BoundPort);
-                InputOutputLabel.Draw(BoundPort);
             }
         }
     }

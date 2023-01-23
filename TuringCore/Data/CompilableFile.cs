@@ -11,7 +11,7 @@ namespace TuringCore
     public abstract class CompilableFile
     {
         [JsonInclude]
-        public string DefinitionAlphabetID;
-        public abstract StateTable Compile(Alphabet DefinitionAlphabet);
+        public Alphabet DefinitionAlphabet;
+        public abstract StateTable Compile();
     }
 }

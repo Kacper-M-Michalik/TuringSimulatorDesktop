@@ -152,7 +152,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Client.SendTCPData(ClientSendPacketFunctions.UnsubscribeFromFolderUpdates(CurrentlyOpenedFileID));
             CurrentlyOpenedFileID = ID;
             UIEventManager.Subscribe(CurrentlyOpenedFileID, ReceivedAlphabetData);
-            Client.SendTCPData(ClientSendPacketFunctions.RequestFolderData(ID, true));
+            Client.SendTCPData(ClientSendPacketFunctions.RequestFile(ID, true));
         }
 
         public void ReceivedAlphabetData(Packet Data)
@@ -165,6 +165,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 return;
             }
 
+            Data.ReadInt();
             title = Data.ReadString();
             FileVersion = Data.ReadInt();
 
@@ -178,6 +179,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 return;
             }
 
+            //DefenitionIDInputBox.Text = "";
             DefenitionIDInputBox.Text = OpenedFile.ID;
             EmptyCharacterInputBox.Text = OpenedFile.EmptyCharacter;
             WildcardCharacterInputBox.Text = OpenedFile.WildcardCharacter;
@@ -216,15 +218,15 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             Background.Position = position;
 
-            DefenitionIDTitle.Position = position + GlobalInterfaceData.Scale(new Vector2());
-            EmptyCharacterTitle.Position = position + GlobalInterfaceData.Scale(new Vector2());
-            WildcardCharacterTitle.Position = position + GlobalInterfaceData.Scale(new Vector2());
-            AllowedCharactersTitle.Position = position + GlobalInterfaceData.Scale(new Vector2());
+            DefenitionIDTitle.Position = position + GlobalInterfaceData.Scale(new Vector2(10, 10));
+            EmptyCharacterTitle.Position = position + GlobalInterfaceData.Scale(new Vector2(10, 50));
+            WildcardCharacterTitle.Position = position + GlobalInterfaceData.Scale(new Vector2(10, 100));
+            AllowedCharactersTitle.Position = position + GlobalInterfaceData.Scale(new Vector2(200, 10));
 
-            DefenitionIDInputBox.Position = position + GlobalInterfaceData.Scale(new Vector2());
-            EmptyCharacterInputBox.Position = position + GlobalInterfaceData.Scale(new Vector2());
-            WildcardCharacterInputBox.Position = position + GlobalInterfaceData.Scale(new Vector2());
-            AllowedCharactersInputBox.Position = position + GlobalInterfaceData.Scale(new Vector2());
+            DefenitionIDInputBox.Position = position + GlobalInterfaceData.Scale(new Vector2(10, 20));
+            EmptyCharacterInputBox.Position = position + GlobalInterfaceData.Scale(new Vector2(10, 60));
+            WildcardCharacterInputBox.Position = position + GlobalInterfaceData.Scale(new Vector2(10, 110));
+            AllowedCharactersInputBox.Position = position + GlobalInterfaceData.Scale(new Vector2(200, 20));
         }
 
         void ResizeLayout()
@@ -234,10 +236,10 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             Background.Bounds = bounds;
 
-            DefenitionIDInputBox.Bounds = GlobalInterfaceData.Scale(new Point(10,10));
-            EmptyCharacterInputBox.Bounds = GlobalInterfaceData.Scale(new Point(10, 10));
-            WildcardCharacterInputBox.Bounds = GlobalInterfaceData.Scale(new Point(10, 10));
-            AllowedCharactersInputBox.Bounds = GlobalInterfaceData.Scale(new Point(10, 10));
+            DefenitionIDInputBox.Bounds = GlobalInterfaceData.Scale(new Point(100,15));
+            EmptyCharacterInputBox.Bounds = GlobalInterfaceData.Scale(new Point(100, 15));
+            WildcardCharacterInputBox.Bounds = GlobalInterfaceData.Scale(new Point(100, 15));
+            AllowedCharactersInputBox.Bounds = GlobalInterfaceData.Scale(new Point(300, 500));
         }
 
         public void Draw(Viewport? BoundPort = null)

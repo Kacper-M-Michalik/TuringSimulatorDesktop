@@ -18,16 +18,16 @@ namespace TuringCore
 
         public TransitionFile()
         {
-            DefinitionAlphabetID = "";
+            DefinitionAlphabet = null;
             HaltStates = new List<string>();
             Transitions = new List<Transition>();            
         }
 
-        public override StateTable Compile(Alphabet DefinitionAlphabet)
+        public override StateTable Compile()
         {
             StateTable Table = new StateTable();
             //Table.ID = "NULL NAME";
-            Table.DefinitionAlphabetID = DefinitionAlphabetID;
+            Table.DefinitionAlphabet = DefinitionAlphabet;
 
             for (int i = 0; i < HaltStates.Count; i++)
             {
@@ -102,6 +102,7 @@ namespace TuringCore
     public enum MoveHeadDirection
     {
         Left,
-        Right
+        Right,
+        Empty
     }
 }

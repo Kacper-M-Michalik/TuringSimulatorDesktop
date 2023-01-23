@@ -40,22 +40,30 @@ namespace TuringSimulatorDesktop.UI
         public ActionGroup Group { get; private set; }
         Viewport Port;
 
-        public bool DragBounded = false;
-        public Vector2 ViewOffsetBoundsMin;
-        public Vector2 ViewOffsetBoundsMax;
-        public Vector2 ViewOffset;
-        public bool Draggable;
-        public float DragFactor = 0.2f;
+        public bool Draggable = true;
+        public float DragFactor = 1f;
+        public float ZoomFactor = 0.1f;
         public bool DrawBounded = true;
 
-        public List<IVisualElement> Elements;
+        Vector3 Offset;
+        float Zoom = 1f;
+        public Matrix OffsetMatrix;
+        public Matrix ZoomMatrix;
+        public Matrix InverseMatrix;
+
+        public List<ICanvasInteractable> Elements;
 
         public DraggableCanvas()
         {
             Group = InputManager.CreateActionGroup();
             Group.PollableObjects.Add(this);
-            Elements = new List<IVisualElement>();
+            
+            Elements = new List<ICanvasInteractable>();
             Port = new Viewport();
+
+            InverseMatrix = Matrix.Identity;
+            OffsetMatrix = Matrix.Identity;
+            ZoomMatrix = Matrix.Identity;
 
             Bounds = new Point(0, 0);
             Position = Vector2.Zero;
@@ -68,24 +76,26 @@ namespace TuringSimulatorDesktop.UI
 
         public void PollInput(bool IsInActionGroupFrame)
         {
-            if (IsInActionGroupFrame && Draggable && IsMouseOver() && InputManager.LeftMousePressed)
+            if (IsInActionGroupFrame && Draggable && IsMouseOver())
             {
-                ViewOffset.X += (float)InputManager.MouseDeltaX * DragFactor;
-                ViewOffset.Y += (float)InputManager.MouseDeltaY * DragFactor;
-
-                if (DragBounded)
+                if (InputManager.MouseData.LeftButton == Microsoft.Xna.Framework.Input.ButtonState.Pressed)
                 {
-                    ViewOffset.X = Math.Clamp(ViewOffset.X, ViewOffsetBoundsMin.X, ViewOffsetBoundsMax.X);
-                    ViewOffset.Y = Math.Clamp(ViewOffset.Y, ViewOffsetBoundsMin.Y, ViewOffsetBoundsMax.Y);
+                    Offset.X += (float)InputManager.MouseDeltaX * DragFactor;
+                    Offset.Y += (float)InputManager.MouseDeltaY * DragFactor;
+                    OffsetMatrix = Matrix.CreateTranslation(Offset);
                 }
 
-                UpdateLayout();
+                Zoom += (InputManager.ScrollWheelDelta/120)*ZoomFactor;
+                ZoomMatrix = Matrix.CreateScale(Zoom);
+
+                Matrix ResultMatrix = OffsetMatrix * ZoomMatrix;
+                InverseMatrix = Matrix.Invert(ResultMatrix);
+
+                foreach (ICanvasInteractable InteractableItem in Elements)
+                {
+                    InteractableItem.SetProjectionMatrix(ResultMatrix, InverseMatrix);
+                }
             }
-        }
-
-        public void UpdateLayout()
-        {
-
         }
 
         public void MoveLayout()
