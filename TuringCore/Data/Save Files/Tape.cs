@@ -5,12 +5,12 @@ using System.Text.Json.Serialization;
 namespace TuringCore
 {
     [Serializable]
-    public class TapeTemplate
+    public class TapeTemplate : SaveFile
     {
         //[JsonInclude]
         //public string ID;
         //[JsonInclude]
-        //public string DefinitionAlphabetID;
+        public Guid DefinitionAlphabetID;
         [JsonInclude]
         public Dictionary<int, string> Data = new Dictionary<int, string>();
         [JsonInclude]
@@ -21,7 +21,7 @@ namespace TuringCore
         public TapeTemplate() 
         {
             //ID = "";
-            //DefinitionAlphabetID = "";
+            DefinitionAlphabetID = Guid.Empty;
             Data = new Dictionary<int, string>();
             HighestIndex = 0;
             LowestIndex = 0;
@@ -57,7 +57,6 @@ namespace TuringCore
 
     public class Tape
     {
-        ///public string ID;
         public Alphabet DefinitionAlphabet;
         public Dictionary<int, string> Data = new Dictionary<int, string>();
         public int HighestIndex;

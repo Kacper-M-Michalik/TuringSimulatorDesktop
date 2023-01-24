@@ -22,7 +22,8 @@ namespace TuringServer
             {(int)ClientSendPackets.RequestLogReceieverStatus, UserRequestedLogReceieverStatus},
             {(int)ClientSendPackets.RequestProjectData, UserRequestedProjectData},
             {(int)ClientSendPackets.RequestFolderData, UserRequestedFolderData},
-            {(int)ClientSendPackets.RequestFile, UserRequestedFile},
+            {(int)ClientSendPackets.RequestFileByID, UserRequestedFileByID},
+            {(int)ClientSendPackets.RequestFileByGUID, UserRequestedFileByGUID},
             {(int)ClientSendPackets.UnsubscribeFromUpdatesForFile, UserUnsubscribedFromFileUpdates},
             {(int)ClientSendPackets.UnsubscribeFromUpdatesForFolder, UserUnsubscribedFromFolderUpdates},
 
@@ -122,7 +123,7 @@ namespace TuringServer
          * int File ID
          * bool Subscribe To Updates (Whether or not client wants to recieve new version of file when it is updated)
          */
-        public static void UserRequestedFile(int SenderClientID, Packet Data)
+        public static void UserRequestedFileByID(int SenderClientID, Packet Data)
         {
             CustomLogging.Log("SERVER INSTRUCTION: User requested file.");
 
@@ -151,6 +152,39 @@ namespace TuringServer
             Server.LoadedProject.CacheDataLookup[FileID].ResetExpiryTimer();
             Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.FileData(FileID));
         }
+
+        public static void UserRequestedFileByGUID(int SenderClientID, Packet Data)
+        {
+            CustomLogging.Log("SERVER INSTRUCTION: User requested GUID file.");
+
+            Guid GuidID;
+            bool SubscribeToUpdates;
+
+            try
+            {
+                GuidID = Data.ReadGuid();
+                SubscribeToUpdates = Data.ReadBool();
+            }
+            catch
+            {
+                CustomLogging.Log("ServerReceive Error: Invalid request file packet recieved from client: " + SenderClientID.ToString());
+                return;
+            }
+
+            int FileID = Server.LoadedProject.GuidFileLookup[GuidID];
+
+            if (!FileManager.LoadFileIntoCache(FileID))
+            {
+                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to retreive file - Server failed to load it."));
+                return;
+            }
+
+            if (SubscribeToUpdates) Server.LoadedProject.FileDataLookup[FileID].SubscriberIDs.Add(SenderClientID);
+
+            Server.LoadedProject.CacheDataLookup[FileID].ResetExpiryTimer();
+            Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.FileData(FileID));
+        }
+
 
         /* -PACKET LAYOUT-
          * int Folder ID
@@ -216,22 +250,24 @@ namespace TuringServer
 
             }
 
+            Guid FileGuidID = Guid.NewGuid();
+
             try
             {
                 FileStream Fs = File.Create(NewFileLocation); 
                 switch (FileType)
                 {
                     case CoreFileType.Alphabet:
-                        Fs.Write(JsonSerializer.SerializeToUtf8Bytes(new Alphabet()));
+                        Fs.Write(JsonSerializer.SerializeToUtf8Bytes(new Alphabet() { FileID = FileGuidID }));
                         break;
                     case CoreFileType.Tape:
-                        Fs.Write(JsonSerializer.SerializeToUtf8Bytes(new TapeTemplate()));
+                        Fs.Write(JsonSerializer.SerializeToUtf8Bytes(new TapeTemplate() { FileID = FileGuidID }));
                         break;
                     case CoreFileType.TransitionFile:
-                        Fs.Write(JsonSerializer.SerializeToUtf8Bytes(new TransitionFile()));
+                        Fs.Write(JsonSerializer.SerializeToUtf8Bytes(new TransitionFile() { FileID = FileGuidID }));
                         break;
                     case CoreFileType.SlateFile:
-                        Fs.Write(JsonSerializer.SerializeToUtf8Bytes(new SlateFile()));
+                        Fs.Write(JsonSerializer.SerializeToUtf8Bytes(new SlateFile() { FileID = FileGuidID }));
                         break;
                 }
                 Fs.Close();
@@ -240,10 +276,12 @@ namespace TuringServer
             {
                 CustomLogging.Log("ServerRecieve Error: UserCreatedNewFile - " + E.ToString());
                 Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to create file - Server failed to create it."));
+                return;
             }
 
             int NewID = FileManager.GetNewFileID();
 
+            Server.LoadedProject.GuidFileLookup.Add(FileGuidID, NewID);
             DirectoryFile NewFileData = new DirectoryFile(NewID, FinalFileName, FileType, Server.LoadedProject.FolderDataLookup[FolderID]);
             Server.LoadedProject.FileDataLookup.Add(NewID, NewFileData);
             ParentFolder.SubFiles.Add(NewFileData);

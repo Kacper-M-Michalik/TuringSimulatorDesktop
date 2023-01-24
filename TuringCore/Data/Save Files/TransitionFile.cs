@@ -18,16 +18,15 @@ namespace TuringCore
 
         public TransitionFile()
         {
-            DefinitionAlphabet = null;
             HaltStates = new List<string>();
             Transitions = new List<Transition>();            
         }
 
-        public override StateTable Compile()
+        public override StateTable Compile(Alphabet DefinitionAlphabet)
         {
             StateTable Table = new StateTable();
             //Table.ID = "NULL NAME";
-            Table.DefinitionAlphabet = DefinitionAlphabet;
+            //Table.DefinitionAlphabet = DefinitionAlphabet;
 
             for (int i = 0; i < HaltStates.Count; i++)
             {

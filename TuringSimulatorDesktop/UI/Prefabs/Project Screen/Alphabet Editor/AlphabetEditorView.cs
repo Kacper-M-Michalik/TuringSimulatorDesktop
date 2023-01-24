@@ -180,7 +180,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             }
 
             //DefenitionIDInputBox.Text = "";
-            DefenitionIDInputBox.Text = OpenedFile.ID;
+            //DefenitionIDInputBox.Text = OpenedFile.ID;
             EmptyCharacterInputBox.Text = OpenedFile.EmptyCharacter;
             WildcardCharacterInputBox.Text = OpenedFile.WildcardCharacter;
 
@@ -203,7 +203,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             }
 
             Alphabet NewAlphabet = new Alphabet();
-            NewAlphabet.ID = DefenitionIDInputBox.Text;
+            //NewAlphabet.ID = DefenitionIDInputBox.Text;
             NewAlphabet.EmptyCharacter = EmptyCharacterInputBox.Text;
             NewAlphabet.WildcardCharacter = WildcardCharacterInputBox.Text;
             NewAlphabet.Characters = AllowedCharactersInputBox.Text.Split("/n").ToHashSet();

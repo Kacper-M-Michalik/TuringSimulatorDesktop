@@ -85,12 +85,14 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
 
         int CurrentlyOpenedFileID = -1;
-        //int CurrentlyOpenedAlphabetID = -1;
+        int CurrentlyOpenedAlphabetID = -1;
+        Guid CurrentlyOpenedAlphabetGUID = Guid.Empty;
         int CurrentlyOpenedTapeID = -1;
         TuringMachine Machine;
 
         CompilableFile TempFile;
         StateTable TempStateTable;
+        Alphabet TempAlphabet;
         bool IsStateTableOutdated;
 
         bool IsAutoStepActive;
@@ -113,15 +115,16 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         public void LoadStateTableSource(int FileID)
         {
-            /*
+            
             if (CurrentlyOpenedAlphabetID != -1)
             {
                 UIEventManager.Unsubscribe(CurrentlyOpenedAlphabetID, ReceivedAlphabetData);
                 Client.SendTCPData(ClientSendPacketFunctions.UnsubscribeFromFileUpdates(CurrentlyOpenedAlphabetID));
                 CurrentlyOpenedAlphabetID = -1;
+                CurrentlyOpenedAlphabetGUID = Guid.Empty;
                 TempAlphabet = null;
             }
-            */
+            
             if (CurrentlyOpenedFileID != -1)
             {
                 UIEventManager.Unsubscribe(CurrentlyOpenedFileID, ReceivedStateTableSourceData);
@@ -190,10 +193,15 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 return;
             }
 
-            CompileSourceFile();
+            //curre
+
+           // UIEventManager.Subscribe(CurrentlyOpenedFileID, ReceivedStateTableSourceData);
+            //Client.SendTCPData(ClientSendPacketFunctions.RequestFile(CurrentlyOpenedFileID, true));
+
+            //CompileSourceFile();
         }
 
-        /*
+        
         public void ReceivedAlphabetData(Packet Data)
         {
             if (CurrentlyOpenedAlphabetID != Data.ReadInt())
@@ -224,19 +232,20 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 return;
             }
 
+            CompileSourceFile();
         }
-        */
+        
 
         public void CompileSourceFile()
-        {
-            TempStateTable = TempFile.Compile();
+        {            
+            TempStateTable = TempFile.Compile(TempAlphabet);
             if (TempStateTable == null)
             {
                 NotificationLabel.Text = "Failed to compile state table: Check it programmed correctly!";
                 CustomLogging.Log("Cllient: Failed to compile file, invalid transition/slate file!");
                 return;
             }
-            IsStateTableOutdated = true;
+            IsStateTableOutdated = true;            
         }
 
         public void LoadTape(int FileID)
@@ -309,7 +318,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             if (IsStateTableOutdated)
             {
-                Machine.SetActiveStateTable(TempStateTable);
+                Machine.SetActiveStateTable(TempStateTable, TempAlphabet);
                 IsStateTableOutdated = false;
             }
 

@@ -35,8 +35,7 @@ namespace TuringServer
         public TuringProjectType TuringTypeRule;
 
         public DirectoryFolder BaseDirectoryFolder;
-
-        public Dictionary<string, int> ProjectAlphabetLookup;
+        public Dictionary<Guid, int> GuidFileLookup;
 
         //Rules get sent to client -> client Ui responsible for telling uiser cant run turing with these rules, unless is server simulated turing
         //Allow server to simualte hese windwos as to have mutiple users have access to same window not only file:

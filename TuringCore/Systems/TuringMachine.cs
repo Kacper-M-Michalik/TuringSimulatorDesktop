@@ -105,11 +105,11 @@ namespace TuringCore
             OriginalTape = NewTape;
         }
 
-        public void SetActiveStateTable(StateTable Table)
+        public void SetActiveStateTable(StateTable Table, Alphabet Alphabet)
         {
             //if (ActiveStateTable.DefinitionAlphabetID != Alphabet.ID) throw new Exception("Wrong alphabet given");
             //if (OriginalTape != null && Table.DefenitionAlphabetID != OriginalTape.DefenitionAlphabetID) throw new Exception("Incompatible alphabets");
-            ActiveAlphabet = Table.DefinitionAlphabet;
+            ActiveAlphabet = Alphabet;
             ActiveStateTable = Table;
         }
 

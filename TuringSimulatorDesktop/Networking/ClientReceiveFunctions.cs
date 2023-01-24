@@ -41,6 +41,7 @@ namespace TuringSimulatorDesktop
         {
             CustomLogging.Log("CLIENT: Recieved FILE Data");
 
+           // UIEventManager.PushToListeners(Data.ReadInt(false), Data);
             UIEventManager.PushToListeners(Data.ReadInt(false), Data);
         }
 
@@ -48,6 +49,7 @@ namespace TuringSimulatorDesktop
         {
             CustomLogging.Log("CLIENT: Recieved FOLDER Data");
 
+            //UIEventManager.PushToListeners(Data.ReadInt(false), Data);
             UIEventManager.PushToListeners(Data.ReadInt(false), Data);
         }
 

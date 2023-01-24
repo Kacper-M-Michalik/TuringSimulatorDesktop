@@ -11,7 +11,8 @@ namespace TuringCore
 
         RequestProjectData,
         RequestFolderData,
-        RequestFile,
+        RequestFileByID,
+        RequestFileByGUID,
         UnsubscribeFromUpdatesForFile,
         UnsubscribeFromUpdatesForFolder,
 
@@ -87,6 +88,11 @@ namespace TuringCore
             TemporaryWriteBuffer.AddRange(BitConverter.GetBytes(Data));
         }
 
+        public void Write(Guid Data)
+        {
+            Write(Data.ToByteArray());
+        }
+
         public void Write(short Data)
         {
             TemporaryWriteBuffer.AddRange(BitConverter.GetBytes(Data));
@@ -134,6 +140,12 @@ namespace TuringCore
             int Result = BitConverter.ToInt32(ReadBuffer, ReadPointerPosition);
             if (MovePointer) ReadPointerPosition += 4;
             return Result;
+        }
+
+        public Guid ReadGuid(bool MovePointer = true)
+        {
+            if (ReadPointerPosition + 16 > ReadBuffer.Length) throw new Exception("ReadGuid Length out of bounds!");
+            return new Guid(ReadBytes(16, MovePointer));
         }
 
         public short ReadShort(bool MovePointer = true)

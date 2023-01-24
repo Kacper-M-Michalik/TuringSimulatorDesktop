@@ -41,7 +41,18 @@ namespace TuringCore
         {
             Packet Data = new Packet();
 
-            Data.Write((int)ClientSendPackets.RequestFile);
+            Data.Write((int)ClientSendPackets.RequestFileByID);
+            Data.Write(FileID);
+            Data.Write(RecieveUpdates);
+
+            return Data;
+        }
+
+        public static Packet RequestFileByGUID(Guid FileID, bool RecieveUpdates)
+        {
+            Packet Data = new Packet();
+
+            Data.Write((int)ClientSendPackets.RequestFileByGUID);
             Data.Write(FileID);
             Data.Write(RecieveUpdates);
 

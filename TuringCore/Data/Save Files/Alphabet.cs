@@ -5,10 +5,10 @@ using System.Text.Json.Serialization;
 namespace TuringCore
 {
     [Serializable]
-    public class Alphabet
+    public class Alphabet : SaveFile
     {
-        [JsonInclude]
-        public string ID;
+        //[JsonInclude]
+        //public string ID;
         [JsonInclude]
         public HashSet<string> Characters;
         [JsonInclude]
@@ -18,7 +18,7 @@ namespace TuringCore
 
         public Alphabet()
         {
-            ID = "";
+            //ID = "";
             Characters = new HashSet<string>();
             EmptyCharacter = "";
             WildcardCharacter = "*";

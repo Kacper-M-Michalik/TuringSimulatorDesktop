@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 namespace TuringCore
 {
     [Serializable]
-    public abstract class CompilableFile
+    public abstract class CompilableFile : SaveFile
     {
         [JsonInclude]
-        public Alphabet DefinitionAlphabet;
-        public abstract StateTable Compile();
+        public Guid DefinitionAlphabetFileID = Guid.Empty;
+        public abstract StateTable Compile(Alphabet DefinitionAlphabet);
     }
 }
