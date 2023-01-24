@@ -39,6 +39,7 @@ namespace TuringServer
     public class DirectoryFile
     {
         public int ID;
+        public Guid GUID;
         public int Version;
         public HashSet<int> SubscriberIDs;
 
@@ -47,9 +48,10 @@ namespace TuringServer
         public CoreFileType FileType;
         public DirectoryFolder ParentFolder;
 
-        public DirectoryFile(int SetID, string SetName, string SetExtension, DirectoryFolder SetParentFolder)
+        public DirectoryFile(int SetID, Guid SetGUID, string SetName, string SetExtension, DirectoryFolder SetParentFolder)
         {
             ID = SetID;
+            GUID = SetGUID;
             Name = SetName;
             Extension = SetExtension;
             FileType = FileManager.ExtensionToFileType(Extension);
@@ -58,9 +60,10 @@ namespace TuringServer
             ParentFolder = SetParentFolder;
             SubscriberIDs = new HashSet<int>();
         }
-        public DirectoryFile(int SetID, string SetName, CoreFileType SetType, DirectoryFolder SetParentFolder)
+        public DirectoryFile(int SetID, Guid SetGUID, string SetName, CoreFileType SetType, DirectoryFolder SetParentFolder)
         {
             ID = SetID;
+            GUID = SetGUID;
             Name = SetName;
 
             FileType = SetType;

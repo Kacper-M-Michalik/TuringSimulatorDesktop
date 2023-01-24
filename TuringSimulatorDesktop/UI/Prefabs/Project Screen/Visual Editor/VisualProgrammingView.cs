@@ -51,9 +51,9 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         string title = "Empty Visual Programming View";
         public string Title => title;
-        public int OpenFileID => CurrentlyOpenedFileID;
+        public Guid OpenFileID => CurrentlyOpenedFileID;
 
-        int CurrentlyOpenedFileID;
+        Guid CurrentlyOpenedFileID;
 
         public bool IsMarkedForDeletion
         {
@@ -63,7 +63,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             }
         }
 
-        public VisualProgrammingView(int FileToDisplay)
+        public VisualProgrammingView(Guid FileToDisplay)
         {
             IsActive = false;
 

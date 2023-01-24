@@ -60,7 +60,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         string title = "Empty Alphabet Editor View";
         public string Title => title;
-        public int OpenFileID => CurrentlyOpenedFileID;
+        public Guid OpenFileID => CurrentlyOpenedFileID;
 
         ActionGroup Group;
 
@@ -77,7 +77,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         InputBox AllowedCharactersInputBox;
 
         bool FullyLoadedFile;
-        int CurrentlyOpenedFileID;
+        Guid CurrentlyOpenedFileID;
         int FileVersion;
         Alphabet OpenedFile;
 
@@ -89,7 +89,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             }
         }
 
-        public AlphabetEditorView(int FileToDisplay)
+        public AlphabetEditorView(Guid FileToDisplay)
         {
             Group = InputManager.CreateActionGroup();
 
@@ -145,7 +145,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             CurrentlyOpenedFileID = FileToDisplay;
         }
 
-        public void SwitchOpenedAlphabet(int ID)
+        public void SwitchOpenedAlphabet(Guid ID)
         {
             FullyLoadedFile = false;
             UIEventManager.Unsubscribe(CurrentlyOpenedFileID, ReceivedAlphabetData);
@@ -159,12 +159,13 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         {
             CustomLogging.Log("CLIENT: Window received Alphabet Data");
             
-            if (Data.ReadInt() != CurrentlyOpenedFileID)
+            if (Data.ReadGuid() != CurrentlyOpenedFileID)
             {
                 CustomLogging.Log("CLIENT: Alphabet Editor Window Fatal Error, recived unwated file data!");
                 return;
             }
 
+            //file type
             Data.ReadInt();
             title = Data.ReadString();
             FileVersion = Data.ReadInt();
@@ -203,12 +204,12 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             }
 
             Alphabet NewAlphabet = new Alphabet();
-            //NewAlphabet.ID = DefenitionIDInputBox.Text;
+            NewAlphabet.FileID = CurrentlyOpenedFileID;
             NewAlphabet.EmptyCharacter = EmptyCharacterInputBox.Text;
             NewAlphabet.WildcardCharacter = WildcardCharacterInputBox.Text;
             NewAlphabet.Characters = AllowedCharactersInputBox.Text.Split("/n").ToHashSet();
 
-            Client.SendTCPData(ClientSendPacketFunctions.UpdateFile(CurrentlyOpenedFileID, FileVersion, JsonSerializer.SerializeToUtf8Bytes(NewAlphabet, GlobalProjectAndUserData.JsonOptions)));
+            Client.SendTCPData(ClientSendPacketFunctions.UpdateFile(FileVersion, JsonSerializer.SerializeToUtf8Bytes(NewAlphabet, GlobalProjectAndUserData.JsonOptions)));
         }
 
         void MoveLayout()

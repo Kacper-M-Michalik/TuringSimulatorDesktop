@@ -44,7 +44,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             }
         }
         public string Title => "Turing Machine";
-        public int OpenFileID => -1;
+        public Guid OpenFileID => Guid.Empty;
 
         Window ownerWindow;
         public Window OwnerWindow
@@ -84,10 +84,9 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         Icon CurrentInstructionPointer;
 
 
-        int CurrentlyOpenedFileID = -1;
-        int CurrentlyOpenedAlphabetID = -1;
-        Guid CurrentlyOpenedAlphabetGUID = Guid.Empty;
-        int CurrentlyOpenedTapeID = -1;
+        Guid CurrentlyOpenedFileID = Guid.Empty;
+        Guid CurrentlyOpenedAlphabetID = Guid.Empty;
+        Guid CurrentlyOpenedTapeID = Guid.Empty;
         TuringMachine Machine;
 
         CompilableFile TempFile;
@@ -100,7 +99,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         const double BaseTimeBetweenSteps = 1000;
         double TimeBetweenStepsMS;
 
-        public TuringMachineView(int FileID)
+        public TuringMachineView(Guid FileID)
         {
             Group = InputManager.CreateActionGroup();
 
@@ -113,19 +112,18 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             LoadStateTableSource(FileID);
         }
 
-        public void LoadStateTableSource(int FileID)
+        public void LoadStateTableSource(Guid FileID)
         {
             
-            if (CurrentlyOpenedAlphabetID != -1)
+            if (CurrentlyOpenedAlphabetID != Guid.Empty)
             {
                 UIEventManager.Unsubscribe(CurrentlyOpenedAlphabetID, ReceivedAlphabetData);
                 Client.SendTCPData(ClientSendPacketFunctions.UnsubscribeFromFileUpdates(CurrentlyOpenedAlphabetID));
-                CurrentlyOpenedAlphabetID = -1;
-                CurrentlyOpenedAlphabetGUID = Guid.Empty;
+                CurrentlyOpenedAlphabetID = Guid.Empty;
                 TempAlphabet = null;
             }
             
-            if (CurrentlyOpenedFileID != -1)
+            if (CurrentlyOpenedFileID != Guid.Empty)
             {
                 UIEventManager.Unsubscribe(CurrentlyOpenedFileID, ReceivedStateTableSourceData);
                 Client.SendTCPData(ClientSendPacketFunctions.UnsubscribeFromFileUpdates(CurrentlyOpenedFileID));
@@ -155,7 +153,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         public void ReceivedStateTableSourceData(Packet Data)
         {
             //get rid of fileID
-            if (CurrentlyOpenedFileID != Data.ReadInt())
+            if (CurrentlyOpenedFileID != Data.ReadGuid())
             {
                 //new request was sent, throw error or whatver
                 return;
@@ -195,8 +193,9 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             //curre
 
-           // UIEventManager.Subscribe(CurrentlyOpenedFileID, ReceivedStateTableSourceData);
-            //Client.SendTCPData(ClientSendPacketFunctions.RequestFile(CurrentlyOpenedFileID, true));
+            CurrentlyOpenedAlphabetID = TempFile.DefinitionAlphabetFileID;
+            UIEventManager.Subscribe(CurrentlyOpenedAlphabetID, ReceivedAlphabetData);
+            Client.SendTCPData(ClientSendPacketFunctions.RequestFile(CurrentlyOpenedAlphabetID, true));
 
             //CompileSourceFile();
         }
@@ -204,7 +203,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         
         public void ReceivedAlphabetData(Packet Data)
         {
-            if (CurrentlyOpenedAlphabetID != Data.ReadInt())
+            if (CurrentlyOpenedAlphabetID != Data.ReadGuid())
             {
                 //new request was sent, throw error or whatver
                 return;
@@ -248,9 +247,9 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             IsStateTableOutdated = true;            
         }
 
-        public void LoadTape(int FileID)
+        public void LoadTape(Guid FileID)
         {
-            if (CurrentlyOpenedTapeID != -1)
+            if (CurrentlyOpenedTapeID != Guid.Empty)
             {
                 UIEventManager.Unsubscribe(CurrentlyOpenedTapeID, ReceivedTapeData);
                 Client.SendTCPData(ClientSendPacketFunctions.UnsubscribeFromFileUpdates(CurrentlyOpenedTapeID));
@@ -263,7 +262,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         public void ReceivedTapeData(Packet Data)
         {
-            if (CurrentlyOpenedTapeID != Data.ReadInt())
+            if (CurrentlyOpenedTapeID != Data.ReadGuid())
             {
                 //new request was sent, throw error or whatver
                 return;

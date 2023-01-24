@@ -10,7 +10,7 @@ namespace TuringSimulatorDesktop.UI
     public interface IView : IVisualElement
     {
         public string Title { get; }
-        public int OpenFileID { get; }
+        public Guid OpenFileID { get; }
         public Window OwnerWindow { get; set; }
     }
 }

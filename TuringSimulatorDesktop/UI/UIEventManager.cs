@@ -32,7 +32,7 @@ namespace TuringSimulatorDesktop
             if (GUIDFileUpdateSubscribers.ContainsKey(FileID) && GUIDFileUpdateSubscribers[FileID].Contains(Function)) GUIDFileUpdateSubscribers[FileID].Remove(Function);
         }
 
-        public static void PushToFolderListeners(int FileID, Packet Data)
+        public static void PushFolderToListeners(int FileID, Packet Data)
         {
             //if (!FileUpdateSubscribers.ContainsKey(FileID)) return;
 
@@ -45,7 +45,7 @@ namespace TuringSimulatorDesktop
                 Data.ReadPointerPosition = BasePointer;
             }
         }
-        public static void PushToFileListeners(Guid FileID, Packet Data)
+        public static void PushFileToListeners(Guid FileID, Packet Data)
         {
             //if (!FileUpdateSubscribers.ContainsKey(FileID)) return;
 

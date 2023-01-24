@@ -22,7 +22,7 @@ namespace TuringServer
             {(int)ClientSendPackets.RequestLogReceieverStatus, UserRequestedLogReceieverStatus},
             {(int)ClientSendPackets.RequestProjectData, UserRequestedProjectData},
             {(int)ClientSendPackets.RequestFolderData, UserRequestedFolderData},
-            {(int)ClientSendPackets.RequestFileByID, UserRequestedFileByID},
+           // {(int)ClientSendPackets.RequestFileByID, UserRequestedFileByID},
             {(int)ClientSendPackets.RequestFileByGUID, UserRequestedFileByGUID},
             {(int)ClientSendPackets.UnsubscribeFromUpdatesForFile, UserUnsubscribedFromFileUpdates},
             {(int)ClientSendPackets.UnsubscribeFromUpdatesForFolder, UserUnsubscribedFromFolderUpdates},
@@ -123,6 +123,7 @@ namespace TuringServer
          * int File ID
          * bool Subscribe To Updates (Whether or not client wants to recieve new version of file when it is updated)
          */
+        /*
         public static void UserRequestedFileByID(int SenderClientID, Packet Data)
         {
             CustomLogging.Log("SERVER INSTRUCTION: User requested file.");
@@ -152,17 +153,18 @@ namespace TuringServer
             Server.LoadedProject.CacheDataLookup[FileID].ResetExpiryTimer();
             Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.FileData(FileID));
         }
+        */
 
         public static void UserRequestedFileByGUID(int SenderClientID, Packet Data)
         {
             CustomLogging.Log("SERVER INSTRUCTION: User requested GUID file.");
 
-            Guid GuidID;
+            Guid FileGUID;
             bool SubscribeToUpdates;
 
             try
             {
-                GuidID = Data.ReadGuid();
+                FileGUID = Data.ReadGuid();
                 SubscribeToUpdates = Data.ReadBool();
             }
             catch
@@ -171,7 +173,13 @@ namespace TuringServer
                 return;
             }
 
-            int FileID = Server.LoadedProject.GuidFileLookup[GuidID];
+            if (!Server.LoadedProject.GuidFileLookup.ContainsKey(FileGUID))
+            {
+                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to retreive file - File doesn't exist."));
+                return;
+            }
+
+            int FileID = Server.LoadedProject.GuidFileLookup[FileGUID];
 
             if (!FileManager.LoadFileIntoCache(FileID))
             {
@@ -182,7 +190,7 @@ namespace TuringServer
             if (SubscribeToUpdates) Server.LoadedProject.FileDataLookup[FileID].SubscriberIDs.Add(SenderClientID);
 
             Server.LoadedProject.CacheDataLookup[FileID].ResetExpiryTimer();
-            Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.FileData(FileID));
+            Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.FileData(FileGUID));
         }
 
 
@@ -250,7 +258,7 @@ namespace TuringServer
 
             }
 
-            Guid FileGuidID = Guid.NewGuid();
+            Guid FileGUID = Guid.NewGuid();
 
             try
             {
@@ -258,16 +266,16 @@ namespace TuringServer
                 switch (FileType)
                 {
                     case CoreFileType.Alphabet:
-                        Fs.Write(JsonSerializer.SerializeToUtf8Bytes(new Alphabet() { FileID = FileGuidID }));
+                        Fs.Write(JsonSerializer.SerializeToUtf8Bytes(new Alphabet() { FileID = FileGUID }));
                         break;
                     case CoreFileType.Tape:
-                        Fs.Write(JsonSerializer.SerializeToUtf8Bytes(new TapeTemplate() { FileID = FileGuidID }));
+                        Fs.Write(JsonSerializer.SerializeToUtf8Bytes(new TapeTemplate() { FileID = FileGUID }));
                         break;
                     case CoreFileType.TransitionFile:
-                        Fs.Write(JsonSerializer.SerializeToUtf8Bytes(new TransitionFile() { FileID = FileGuidID }));
+                        Fs.Write(JsonSerializer.SerializeToUtf8Bytes(new TransitionFile() { FileID = FileGUID }));
                         break;
                     case CoreFileType.SlateFile:
-                        Fs.Write(JsonSerializer.SerializeToUtf8Bytes(new SlateFile() { FileID = FileGuidID }));
+                        Fs.Write(JsonSerializer.SerializeToUtf8Bytes(new SlateFile() { FileID = FileGUID }));
                         break;
                 }
                 Fs.Close();
@@ -281,8 +289,8 @@ namespace TuringServer
 
             int NewID = FileManager.GetNewFileID();
 
-            Server.LoadedProject.GuidFileLookup.Add(FileGuidID, NewID);
-            DirectoryFile NewFileData = new DirectoryFile(NewID, FinalFileName, FileType, Server.LoadedProject.FolderDataLookup[FolderID]);
+            Server.LoadedProject.GuidFileLookup.Add(FileGUID, NewID);
+            DirectoryFile NewFileData = new DirectoryFile(NewID, FileGUID, FinalFileName, FileType, Server.LoadedProject.FolderDataLookup[FolderID]);
             Server.LoadedProject.FileDataLookup.Add(NewID, NewFileData);
             ParentFolder.SubFiles.Add(NewFileData);
             FileManager.LoadFileIntoCache(NewID);
@@ -303,15 +311,16 @@ namespace TuringServer
         {
             CustomLogging.Log("SERVER INSTRUCTION: User updated file.");
 
-            int FileID;
+            Guid FileGUID;
             int FileVersion;
             byte[] NewData;
 
             try
             {
-                FileID = Data.ReadInt(); 
                 FileVersion = Data.ReadInt();
                 NewData = Data.ReadByteArray();
+                SaveFile TempFile = JsonSerializer.Deserialize<SaveFile>(NewData);
+                FileGUID = TempFile.FileID;
             }
             catch
             {
@@ -320,6 +329,14 @@ namespace TuringServer
             }
 
             //Possibly implement parsing bytes into actual object to see if it succeeds -> prevent users from sending corrupt files
+
+            if (!Server.LoadedProject.GuidFileLookup.ContainsKey(FileGUID))
+            {
+                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to update file - File doesn't exist."));
+                return;
+            }
+
+            int FileID = Server.LoadedProject.GuidFileLookup[FileGUID];
 
             if (!Server.LoadedProject.FileDataLookup.ContainsKey(FileID))
             {
@@ -335,7 +352,7 @@ namespace TuringServer
             }
 
             try
-            {                
+            {
                 //Replace with async here later?
                 File.WriteAllBytes(Server.LoadedProject.BasePath + FileData.GetLocalPath(), NewData);
             }
@@ -363,7 +380,7 @@ namespace TuringServer
 
             Server.LoadedProject.CacheDataLookup[FileID].ResetExpiryTimer();
 
-            Packet SendPacket = ServerSendPacketFunctions.FileData(FileID);
+            Packet SendPacket = ServerSendPacketFunctions.FileData(FileGUID);
             foreach (int Client in FileData.SubscriberIDs)
             {
                 Server.SendTCPData(Client, SendPacket);
@@ -380,12 +397,12 @@ namespace TuringServer
         {
             CustomLogging.Log("SERVER INSTRUCTION: User renamed file.");
 
-            int FileID;
+            Guid FileGUID;
             string NewFileName;
 
             try
             {
-                FileID = Data.ReadInt();
+                FileGUID = Data.ReadGuid();
                 NewFileName = Data.ReadString();
             }
             catch
@@ -393,6 +410,14 @@ namespace TuringServer
                 CustomLogging.Log("ServerReceive Error: Invalid rename file packet recieved from client: " + SenderClientID.ToString());
                 return;
             }
+
+            if (!Server.LoadedProject.GuidFileLookup.ContainsKey(FileGUID))
+            {
+                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to rename file - File doesn't exist."));
+                return;
+            }
+
+            int FileID = Server.LoadedProject.GuidFileLookup[FileGUID];
 
             if (!FileManager.IsValidFileName(NewFileName))
             {
@@ -447,7 +472,7 @@ namespace TuringServer
             }
 
             //REDO TO SEND ONYL RENAME INSTEAD OF WHOLE FILE
-            SendPacket = ServerSendPacketFunctions.FileData(FileData.ID);
+            SendPacket = ServerSendPacketFunctions.FileData(FileData.GUID);
             foreach (int SubscriberID in Server.LoadedProject.FileDataLookup[FileData.ID].SubscriberIDs)
             {
                 Server.SendTCPData(SubscriberID, SendPacket);
@@ -464,12 +489,12 @@ namespace TuringServer
         {
             CustomLogging.Log("SERVER INSTRUCTION: User moved file.");
 
-            int FileID;
+            Guid FileGUID;
             int NewFolderID;
 
             try
             {
-                FileID = Data.ReadInt();
+                FileGUID = Data.ReadGuid();
                 NewFolderID = Data.ReadInt();
             }
             catch
@@ -477,6 +502,14 @@ namespace TuringServer
                 CustomLogging.Log("ServerReceive Error: Invalid move file packet recieved from client: " + SenderClientID.ToString());
                 return;
             }
+
+            if (!Server.LoadedProject.GuidFileLookup.ContainsKey(FileGUID))
+            {
+                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to move file - File doesn't exist."));
+                return;
+            }
+
+            int FileID = Server.LoadedProject.GuidFileLookup[FileGUID];
 
             if (!Server.LoadedProject.FolderDataLookup.ContainsKey(NewFolderID))
             {
@@ -549,11 +582,11 @@ namespace TuringServer
         {
             CustomLogging.Log("SERVER INSTRUCTION: User deleted file.");
 
-            int FileID;
+            Guid FileGUID;
 
             try
             {
-                FileID = Data.ReadInt();
+                FileGUID = Data.ReadGuid();
             }
             catch
             {
@@ -561,11 +594,13 @@ namespace TuringServer
                 return;
             }
 
-            if (!Server.LoadedProject.FileDataLookup.ContainsKey(FileID))
+            if (!Server.LoadedProject.GuidFileLookup.ContainsKey(FileGUID))
             {
                 Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to delete file - File doesn't exist."));
                 return;
             }
+
+            int FileID = Server.LoadedProject.GuidFileLookup[FileGUID];
 
             DirectoryFile FileData = Server.LoadedProject.FileDataLookup[FileID];
 
@@ -582,7 +617,7 @@ namespace TuringServer
                 Server.SendTCPData(SubscriberID, SendPacket);
             }
 
-            SendPacket = ServerSendPacketFunctions.FileDeleted(FileData.ID);
+            SendPacket = ServerSendPacketFunctions.FileDeleted(FileData.GUID);
             foreach (int SubscriberID in Server.LoadedProject.FileDataLookup[FileData.ID].SubscriberIDs)
             {
                 Server.SendTCPData(SubscriberID, SendPacket);
@@ -598,11 +633,11 @@ namespace TuringServer
         {
             CustomLogging.Log("SERVER INSTRUCTION: User unsubbed from file.");
 
-            int FileID;
+            Guid FileGUID;
 
             try
             {
-                FileID = Data.ReadInt();
+                FileGUID = Data.ReadGuid();
             }
             catch
             {
@@ -610,7 +645,15 @@ namespace TuringServer
                 return;
             }
 
-            if (!Server.LoadedProject.FileDataLookup.ContainsKey(FileID))
+            if (!Server.LoadedProject.GuidFileLookup.ContainsKey(FileGUID))
+            {
+                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to unsubscribe from file - File doesn't exist."));
+                return;
+            }
+
+            int FileID = Server.LoadedProject.GuidFileLookup[FileGUID];
+
+            if (!Server.LoadedProject.GuidFileLookup.ContainsKey(FileGUID))
             {
                 Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to unsubscribe from file - File doesn't exist."));
                 return;
@@ -621,6 +664,9 @@ namespace TuringServer
             Server.LoadedProject.FileDataLookup[FileID].SubscriberIDs.Remove(SenderClientID);
         }
 
+        /*
+         * 
+         */
         public static void UserUnsubscribedFromFolderUpdates(int SenderClientID, Packet Data)
         {
             CustomLogging.Log("SERVER INSTRUCTION: User unsubbed from folder.");

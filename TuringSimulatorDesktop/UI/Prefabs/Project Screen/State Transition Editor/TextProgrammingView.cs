@@ -59,7 +59,7 @@ namespace TuringSimulatorDesktop.UI
         string title = "Empty Programming View";
         public string Title => title;
         
-        public int OpenFileID => CurrentlyOpenedFileID;
+        public Guid OpenFileID => CurrentlyOpenedFileID;
 
         public bool IsMarkedForDeletion
         {
@@ -90,12 +90,12 @@ namespace TuringSimulatorDesktop.UI
 
 
         bool FullyLoadedFile;
-        int CurrentlyOpenedFileID;
+        Guid CurrentlyOpenedFileID;
         int FileVersion;
         TransitionFile OpenedFile;
 
 
-        public TextProgrammingView(int FileToDisplay)
+        public TextProgrammingView(Guid FileToDisplay)
         {
             Group = InputManager.CreateActionGroup();
             Group.PollableObjects.Add(this);
@@ -151,7 +151,7 @@ namespace TuringSimulatorDesktop.UI
             TransitionLayout.UpdateLayout();    
         }
 
-        public void SwitchOpenedFile(int ID)
+        public void SwitchOpenedFile(Guid ID)
         {
             FullyLoadedFile = false;
             UIEventManager.Unsubscribe(CurrentlyOpenedFileID, ReceivedStateTransitionTable);
@@ -166,7 +166,7 @@ namespace TuringSimulatorDesktop.UI
             TransitionItems = new List<StateTransitionItem>();
 
             //file id
-            Data.ReadInt();
+            Data.ReadGuid();
 
             if ((CoreFileType)Data.ReadInt() != CoreFileType.TransitionFile) throw new Exception("Opened File is not a transition file!");
 
@@ -224,7 +224,7 @@ namespace TuringSimulatorDesktop.UI
 
             TransitionFile NewFile = new TransitionFile();
 
-            //NewFile.DefinitionAlphabetID = DefenitionAlphabetInputBox.Text;
+            NewFile.FileID = CurrentlyOpenedFileID;
 
             NewFile.HaltStates.AddRange(HaltStateInputBox.Text.Split("/n"));
 
@@ -258,7 +258,7 @@ namespace TuringSimulatorDesktop.UI
                 NewFile.Transitions.Add(NewTransition);
             }
 
-            Client.SendTCPData(ClientSendPacketFunctions.UpdateFile(CurrentlyOpenedFileID, FileVersion, JsonSerializer.SerializeToUtf8Bytes(NewFile, GlobalProjectAndUserData.JsonOptions)));
+            Client.SendTCPData(ClientSendPacketFunctions.UpdateFile(FileVersion, JsonSerializer.SerializeToUtf8Bytes(NewFile, GlobalProjectAndUserData.JsonOptions)));
         }
 
         void MoveLayout()

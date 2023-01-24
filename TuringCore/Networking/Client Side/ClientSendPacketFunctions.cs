@@ -37,11 +37,11 @@ namespace TuringCore
             return Data;
         }
 
-        public static Packet RequestFile(int FileID, bool RecieveUpdates)
+        public static Packet RequestFile(Guid FileID, bool RecieveUpdates)
         {
             Packet Data = new Packet();
 
-            Data.Write((int)ClientSendPackets.RequestFileByID);
+            Data.Write((int)ClientSendPackets.RequestFileByGUID);
             Data.Write(FileID);
             Data.Write(RecieveUpdates);
 
@@ -82,7 +82,7 @@ namespace TuringCore
             return Data;
         }
 
-        public static Packet UpdateFile(int FileID, int Version, string NewContents)
+        public static Packet UpdateFile(Guid FileID, int Version, string NewContents)
         {
             Packet Data = new Packet();
 
@@ -94,19 +94,18 @@ namespace TuringCore
             return Data;
         }
 
-        public static Packet UpdateFile(int FileID, int Version, byte[] NewContents)
+        public static Packet UpdateFile(int Version, byte[] NewContents)
         {
             Packet Data = new Packet();
 
             Data.Write((int)ClientSendPackets.UpdateFile);
-            Data.Write(FileID);
             Data.Write(Version);
             Data.Write(NewContents);
 
             return Data;
         }
 
-        public static Packet RenameFile(int FileID, string NewFileName)
+        public static Packet RenameFile(Guid FileID, string NewFileName)
         {
             Packet Data = new Packet();
 
@@ -117,7 +116,7 @@ namespace TuringCore
             return Data;
         }
 
-        public static Packet MoveFile(int FileID, int NewFolderID)
+        public static Packet MoveFile(Guid FileID, int NewFolderID)
         {
             Packet Data = new Packet();
 
@@ -128,7 +127,7 @@ namespace TuringCore
             return Data;
         }
 
-        public static Packet DeleteFile(int FileID)
+        public static Packet DeleteFile(Guid FileID)
         {
             Packet Data = new Packet();
 
@@ -138,7 +137,7 @@ namespace TuringCore
             return Data;
         }
 
-        public static Packet UnsubscribeFromFileUpdates(int FileID)
+        public static Packet UnsubscribeFromFileUpdates(Guid FileID)
         {
             Packet Data = new Packet();
 

@@ -55,7 +55,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         }
 
         public string Title => "File Browser";
-        public int OpenFileID => -1;
+        public Guid OpenFileID => Guid.Empty;
 
         public bool IsMarkedForDeletion
         {
@@ -188,7 +188,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             int FileCount = Data.ReadInt();
             for (int i = 0; i < FileCount; i++)
             {
-                FileDisplayItem Item = new FileDisplayItem(new FileData(Data.ReadString(), Data.ReadInt(), (CoreFileType)Data.ReadInt()), this, FileLayout.Group);
+                FileDisplayItem Item = new FileDisplayItem(new FileData(Data.ReadString(), Data.ReadGuid(), (CoreFileType)Data.ReadInt()), this, FileLayout.Group);
                 Item.Bounds = new Point(FileLayout.Bounds.X, 0);
                 Files.Add(Item);
                 FileLayout.AddElement(Item);
@@ -264,17 +264,17 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             switch (Data.Type)
             {
                 case CoreFileType.Alphabet:
-                    ViewToAdd = new AlphabetEditorView(Data.ID);
+                    ViewToAdd = new AlphabetEditorView(Data.GUID);
                     break;
                 case CoreFileType.Tape:
-                    ViewToAdd = new TapeEditorView(Data.ID);
+                    ViewToAdd = new TapeEditorView(Data.GUID);
                     break;
                 case CoreFileType.TransitionFile:
-                    ViewToAdd = new TextProgrammingView(Data.ID);
+                    ViewToAdd = new TextProgrammingView(Data.GUID);
                     OwnerWindow.OwnerScreen.SetActiveEditorWindow((IRunnable)ViewToAdd);
                     break;
                 case CoreFileType.SlateFile:
-                    ViewToAdd = new VisualProgrammingView(Data.ID);
+                    ViewToAdd = new VisualProgrammingView(Data.GUID);
                     //OwnerWindow.OwnerScreen.SetActiveEditorWindow((IRunnable)ViewToAdd);
                     break;
                 case CoreFileType.Other:

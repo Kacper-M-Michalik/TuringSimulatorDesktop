@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 using TuringCore;
 using TuringSimulatorDesktop.Input;
 
@@ -154,13 +155,14 @@ namespace TuringSimulatorDesktop.UI.Prefabs
     {
         public string Name;
         public int ID;
+        public Guid GUID;
         public CoreFileType Type;
         public bool IsFolder;
 
-        public FileData(string SetName, int SetID, CoreFileType SetType)
+        public FileData(string SetName, Guid SetGUID, CoreFileType SetType)
         {
             Name = SetName;
-            ID = SetID;
+            GUID = SetGUID;
             Type = SetType;
             IsFolder = false;
         }

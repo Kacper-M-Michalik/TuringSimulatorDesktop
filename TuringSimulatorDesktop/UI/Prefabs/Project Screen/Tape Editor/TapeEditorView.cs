@@ -62,10 +62,10 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         string title = "Empty Tape Editor View";
         public string Title => title;
-        public int OpenFileID => CurrentlyOpenedFileID;
+        public Guid OpenFileID => CurrentlyOpenedFileID;
 
         bool FullyLoadedFile;
-        int CurrentlyOpenedFileID;
+        Guid CurrentlyOpenedFileID;
         int FileVersion;
         TapeTemplate OpenedFile;
 
@@ -73,7 +73,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         TapeVisualItem VisualTape;
 
 
-        public TapeEditorView(int FileToDisplay)
+        public TapeEditorView(Guid FileToDisplay)
         {
             Canvas = new DraggableCanvas();
 
@@ -87,7 +87,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             //call switch here
         }
 
-        public void SwitchOpenedTape(int ID)
+        public void SwitchOpenedTape(Guid ID)
         {
             FullyLoadedFile = false;
             UIEventManager.Unsubscribe(CurrentlyOpenedFileID, ReceivedTapeData);
@@ -101,7 +101,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         {
             CustomLogging.Log("CLIENT: Window received Tape Template Data");
 
-            if (Data.ReadInt() != CurrentlyOpenedFileID)
+            if (Data.ReadGuid() != CurrentlyOpenedFileID)
             {
                 CustomLogging.Log("CLIENT: Tape Editor Window Fatal Error, recived unwanted file data!");
                 return;

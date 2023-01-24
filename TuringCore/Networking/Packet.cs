@@ -11,7 +11,7 @@ namespace TuringCore
 
         RequestProjectData,
         RequestFolderData,
-        RequestFileByID,
+        //RequestFileByID,
         RequestFileByGUID,
         UnsubscribeFromUpdatesForFile,
         UnsubscribeFromUpdatesForFolder,
@@ -90,7 +90,7 @@ namespace TuringCore
 
         public void Write(Guid Data)
         {
-            Write(Data.ToByteArray());
+            TemporaryWriteBuffer.AddRange(Data.ToByteArray());
         }
 
         public void Write(short Data)

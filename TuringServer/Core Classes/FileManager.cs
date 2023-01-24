@@ -208,7 +208,7 @@ namespace TuringServer
                     }
 
                     NewGuidFileLookup.Add(GuidID, ID);
-                    DirectoryFile NewFileData = new DirectoryFile(ID, Name, Extension, NewFolder);
+                    DirectoryFile NewFileData = new DirectoryFile(ID, GuidID, Name, Extension, NewFolder);
                     NewFileDataLookup.Add(NewFileData.ID, NewFileData);
                     NewFolder.SubFiles.Add(NewFileData);
                 }

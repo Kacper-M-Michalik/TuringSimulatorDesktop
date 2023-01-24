@@ -41,13 +41,15 @@ namespace TuringServer
             return Data;
         }
 
-        public static Packet FileData(int FileID)
+        public static Packet FileData(Guid FileGUID)
         {
             Packet Data = new Packet();
 
             Data.Write((int)ServerSendPackets.SentOrUpdatedFile);
-            Data.Write(FileID);
 
+            int FileID = Server.LoadedProject.GuidFileLookup[FileGUID];
+
+            Data.Write(FileGUID);
             Data.Write((int)Server.LoadedProject.FileDataLookup[FileID].FileType);
             Data.Write(Server.LoadedProject.FileDataLookup[FileID].Name);
             Data.Write(Server.LoadedProject.FileDataLookup[FileID].Version);
@@ -96,7 +98,7 @@ namespace TuringServer
             foreach (DirectoryFile File in SendFolder.SubFiles)
             {
                 Data.Write(File.Name);
-                Data.Write(File.ID);
+                Data.Write(File.GUID);
                 Data.Write((int)File.FileType);
             }
 
@@ -127,12 +129,12 @@ namespace TuringServer
         }
         */
 
-        public static Packet FileDeleted(int FileID)
+        public static Packet FileDeleted(Guid FileGUID)
         {
             Packet Data = new Packet();
 
             Data.Write((int)ServerSendPackets.DeletedFile);
-            Data.Write(FileID);
+            Data.Write(FileGUID);
 
             //SendTCPToAllClients(Data);
             return Data;

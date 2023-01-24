@@ -95,7 +95,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         {
             foreach (WindowHeaderItem Header in Headers)
             {
-                if (View.OpenFileID != -1 && Header.View.OpenFileID == View.OpenFileID)
+                if (View.OpenFileID != Guid.Empty && Header.View.OpenFileID == View.OpenFileID)
                 {
                     SetView(Header);
                     return;
