@@ -17,10 +17,11 @@ using TuringSimulatorDesktop.UI;
 namespace TuringSimulatorDesktop
 {
     public static class GlobalInterfaceData
-    {
+    {     
+
         public static int MainMenuWidth = 750;
         public static int MainMenuHeight = 750;
-        public static int MinimumApplicationWindowWidth = 770;
+        public static int MinimumApplicationWindowWidth = 750;
         public static int MinimumApplicationWindowHeight = 370;
         
         public static GameWindow OSWindow;
@@ -66,7 +67,7 @@ namespace TuringSimulatorDesktop
             return Texture;
         }
 
-        const int ManuallyGeneratedMaxEnum = 10;
+        const int ManuallyGeneratedMaxEnum = 13;
         public static void BakeTextures()
         {
             for (int i = 0; i < ManuallyGeneratedMaxEnum + 1; i++)
@@ -235,6 +236,9 @@ namespace TuringSimulatorDesktop
     {
         MouseIcon,
         TypingIcon,
+        MinimiseIcon,
+        MaximiseIcon,
+        CloseIcon,
         UndoIcon,
         RedoIcon,
         SaveIcon,

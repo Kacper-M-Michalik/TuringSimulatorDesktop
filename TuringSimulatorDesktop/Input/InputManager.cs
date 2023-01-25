@@ -13,6 +13,8 @@ namespace TuringSimulatorDesktop.Input
         static List<ActionGroup> ActionGroups = new List<ActionGroup>(); 
         static IClickable PreviouslyClickedObject;
 
+        public static bool IsMouseOverTypingArea;
+
         public static MouseState MouseData;
 
         public static Matrix MousePositionMatrix;

@@ -173,8 +173,18 @@ namespace TuringSimulatorDesktop
 
             CurrentView.Draw();       
 
+            GraphicsDevice.Viewport = GlobalInterfaceData.FullscreenViewport;
             ScreenBatch.Begin();
-            //DebugManager.Draw(GraphicsDevice, ScreenBatch, gameTime);
+            if (InputManager.IsMouseOverTypingArea)
+            {
+                Texture2D Texture = GlobalInterfaceData.TextureLookup[UILookupKey.TypingIcon];
+                ScreenBatch.Draw(Texture, new Vector2(InputManager.MouseData.X - Texture.Width * 0.5f, InputManager.MouseData.Y - Texture.Height * 0.5f), Color.White);
+            }
+            else
+            {
+                ScreenBatch.Draw(GlobalInterfaceData.TextureLookup[UILookupKey.MouseIcon], new Vector2(InputManager.MouseData.X, InputManager.MouseData.Y), Color.White);
+            }
+            InputManager.IsMouseOverTypingArea = false;
             ScreenBatch.End();
 
             //InputManager.DrawActionGroups();         

@@ -154,6 +154,7 @@ namespace TuringSimulatorDesktop.UI
         {
             if (IsActive)
             {
+                if (IsMouseOver()) InputManager.IsMouseOverTypingArea = true;
                 GlobalMeshRenderer.Draw(BackgroundMesh, WorldSpaceMatrix * ProjectionMatrix, BackgroundColor, BoundPort);                
                 OutputLabel.Draw(BoundPort);
             }
