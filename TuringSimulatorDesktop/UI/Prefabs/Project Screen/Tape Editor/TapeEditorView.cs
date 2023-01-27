@@ -132,6 +132,11 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         public void Save()
         {
+            if (!FullyLoadedFile)
+            {
+                return;
+            }
+
             TapeTemplate NewTemplate = new TapeTemplate();
 
             NewTemplate.FileID = CurrentlyOpenedFileID;
