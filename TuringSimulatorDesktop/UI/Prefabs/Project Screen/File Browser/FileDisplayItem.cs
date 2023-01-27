@@ -3,10 +3,11 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using TuringCore;
 using TuringSimulatorDesktop.Input;
+using Microsoft.Xna.Framework.Input;
 
 namespace TuringSimulatorDesktop.UI.Prefabs
 {
-    public class FileDisplayItem : IVisualElement, IClickable
+    public class FileDisplayItem : IVisualElement, IClickable, IPollable
     {
         Vector2 position;
         public Vector2 Position
@@ -50,6 +51,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Data = data;
             Browser = browser;
             group.ClickableObjects.Add(this);
+            group.PollableObjects.Add(this);
 
             Background = new Icon(GlobalInterfaceData.Scheme.Background);
 
@@ -125,6 +127,15 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         public bool IsMouseOver()
         {
             return (IsActive && InputManager.MouseData.X >= Position.X && InputManager.MouseData.X <= Position.X + bounds.X && InputManager.MouseData.Y >= Position.Y && InputManager.MouseData.Y <= Position.Y + bounds.Y);
+        }
+
+        public void PollInput(bool IsInActionGroupFrame)
+        {
+            if (ClickedOnce && InputManager.MouseData.LeftButton == ButtonState.Pressed && !IsMouseOver())
+            {
+                InputManager.StartDragging(Data);
+                ClickedOnce = false;
+            }
         }
 
         void MoveLayout()

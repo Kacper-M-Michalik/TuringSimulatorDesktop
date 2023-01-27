@@ -17,6 +17,7 @@ namespace TuringSimulatorDesktop
             {(int)ServerSendPackets.SentProjectData, ReceivedProjectData},
             {(int)ServerSendPackets.ErrorNotification, ReceiveErrorNotification},
             {(int)ServerSendPackets.SentOrUpdatedFile, ReceivedFileFromServer},
+            {(int)ServerSendPackets.SentFileMetadata, ReceivedFileMetadataFromServer},
             {(int)ServerSendPackets.SentFolderData, ReceivedFolderDataFromServer},
             {(int)ServerSendPackets.LogData, ReceiveLogData},
         };
@@ -41,8 +42,22 @@ namespace TuringSimulatorDesktop
         {
             CustomLogging.Log("CLIENT: Recieved FILE Data");
 
+            Guid ID = Data.ReadGuid(false);
+            Data.ReadPointerPosition -= 4;
+
            // UIEventManager.PushToListeners(Data.ReadInt(false), Data);
-            UIEventManager.PushFileToListeners(Data.ReadGuid(false), Data);
+            UIEventManager.PushFileToListeners(ID, Data);
+        }
+
+        public static void ReceivedFileMetadataFromServer(Packet Data)
+        {
+            CustomLogging.Log("CLIENT: Recieved METADATA");
+
+            Guid ID = Data.ReadGuid(false);
+            Data.ReadPointerPosition -= 4;
+
+            // UIEventManager.PushToListeners(Data.ReadInt(false), Data);
+            UIEventManager.PushFileToListeners(ID, Data);
         }
 
         public static void ReceivedFolderDataFromServer(Packet Data)

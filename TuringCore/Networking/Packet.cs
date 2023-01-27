@@ -12,7 +12,8 @@ namespace TuringCore
         RequestProjectData,
         RequestFolderData,
         //RequestFileByID,
-        RequestFileByGUID,
+        RequestFileMetadata,
+        RequestFile,
         UnsubscribeFromUpdatesForFile,
         UnsubscribeFromUpdatesForFolder,
 
@@ -36,6 +37,7 @@ namespace TuringCore
         SentProjectData,
         SentFolderData,
         SentOrUpdatedFile,
+        SentFileMetadata,
 
         //Unecessary?
 

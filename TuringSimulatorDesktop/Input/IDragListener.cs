@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace TuringSimulatorDesktop.UI
 {
-    public interface IDragListener
+    public interface IDragListener : IClickable
     {
-
+        public void RecieveDragData();
     }
 }

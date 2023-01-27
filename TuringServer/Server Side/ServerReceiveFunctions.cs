@@ -23,7 +23,8 @@ namespace TuringServer
             {(int)ClientSendPackets.RequestProjectData, UserRequestedProjectData},
             {(int)ClientSendPackets.RequestFolderData, UserRequestedFolderData},
            // {(int)ClientSendPackets.RequestFileByID, UserRequestedFileByID},
-            {(int)ClientSendPackets.RequestFileByGUID, UserRequestedFileByGUID},
+            {(int)ClientSendPackets.RequestFile, UserRequestedFile},
+            {(int)ClientSendPackets.RequestFileMetadata, UserRequestedFileMetadata},
             {(int)ClientSendPackets.UnsubscribeFromUpdatesForFile, UserUnsubscribedFromFileUpdates},
             {(int)ClientSendPackets.UnsubscribeFromUpdatesForFolder, UserUnsubscribedFromFolderUpdates},
 
@@ -155,7 +156,7 @@ namespace TuringServer
         }
         */
 
-        public static void UserRequestedFileByGUID(int SenderClientID, Packet Data)
+        public static void UserRequestedFile(int SenderClientID, Packet Data)
         {
             CustomLogging.Log("SERVER INSTRUCTION: User requested GUID file.");
 
@@ -193,6 +194,32 @@ namespace TuringServer
             Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.FileData(FileGUID));
         }
 
+        public static void UserRequestedFileMetadata(int SenderClientID, Packet Data)
+        {
+            CustomLogging.Log("SERVER INSTRUCTION: User requested GUID Metadata file.");
+
+            Guid FileGUID;
+
+            try
+            {
+                FileGUID = Data.ReadGuid();
+            }
+            catch
+            {
+                CustomLogging.Log("ServerReceive Error: Invalid request file packet recieved from client: " + SenderClientID.ToString());
+                return;
+            }
+
+            if (!Server.LoadedProject.GuidFileLookup.ContainsKey(FileGUID))
+            {
+                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to retreive file metadata - File doesn't exist."));
+                return;
+            }
+
+            int FileID = Server.LoadedProject.GuidFileLookup[FileGUID];
+
+            Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.FileMetadata(FileGUID));
+        }
 
         /* -PACKET LAYOUT-
          * int Folder ID

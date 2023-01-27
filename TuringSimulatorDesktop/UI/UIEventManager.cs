@@ -32,11 +32,11 @@ namespace TuringSimulatorDesktop
             if (GUIDFileUpdateSubscribers.ContainsKey(FileID) && GUIDFileUpdateSubscribers[FileID].Contains(Function)) GUIDFileUpdateSubscribers[FileID].Remove(Function);
         }
 
-        public static void PushFolderToListeners(int FileID, Packet Data)
+        public static void PushFolderToListeners(int FolderID, Packet Data)
         {
             //if (!FileUpdateSubscribers.ContainsKey(FileID)) return;
 
-            List<SubscriberDataCallback> Subscribers = FileUpdateSubscribers[FileID];
+            List<SubscriberDataCallback> Subscribers = FileUpdateSubscribers[FolderID];
             int BasePointer = Data.ReadPointerPosition;      
             
             for (int i = Subscribers.Count - 1; i > -1; i--)

@@ -58,6 +58,22 @@ namespace TuringServer
             return Data;
         }
 
+        public static Packet FileMetadata(Guid FileGUID)
+        {
+            Packet Data = new Packet();
+
+            Data.Write((int)ServerSendPackets.SentFileMetadata);
+
+            int FileID = Server.LoadedProject.GuidFileLookup[FileGUID];
+
+            Data.Write(FileGUID);
+            Data.Write((int)Server.LoadedProject.FileDataLookup[FileID].FileType);
+            Data.Write(Server.LoadedProject.FileDataLookup[FileID].Name);
+            Data.Write(Server.LoadedProject.FileDataLookup[FileID].Version);
+
+            return Data;
+        }
+
         public static Packet FolderData(int FolderID)
         {
             Packet Data = new Packet();

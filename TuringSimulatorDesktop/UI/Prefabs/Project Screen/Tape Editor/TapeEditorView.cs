@@ -103,6 +103,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         public void ReceivedTapeData(Packet Data)
         {
+            if ((ServerSendPackets)Data.ReadInt() == ServerSendPackets.SentFileMetadata) return;
+
             CustomLogging.Log("CLIENT: Window received Tape Template Data");
 
             if (Data.ReadGuid() != CurrentlyOpenedFileID)

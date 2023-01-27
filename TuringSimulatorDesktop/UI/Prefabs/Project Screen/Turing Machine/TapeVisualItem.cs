@@ -88,7 +88,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             float Width = CameraMax - CameraMin;
             int TargetCellCount = Convert.ToInt32(MathF.Ceiling(Width / TapeCell.ReferenceTotalWidth)) + 1;
 
-            //redo? yh
+            //redo!!!, zoom out nmegative value bug, need to multiply movement by zoom too
             if (Cells.Count < TargetCellCount)
             {
                 while (Cells.Count < TargetCellCount)

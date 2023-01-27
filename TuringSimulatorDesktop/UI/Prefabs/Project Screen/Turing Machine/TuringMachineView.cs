@@ -152,6 +152,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         public void ReceivedStateTableSourceData(Packet Data)
         {
+            if ((ServerSendPackets)Data.ReadInt() == ServerSendPackets.SentFileMetadata) return;
+
             //get rid of fileID
             if (CurrentlyOpenedFileID != Data.ReadGuid())
             {
@@ -203,6 +205,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         
         public void ReceivedAlphabetData(Packet Data)
         {
+            if ((ServerSendPackets)Data.ReadInt() == ServerSendPackets.SentFileMetadata) return;
+
             if (CurrentlyOpenedAlphabetID != Data.ReadGuid())
             {
                 //new request was sent, throw error or whatver

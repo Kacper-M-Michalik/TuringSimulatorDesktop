@@ -11,7 +11,7 @@ using TuringCore;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace TuringSimulatorDesktop.UI
+namespace TuringSimulatorDesktop.UI.Prefabs
 {    
     public class TextProgrammingView : IView, IPollable, IRunnable, ISaveable
     {
@@ -74,7 +74,7 @@ namespace TuringSimulatorDesktop.UI
         Icon Background;
 
         Label DefenitionAlphabetTitle;
-        InputBox DefenitionAlphabetInputBox;
+        DefenitionAlphabetInputItem DefenitionAlphabetBox;
 
         Label HaltStatesTitle;
 
@@ -105,7 +105,7 @@ namespace TuringSimulatorDesktop.UI
             DefenitionAlphabetTitle = new Label();
             DefenitionAlphabetTitle.Text = "Defenition Alphabet ID:";
 
-            DefenitionAlphabetInputBox = new InputBox(Group);
+            DefenitionAlphabetBox = new DefenitionAlphabetInputItem(Group);
 
 
             HaltStatesTitle = new Label();
@@ -154,15 +154,17 @@ namespace TuringSimulatorDesktop.UI
         public void SwitchOpenedFile(Guid ID)
         {
             FullyLoadedFile = false;
-            UIEventManager.Unsubscribe(CurrentlyOpenedFileID, ReceivedStateTransitionTable);
+            UIEventManager.Unsubscribe(CurrentlyOpenedFileID, ReceivedStateTransitionFile);
             Client.SendTCPData(ClientSendPacketFunctions.UnsubscribeFromFileUpdates(CurrentlyOpenedFileID));
             CurrentlyOpenedFileID = ID;
-            UIEventManager.Subscribe(CurrentlyOpenedFileID, ReceivedStateTransitionTable);
+            UIEventManager.Subscribe(CurrentlyOpenedFileID, ReceivedStateTransitionFile);
             Client.SendTCPData(ClientSendPacketFunctions.RequestFile(ID, true));
         }
 
-        public void ReceivedStateTransitionTable(Packet Data)
+        public void ReceivedStateTransitionFile(Packet Data)
         {
+            if ((ServerSendPackets)Data.ReadInt() == ServerSendPackets.SentFileMetadata) return;
+
             TransitionItems = new List<StateTransitionItem>();
 
             //file id
@@ -183,6 +185,13 @@ namespace TuringSimulatorDesktop.UI
             }
 
             //TestLabel.Text = "VERSION: " + FileVersion.ToString() + "/n" + Encoding.ASCII.GetString(Data.ReadByteArray()) + "/n" + OpenedFile.DefinitionAlphabetID;
+
+            DefenitionAlphabetBox.ReferenceFileData = null;
+            DefenitionAlphabetBox.FileLabel.Text = "";
+
+            //request metadata
+            UIEventManager.Subscribe(OpenedFile.DefinitionAlphabetFileID, ReceiveAlphabetMetaData);
+            Client.SendTCPData(ClientSendPacketFunctions.RequestFileMetadata(OpenedFile.DefinitionAlphabetFileID));
 
             TransitionLayout.Clear();
 
@@ -212,6 +221,23 @@ namespace TuringSimulatorDesktop.UI
             }
 
             TransitionLayout.UpdateLayout();
+        }
+
+        public void ReceiveAlphabetMetaData(Packet Data)
+        {
+            if ((ServerSendPackets)Data.ReadInt() == ServerSendPackets.SentOrUpdatedFile) return;
+
+            UIEventManager.Unsubscribe(OpenedFile.DefinitionAlphabetFileID, ReceiveAlphabetMetaData);
+
+            Guid AlphabetID = Data.ReadGuid();
+            Data.ReadInt();
+            string AlphabetFileName = Data.ReadString();
+            int AlphabetFileVersion = Data.ReadInt();
+
+            DefenitionAlphabetBox.ReferenceFileData = new FileData(AlphabetFileName, AlphabetID, CoreFileType.Alphabet);
+            DefenitionAlphabetBox.FileLabel.Text = AlphabetFileName;
+
+            //may have to move back 
             FullyLoadedFile = true;
         }
 
@@ -225,6 +251,15 @@ namespace TuringSimulatorDesktop.UI
             TransitionFile NewFile = new TransitionFile();
 
             NewFile.FileID = CurrentlyOpenedFileID;
+
+            if (DefenitionAlphabetBox.ReferenceFileData != null)
+            {
+                NewFile.DefinitionAlphabetFileID = DefenitionAlphabetBox.ReferenceFileData.GUID;
+            }
+            else
+            {
+                NewFile.DefinitionAlphabetFileID = Guid.Empty;
+            }
 
             NewFile.HaltStates.AddRange(HaltStateInputBox.Text.Split("/n"));
 
@@ -269,7 +304,7 @@ namespace TuringSimulatorDesktop.UI
             Background.Position = position;
 
             DefenitionAlphabetTitle.Position = new Vector2(position.X + 10, position.Y + 10);
-            DefenitionAlphabetInputBox.Position = new Vector2(position.X + 10, position.Y + 30);
+            DefenitionAlphabetBox.Position = new Vector2(position.X + 10, position.Y + 30);
 
             HaltStatesTitle.Position = new Vector2(position.X + 10, position.Y + 60);
             //HaltStatesLayout.Position = new Vector2(position.X + 10, position.Y + 80);
@@ -288,7 +323,7 @@ namespace TuringSimulatorDesktop.UI
             Background.Bounds = bounds;
 
             DefenitionAlphabetTitle.Bounds = new Point(70, 15);
-            DefenitionAlphabetInputBox.Bounds = new Point(70, 15);
+            DefenitionAlphabetBox.Bounds = new Point(70, 15);
 
             HaltStatesTitle.Bounds = new Point(70, 15);
             //HaltStatesLayout.Bounds = new Point(45, 80);
@@ -305,7 +340,7 @@ namespace TuringSimulatorDesktop.UI
             {
                 Background.Draw(BoundPort); 
                 DefenitionAlphabetTitle.Draw(BoundPort);
-                DefenitionAlphabetInputBox.Draw(BoundPort);
+                DefenitionAlphabetBox.Draw(BoundPort);
 
                 HaltStatesTitle.Draw(BoundPort);
                 HaltStateInputBox.Draw(BoundPort);

@@ -34,6 +34,9 @@ namespace TuringSimulatorDesktop.Input
         public static int PreviousScrollWheel;
         public static int ScrollWheelDelta;
 
+        public static object DragData;
+        public static bool IsDragging;
+
         public static void Update()
         {
             MouseData = Mouse.GetState();
@@ -59,7 +62,7 @@ namespace TuringSimulatorDesktop.Input
             ScrollWheelDelta = MouseData.ScrollWheelValue - PreviousScrollWheel;
             PreviousScrollWheel = MouseData.ScrollWheelValue;
 
-            if (LeftMousePressed || RightMousePressed)
+            if (LeftMousePressed || RightMousePressed || LeftMouseReleased)
             {
                 int i = ActionGroups.Count-1;
                 bool RecepientFound = false;
@@ -72,9 +75,22 @@ namespace TuringSimulatorDesktop.Input
                         {
                             if (ActionGroups[i].ClickableObjects[j].IsMouseOver())
                             {
-                                ActionGroups[i].ClickableObjects[j].Clicked();
-                                if (PreviouslyClickedObject != null && ActionGroups[i].ClickableObjects[j] != PreviouslyClickedObject) PreviouslyClickedObject.ClickedAway();
-                                PreviouslyClickedObject = ActionGroups[i].ClickableObjects[j];
+                                if (LeftMousePressed || RightMousePressed)
+                                {
+                                    ActionGroups[i].ClickableObjects[j].Clicked();
+                                    if (PreviouslyClickedObject != null && ActionGroups[i].ClickableObjects[j] != PreviouslyClickedObject) PreviouslyClickedObject.ClickedAway();
+                                    PreviouslyClickedObject = ActionGroups[i].ClickableObjects[j];
+                                    
+                                }                  
+                                else
+                                {
+                                    IDragListener Listener = ActionGroups[i].ClickableObjects[j] as IDragListener;
+                                    if (Listener != null)
+                                    {
+                                        Listener.RecieveDragData();
+                                    }
+                                }
+
                                 RecepientFound = true;
                             }
 
@@ -87,6 +103,12 @@ namespace TuringSimulatorDesktop.Input
                 }
 
                 if (PreviouslyClickedObject != null && RecepientFound == false) PreviouslyClickedObject.ClickedAway();
+            }
+
+            if (LeftMouseReleased)
+            {
+                IsDragging = false;
+                DragData = null;
             }
 
             for (int i = 0; i < ActionGroups.Count; i++)
@@ -188,6 +210,11 @@ namespace TuringSimulatorDesktop.Input
             PreviouslyClickedObject = null;
         }
 
+        public static void StartDragging(object Data)
+        {
+            DragData = Data;
+            IsDragging = true;
+        }
         //Depracted
         /*
         public static char? KeyToChar(Keys Key, KeyboardModifiers Modifiers, bool Shift, bool Control, bool Alt)

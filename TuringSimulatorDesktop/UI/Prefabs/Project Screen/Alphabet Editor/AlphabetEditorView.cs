@@ -66,12 +66,10 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         Icon Background;
 
-        Label DefenitionIDTitle;
         Label EmptyCharacterTitle;
         Label WildcardCharacterTitle;
         Label AllowedCharactersTitle;
 
-        InputBox DefenitionIDInputBox;
         InputBox EmptyCharacterInputBox;
         InputBox WildcardCharacterInputBox;
         InputBox AllowedCharactersInputBox;
@@ -94,17 +92,6 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Group = InputManager.CreateActionGroup();
 
             Background = new Icon(GlobalInterfaceData.Scheme.Background);
-
-            DefenitionIDTitle = new Label();
-            DefenitionIDTitle.FontSize = GlobalInterfaceData.Scale(10);
-            DefenitionIDTitle.FontColor = GlobalInterfaceData.Scheme.FontGrayedOutColor;
-            DefenitionIDTitle.Text = "Alphabet ID";
-
-            DefenitionIDInputBox = new InputBox(Group);
-            DefenitionIDInputBox.OutputLabel.FontSize = GlobalInterfaceData.Scale(20);
-            DefenitionIDInputBox.OutputLabel.FontColor = GlobalInterfaceData.Scheme.FontColor;
-            DefenitionIDInputBox.OutputLabel.Text = "-";
-            DefenitionIDInputBox.Modifiers.AllowsNewLine = false;
 
             EmptyCharacterTitle = new Label();
             EmptyCharacterTitle.FontSize = GlobalInterfaceData.Scale(10);
@@ -158,7 +145,9 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         public void ReceivedAlphabetData(Packet Data)
         {
             CustomLogging.Log("CLIENT: Window received Alphabet Data");
-            
+
+            if ((ServerSendPackets)Data.ReadInt() == ServerSendPackets.SentFileMetadata) return;
+
             if (Data.ReadGuid() != CurrentlyOpenedFileID)
             {
                 CustomLogging.Log("CLIENT: Alphabet Editor Window Fatal Error, recived unwated file data!");
@@ -219,12 +208,10 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             Background.Position = position;
 
-            DefenitionIDTitle.Position = position + GlobalInterfaceData.Scale(new Vector2(10, 10));
             EmptyCharacterTitle.Position = position + GlobalInterfaceData.Scale(new Vector2(10, 50));
             WildcardCharacterTitle.Position = position + GlobalInterfaceData.Scale(new Vector2(10, 100));
             AllowedCharactersTitle.Position = position + GlobalInterfaceData.Scale(new Vector2(200, 10));
 
-            DefenitionIDInputBox.Position = position + GlobalInterfaceData.Scale(new Vector2(10, 20));
             EmptyCharacterInputBox.Position = position + GlobalInterfaceData.Scale(new Vector2(10, 60));
             WildcardCharacterInputBox.Position = position + GlobalInterfaceData.Scale(new Vector2(10, 110));
             AllowedCharactersInputBox.Position = position + GlobalInterfaceData.Scale(new Vector2(200, 20));
@@ -237,7 +224,6 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             Background.Bounds = bounds;
 
-            DefenitionIDInputBox.Bounds = GlobalInterfaceData.Scale(new Point(100,15));
             EmptyCharacterInputBox.Bounds = GlobalInterfaceData.Scale(new Point(100, 15));
             WildcardCharacterInputBox.Bounds = GlobalInterfaceData.Scale(new Point(100, 15));
             AllowedCharactersInputBox.Bounds = GlobalInterfaceData.Scale(new Point(300, 500));
@@ -249,12 +235,10 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             {
                 Background.Draw(BoundPort);
 
-                DefenitionIDTitle.Draw(BoundPort);
                 EmptyCharacterTitle.Draw(BoundPort);
                 WildcardCharacterTitle.Draw(BoundPort);
                 AllowedCharactersTitle.Draw(BoundPort);
 
-                DefenitionIDInputBox.Draw(BoundPort);
                 EmptyCharacterInputBox.Draw(BoundPort);
                 WildcardCharacterInputBox.Draw(BoundPort);
                 AllowedCharactersInputBox.Draw(BoundPort);
