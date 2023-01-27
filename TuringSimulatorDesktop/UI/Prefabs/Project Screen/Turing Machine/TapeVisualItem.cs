@@ -48,11 +48,15 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         public void SetProjectionMatrix(Matrix projectionMatrix, Matrix inverseProjectionMatrix)
         {
+            ProjectionMatrix = projectionMatrix;
+            InverseProjectionMatrix = inverseProjectionMatrix;
+
             for (int i = 0; i < Cells.Count; i++)
             {
                 Cells[i].SetProjectionMatrix(projectionMatrix, inverseProjectionMatrix);
             }
         }
+        Matrix ProjectionMatrix, InverseProjectionMatrix;
 
         ActionGroup Group;
 
@@ -73,7 +77,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             IsActive = true;
         }
 
-        public void SetTapeData(Tape Data)
+        public void SetSourceTape(Tape Data)
         {
             SourceTape = Data;
             UpdateLayout();
@@ -82,14 +86,16 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         public void UpdateLayout()
         {
             float Width = CameraMax - CameraMin;
-            int TargetCellCount = (int)MathF.Ceiling(Width / TapeCell.ReferenceWidth) + 1;
+            int TargetCellCount = Convert.ToInt32(MathF.Ceiling(Width / TapeCell.ReferenceTotalWidth)) + 1;
 
+            //redo? yh
             if (Cells.Count < TargetCellCount)
             {
                 while (Cells.Count < TargetCellCount)
                 {
-                    TapeCell NewCell = new TapeCell(Group);
+                    TapeCell NewCell = new TapeCell(this, Group);
                     NewCell.IsActive = true;
+                    NewCell.SetProjectionMatrix(ProjectionMatrix, InverseProjectionMatrix);
                     Cells.Add(NewCell);
                     CellLayoutBox.AddElement(NewCell);
                 }
@@ -104,18 +110,59 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 }
             }
 
+            float TapeLeftPosition;
+
+            if (Position.X - CameraMin > CameraMax - Position.X)
+            {
+                TapeLeftPosition = CameraMin - (TapeCell.ReferenceTotalWidth - ((Position.X - CameraMin) % TapeCell.ReferenceTotalWidth));
+            }
+            else
+            {
+                TapeLeftPosition = CameraMin - ((CameraMax- Position.X) % TapeCell.ReferenceTotalWidth);
+            }
+
+            int BaseCellIndex = Convert.ToInt32((TapeLeftPosition - Position.X) / TapeCell.ReferenceTotalWidth);
+
+            int CellIndex = BaseCellIndex;
+            for (int i = 0; i < Cells.Count; i++)
+            {
+                Cells[i].Index = CellIndex;
+                Cells[i].IndexLabel.Text = CellIndex.ToString();
+                CellIndex++;
+            }
+
+            CellIndex = BaseCellIndex;
             if (SourceTape != null)
             {
                 for (int i = 0; i < Cells.Count; i++)
                 {
-
+                    if (CellIndex > SourceTape.HighestIndex || CellIndex < SourceTape.LowestIndex)
+                    {
+                        Cells[i].InputOutputLabel.Text = SourceTape.DefinitionAlphabet.EmptyCharacter;
+                    }
+                    else
+                    {
+                        Cells[i].InputOutputLabel.Text = SourceTape[CellIndex];
+                    }
+                    CellIndex++;
                 }
             }
 
-            CellLayoutBox.Position = new Vector2(CameraMin - (TapeCell.ReferenceWidth - ((Position.X - CameraMin) % TapeCell.ReferenceWidth)), position.Y);
+            CellLayoutBox.Position = new Vector2(TapeLeftPosition, position.Y);
             CellLayoutBox.UpdateLayout();
         }
 
+        public void UpdateTapeContents(int Index, InputBox Sender)
+        {
+            if (SourceTape != null)
+            {
+                SourceTape[Index] = Sender.Text;
+            }
+            else
+            {
+                Sender.Text = "";
+            }
+        }
 
         void MoveLayout()
         {

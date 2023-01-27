@@ -49,30 +49,36 @@ namespace TuringSimulatorDesktop.UI
 
         public ColorButton(ActionGroup group)
         {
-            Background = new Icon();
             Group = group;
             group.ClickableObjects.Add(this);
             group.PollableObjects.Add(this);
+
+            Background = new Icon();
+
+            Bounds = Point.Zero;
+            Position = Vector2.Zero;
         }
         public ColorButton(int width, int height, ActionGroup group)
         {
-            Background = new Icon();
-            Bounds = new Point(width, height);
-            Position = Vector2.Zero;
-
             Group = group;
             group.ClickableObjects.Add(this);
             group.PollableObjects.Add(this);
+
+            Background = new Icon();
+
+            Bounds = new Point(width, height);
+            Position = Vector2.Zero;
         }
         public ColorButton(int width, int height, Vector2 position, ActionGroup group)
         {
-            Background = new Icon();
-            Bounds = new Point(width, height);
-            Position = position;
-
             Group = group;
             group.ClickableObjects.Add(this);
             group.PollableObjects.Add(this);
+
+            Background = new Icon();
+
+            Bounds = new Point(width, height);
+            Position = position;
         }
 
         void IClickable.Clicked()

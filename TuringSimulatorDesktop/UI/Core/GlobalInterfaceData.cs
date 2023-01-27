@@ -222,6 +222,7 @@ namespace TuringSimulatorDesktop
         public Color NonInteractableAccent = new Color(208, 208, 208);
 
         public Color FontColor = Color.Black;
+        public Color FontColorBright = Color.White;
         public Color FontGrayedOutColor = new Color(94, 94, 94);
 
 

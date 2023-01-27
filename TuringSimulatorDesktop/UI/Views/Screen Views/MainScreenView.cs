@@ -25,71 +25,143 @@ namespace TuringSimulatorDesktop.UI
 
         Label Title;
         
-        TextureButton NewProjectButton;
-        TextureButton LoadProjectButton;
-        TextureButton JoinProjectButton;
-        TextureButton HostProjectButton;
+        ElementCollection NewProjectButton;
+        ElementCollection LoadProjectButton;
+        ElementCollection JoinProjectButton;
+        ElementCollection HostProjectButton;
 
-        InputBox IPBox;
-        RecentFilesViewer Viewer;
-        //DropDownMenu Menu;
+        IVisualElement OpenMenu;
 
         public MainScreenView()
         {          
             Group = InputManager.CreateActionGroup();
 
-            //Background = new Icon(Width, Height, Vector2.Zero, GlobalInterfaceData.BackgroundColor);// UIMesh.CreateRectangle(Vector2.Zero, Width, Height, GlobalInterfaceData.BackgroundColor);
-            //Header = new Icon(Width, GlobalInterfaceData.WindowTitleBarHeight, Vector2.Zero, GlobalInterfaceData.HeaderColor);//UIMesh.CreateRectangle(Vector2.Zero, Width, GlobalInterfaceData.WindowTitleBarHeight, GlobalInterfaceData.HeaderColor);
 
             CloseButton = new TextureButton(45, 32, new Vector2(705, 0), Group);
             CloseButton.OnClickedEvent += Close;
             CloseButton.HighlightOnMouseOver = true;
 
-            Title = new Label(new Vector2(0, 0), GlobalInterfaceData.MediumRegularFont);
-            Title.FontSize = 20;
-            Title.Text = "T";
 
-            Viewer = new RecentFilesViewer(this);
-            Viewer.Bounds = new Point(470, GlobalInterfaceData.MainMenuHeight - 52);
-            Viewer.Position = new Vector2(10, 42);
+            NewProjectButton = new ElementCollection(); 
+
+            ColorButton CreateButton = new ColorButton(Group);
+            CreateButton.Bounds = new Point(250, 90);
+            CreateButton.BaseColor = GlobalInterfaceData.Scheme.InteractableAccent;
+            CreateButton.HighlightColor = GlobalInterfaceData.Scheme.DarkInteractableAccent;
+            CreateButton.HighlightOnMouseOver = true;
+            CreateButton.OnClickedEvent += CreateNewProject;
+
+            Icon CreateIcon = new Icon();
+            CreateIcon.Bounds = new Point();
+            CreateIcon.Position = new Vector2();
+
+            Label CreateLabel = new Label();
+            CreateLabel.FontSize = 24;
+            CreateLabel.Text = "Create Project";
+
+            NewProjectButton.AddElement(CreateButton);
+            NewProjectButton.AddElement(CreateIcon);
+            NewProjectButton.AddElement(CreateLabel);
+            NewProjectButton.Position = new Vector2(14, 50);
+
+
+            LoadProjectButton = new ElementCollection();
+
+            ColorButton LoadButton = new ColorButton(Group);
+            LoadButton.Bounds = new Point(250, 90);
+            LoadButton.BaseColor = GlobalInterfaceData.Scheme.InteractableAccent;
+            LoadButton.HighlightColor = GlobalInterfaceData.Scheme.DarkInteractableAccent;
+            LoadButton.HighlightOnMouseOver = true;
+            LoadButton.OnClickedEvent += LoadProject;
+
+            Icon LoadIcon = new Icon();
+            LoadIcon.Bounds = new Point();
+            LoadIcon.Position = new Vector2();
+
+            Label LoadLabel = new Label();
+            LoadLabel.FontSize = 24;
+            LoadLabel.Text = "Load Project";
+
+            LoadProjectButton.AddElement(LoadButton);
+            LoadProjectButton.AddElement(LoadIcon);
+            LoadProjectButton.AddElement(LoadLabel);
+            LoadProjectButton.Position = new Vector2(14, 158);
+
+
+            HostProjectButton = new ElementCollection();
+
+            ColorButton HostButton = new ColorButton(Group);
+            HostButton.Bounds = new Point(250, 90);
+            HostButton.BaseColor = GlobalInterfaceData.Scheme.InteractableAccent;
+            HostButton.HighlightColor = GlobalInterfaceData.Scheme.DarkInteractableAccent;
+            HostButton.HighlightOnMouseOver = true;
+            HostButton.OnClickedEvent += HostProject;
+
+            Icon HostIcon = new Icon();
+            HostIcon.Bounds = new Point();
+            HostIcon.Position = new Vector2();
+
+            Label HostLabel = new Label();
+            HostLabel.FontSize = 24;
+            HostLabel.Text = "Host Project";
+
+            HostProjectButton.AddElement(HostButton);
+            HostProjectButton.AddElement(HostIcon);
+            HostProjectButton.AddElement(HostLabel);
+            HostProjectButton.Position = new Vector2(14, 266);
+
+
+            JoinProjectButton = new ElementCollection();
+
+            ColorButton JoinButton = new ColorButton(Group);
+            JoinButton.Bounds = new Point(250, 90);
+            JoinButton.BaseColor = GlobalInterfaceData.Scheme.InteractableAccent;
+            JoinButton.HighlightColor = GlobalInterfaceData.Scheme.DarkInteractableAccent;
+            JoinButton.HighlightOnMouseOver = true;
+            JoinButton.OnClickedEvent += HostProject;
+
+            Icon JoinIcon = new Icon();
+            JoinIcon.Bounds = new Point();
+            JoinIcon.Position = new Vector2();
+
+            Label JoinLabel = new Label();
+            JoinLabel.FontSize = 24;
+            JoinLabel.Text = "Join Project";
+
+            JoinProjectButton.AddElement(JoinButton);
+            JoinProjectButton.AddElement(JoinIcon);
+            JoinProjectButton.AddElement(JoinLabel);
+            JoinProjectButton.Position = new Vector2(14, 374);
+
+
+            Title = new Label(GlobalInterfaceData.MediumRegularFont);
+            Title.FontSize = 20;
+            Title.FontColor = GlobalInterfaceData.Scheme.FontColorBright;
+            Title.Text = "T";
+            Title.Position = new Vector2(0, Title.Bounds.Y * 0.5f);
+
+            RecentFilesMenu Viewer = new RecentFilesMenu(this);
+            Viewer.Bounds = new Point(454, GlobalInterfaceData.MainMenuHeight - 36 - 32);
+            Viewer.Position = new Vector2(282, 50);
+
             if (GlobalProjectAndUserData.UserData != null)
             {
                 Viewer.DisplayRecentFiles();
             }
 
-            NewProjectButton = new TextureButton(250, 70, new Vector2(490, 42), Group);
-            //NewProjectButton.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.NewProjectButton];
-            //NewProjectButton.HighlightTexture = GlobalInterfaceData.TextureLookup[UILookupKey.NewProjectButtonHightlight];
-            NewProjectButton.HighlightOnMouseOver = true;
-
-            LoadProjectButton = new TextureButton(250, 70, new Vector2(490, 122), Group);
-            //NewProjectButton.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.LoadProjectButton];
-            //NewProjectButton.HighlightTexture = GlobalInterfaceData.TextureLookup[UILookupKey.LoadProjectButtonHightlight];
-            LoadProjectButton.HighlightOnMouseOver = true;
-            LoadProjectButton.OnClickedEvent += SelectProjectLocation;
-
-            HostProjectButton = new TextureButton(250, 70, new Vector2(490, 202), Group);
-            //NewProjectButton.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.HostProjectButton];
-            //NewProjectButton.HighlightTexture = GlobalInterfaceData.TextureLookup[UILookupKey.HostProjectButtonHightlight];
-            HostProjectButton.HighlightOnMouseOver = true;
-
-            JoinProjectButton = new TextureButton(250, 70, new Vector2(490, 282), Group);
-            //NewProjectButton.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.JoinProjectButton];
-            //NewProjectButton.HighlightTexture = GlobalInterfaceData.TextureLookup[UILookupKey.JoinProjectButtonHightlight];
-            JoinProjectButton.HighlightOnMouseOver = true;
-            JoinProjectButton.OnClickedEvent += ConnectToOtherDevice;
-
-
-            IPBox = new InputBox(100, 20, Group);
-            IPBox.Position = Vector2.Zero;
+            OpenMenu = Viewer;
 
             ScreenResize();
-           // Menu = new DropDownMenu(60, 20, new Vector2(45, 6), Group);
         }
 
 
+        public void CreateNewProject(Button Sender)
+        {
+
+        }
+
         string Location;
-        public void SelectProjectLocation(Button Sender)
+        public void LoadProject(Button Sender)
         {
             OpenFileDialog Dialog = new OpenFileDialog
             {
@@ -138,11 +210,11 @@ namespace TuringSimulatorDesktop.UI
         }
 
 
-        void ConnectToOtherDevice(Button Sender)
+        void ConnectToOtherDevice(string IP)
         {
             UIEventManager.RecievedProjectDataFromServerDelegate = FullyConnectedToServer;
             UIEventManager.ClientFailedConnectingDelegate = ResetConnection;
-            Client.ConnectToServer(System.Net.IPAddress.Parse(IPBox.Text), 28104);
+            Client.ConnectToServer(System.Net.IPAddress.Parse(IP), 28104);
         }
 
         void ResetConnection(object sender, EventArgs e)
@@ -162,6 +234,16 @@ namespace TuringSimulatorDesktop.UI
             ProjectScreenView ProjectView = new ProjectScreenView();
             UIEventManager.RecievedProjectDataFromServerDelegate = ProjectView.UpdatedProject;
             GlobalInterfaceData.MainWindow.CurrentView = ProjectView;
+        }
+
+        public void HostProject(Button Sender)
+        {
+
+        }
+
+        public void JoinProject(Button Sender)
+        {
+
         }
 
         public void Minimise(Button Sender)
@@ -184,18 +266,14 @@ namespace TuringSimulatorDesktop.UI
 
             Title.Draw();
 
-           // Menu.Draw();
-
             CloseButton.Draw();
-
-            Viewer.Draw();
 
             NewProjectButton.Draw();
             LoadProjectButton.Draw();
             JoinProjectButton.Draw();
             HostProjectButton.Draw();
 
-            IPBox.Draw();
+            OpenMenu.Draw();
         }
 
         public override void ScreenResize()

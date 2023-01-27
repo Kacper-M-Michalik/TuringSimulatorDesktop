@@ -45,7 +45,6 @@
     <ProjectReference Include="..\TuringServer\TuringServer.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Assets\SVG\" />
     <Folder Include="Content\bin\DesktopGL\Content\" />
   </ItemGroup>
   <ItemGroup>
@@ -100,7 +99,7 @@
     <None Update="Assets\SVG\FolderIcon.svg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Assets\SVG\FullscreenIcon.svg">
+    <None Update="Assets\SVG\MaximiseIcon.svg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Assets\SVG\HostProjectButton.svg">

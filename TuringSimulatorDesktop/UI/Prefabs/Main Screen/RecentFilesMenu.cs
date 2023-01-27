@@ -9,7 +9,7 @@ using TuringSimulatorDesktop.Input;
 
 namespace TuringSimulatorDesktop.UI.Prefabs
 {
-    public class RecentFilesViewer : IVisualElement
+    public class RecentFilesMenu : IVisualElement
     {
         Vector2 position;
         public Vector2 Position
@@ -18,13 +18,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             set
             {
                 position = value;
-
-                Background.Position = position;
-                Header.Position = new Vector2(position.X + 1, position.Y + 1);
-                ForeGround.Position = new Vector2(position.X + 1, position.Y + 25);
-                Title.Position = new Vector2(position.X + 1, position.Y + 1);
-
-                LayoutBox.Position = new Vector2(position.X + 1, position.Y + 25);
+                MoveLayout();
             }
         }
 
@@ -35,33 +29,29 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             set
             {
                 bounds = value;
-
-                Background.Bounds = bounds;
-                Header.Bounds = new Point(bounds.X - 2, 24);
-                ForeGround.Bounds = new Point(bounds.X - 2, bounds.Y - 26);
-
-                LayoutBox.Bounds = new Point(bounds.X - 2, bounds.Y - 26);
+                ResizeLayout();
             }
         }
 
         public bool IsActive { get; set; } = true;
 
-        Icon Background;
         Icon Header;
-        Icon ForeGround;
+        Icon Background;
         Label Title;
         VerticalLayoutBox LayoutBox;
         MainScreenView MainScreen;
 
-        public RecentFilesViewer(MainScreenView Screen)
+        public RecentFilesMenu(MainScreenView Screen)
         {
             MainScreen = Screen;
 
-            Background = new Icon(GlobalInterfaceData.Scheme.DarkAccent);
             Header = new Icon(GlobalInterfaceData.Scheme.Header);
-            ForeGround = new Icon(GlobalInterfaceData.Scheme.Background);
+            Background = new Icon(GlobalInterfaceData.Scheme.InteractableAccent);
 
             Title = new Label();
+            Title.FontSize = 12f;
+            Title.Font = GlobalInterfaceData.StandardBoldFont;
+            Title.FontColor = GlobalInterfaceData.Scheme.FontColorBright;
             Title.Text = "Recently Opened Projects";
 
             LayoutBox = new VerticalLayoutBox();
@@ -70,7 +60,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             LayoutBox.ScrollFactor = 0.2f;
             LayoutBox.ViewOffsetBoundsMin = new Vector2(0f, 5f);
             LayoutBox.ViewOffset = new Vector2(0f, 5f);
-
+            
             //Bounds = new Point(width, height);
             //Position = position;
         }
@@ -84,11 +74,26 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             LayoutBox.UpdateLayout();
         }
 
+        void MoveLayout()
+        {
+            Background.Position = position;
+            Header.Position = position;
+            Title.Position = new Vector2(position.X, position.Y);
+
+            LayoutBox.Position = new Vector2(position.X, position.Y + 24);
+        }
+
+        void ResizeLayout()
+        {
+            Background.Bounds = bounds;
+            Header.Bounds = new Point(bounds.X, 24);
+            LayoutBox.Bounds = new Point(bounds.X, bounds.Y - 24);
+        }
+
         public void Draw(Viewport? BoundPort = null)
         {
             Background.Draw();
             Header.Draw();
-            ForeGround.Draw();
             Title.Draw();
             LayoutBox.Draw();
         }
@@ -108,19 +113,16 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             set 
             {
                 position = value;
-                Background.Position = Position;
-                FileName.Position = new Vector2(Position.X + 5, Position.Y + 5);
-                FileLocation.Position = new Vector2(Position.X + 5, Position.Y + 35);
-                FileLastAccessed.Position = new Vector2(Position.X + 50, Position.Y + 5);
+                MoveLayout();
             } 
         }
 
+        Point bounds;
         public Point Bounds 
         {
-            get => Background.Bounds; 
+            get => bounds; 
             set 
             { 
-                return;
             } 
         }
 
@@ -134,13 +136,18 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         FileInfoWrapper FileInfo;
         MainScreenView MainScreen;
 
+        public static int ReferenceWidth = 250;
+        public static int ReferenceHeight = 90;
+
         public RecentFileCard(FileInfoWrapper Info, MainScreenView Screen, ActionGroup group)
         {
             FileInfo = Info;
             MainScreen = Screen;
 
-            Background = new ColorButton(450, 80, group);
-            Background.BaseColor = GlobalInterfaceData.Scheme.SubHeader;//, ,Vector2.Zero, GlobalRenderingData.SubHeaderColor);
+            Background = new ColorButton(ReferenceWidth, ReferenceHeight, group);
+            Background.BaseColor = GlobalInterfaceData.Scheme.Background;//, ,Vector2.Zero, GlobalRenderingData.SubHeaderColor);
+            Background.HighlightColor = GlobalInterfaceData.Scheme.DarkInteractableAccent;
+            Background.HighlightOnMouseOver = true;
             Background.OnClickedEvent += LoadRecentProject;
 
             FileName = new Label();
@@ -150,11 +157,22 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             FileName.Text = FileInfo.FileName;
             FileLocation.Text = FileInfo.FullPath;
             FileLastAccessed.Text = FileInfo.LastAccessed.ToString("g");
+
+            bounds = new Point(ReferenceWidth, ReferenceHeight);
+            Position = Vector2.Zero;
         }
 
         void LoadRecentProject(Button Sender)
         {
             MainScreen.SelectedProject(FileInfo.FullPath);
+        }
+
+        void MoveLayout()
+        {
+            Background.Position = Position;
+            FileName.Position = new Vector2(Position.X + 5, Position.Y + 5);
+            FileLocation.Position = new Vector2(Position.X + 5, Position.Y + 35);
+            FileLastAccessed.Position = new Vector2(Position.X + 50, Position.Y + 5);
         }
 
         public void Draw(Viewport? BoundPort = null)

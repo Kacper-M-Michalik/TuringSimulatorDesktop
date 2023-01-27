@@ -68,10 +68,15 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         Guid CurrentlyOpenedFileID;
         int FileVersion;
         TapeTemplate OpenedFile;
+        Tape ActivelyEditedTape;
 
         DraggableCanvas Canvas;
         TapeVisualItem VisualTape;
 
+        Alphabet EditorAlphabet = new Alphabet()
+        {
+            EmptyCharacter = ""
+        };
 
         public TapeEditorView(Guid FileToDisplay)
         {
@@ -83,8 +88,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             IsActive = false;
 
-            CurrentlyOpenedFileID = FileToDisplay;
-            //call switch here
+            SwitchOpenedTape(FileToDisplay);
         }
 
         public void SwitchOpenedTape(Guid ID)
@@ -120,15 +124,22 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 CustomLogging.Log("CLIENT: Window - Invalid Tape Template recieved");
                 return;
             }
-
-            //VisualTape.SetTapeData(OpenedFile.Clone());
+            ActivelyEditedTape = OpenedFile.Clone(EditorAlphabet);
+            VisualTape.SetSourceTape(ActivelyEditedTape);
 
             FullyLoadedFile = true;
         }
 
         public void Save()
         {
+            TapeTemplate NewTemplate = new TapeTemplate();
 
+            NewTemplate.FileID = CurrentlyOpenedFileID;
+            NewTemplate.Data = ActivelyEditedTape.Data;
+            NewTemplate.HighestIndex = ActivelyEditedTape.HighestIndex;
+            NewTemplate.LowestIndex = ActivelyEditedTape.LowestIndex;
+
+            Client.SendTCPData(ClientSendPacketFunctions.UpdateFile(FileVersion, JsonSerializer.SerializeToUtf8Bytes(NewTemplate, GlobalProjectAndUserData.JsonOptions)));
         }
 
         void MoveLayout()
@@ -137,7 +148,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         }
 
         void ResizeLayout()
-        {
+        {            
             Canvas.Bounds = bounds;
         }
 
@@ -145,10 +156,9 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         {
             if (IsActive)
             {
-                VisualTape.CameraMin = (Matrix.CreateTranslation(Position.X, 0, 0) * Canvas.InverseMatrix).Translation.X;
-                VisualTape.CameraMax = (Matrix.CreateTranslation(Position.X + Bounds.X, 0, 0) * Canvas.InverseMatrix).Translation.X;
+                VisualTape.CameraMin = (Matrix.CreateTranslation(Canvas.Position.X, 0, 0) * Canvas.InverseMatrix).Translation.X;
+                VisualTape.CameraMax = (Matrix.CreateTranslation(Canvas.Position.X + Canvas.Bounds.X, 0, 0) * Canvas.InverseMatrix).Translation.X;
                 VisualTape.UpdateLayout();
-
                 Canvas.Draw();
             }
         }

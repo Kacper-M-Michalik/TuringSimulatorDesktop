@@ -10,7 +10,7 @@ namespace TuringCore
         //[JsonInclude]
         //public string ID;
         //[JsonInclude]
-        public Guid DefinitionAlphabetID;
+        //public Guid DefinitionAlphabetID;
         [JsonInclude]
         public Dictionary<int, string> Data = new Dictionary<int, string>();
         [JsonInclude]
@@ -21,7 +21,7 @@ namespace TuringCore
         public TapeTemplate() 
         {
             //ID = "";
-            DefinitionAlphabetID = Guid.Empty;
+           // DefinitionAlphabetID = Guid.Empty;
             Data = new Dictionary<int, string>();
             HighestIndex = 0;
             LowestIndex = 0;

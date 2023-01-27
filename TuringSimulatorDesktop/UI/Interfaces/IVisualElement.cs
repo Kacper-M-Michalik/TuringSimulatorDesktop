@@ -14,6 +14,6 @@ namespace TuringSimulatorDesktop.UI
         public Point Bounds { get; set; }
         public bool IsActive { get; set; }
         public void Draw(Viewport? BoundPort = null);
-        //public void Close();
+       // public void Close();
     }
 }

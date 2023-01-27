@@ -48,34 +48,56 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             //might not wanan draw like this tough
             Seperator.SetProjectionMatrix(projectionMatrix, inverseProjectionMatrix);
             InputOutputLabel.SetProjectionMatrix(projectionMatrix, inverseProjectionMatrix);
+            IndexLabel.SetProjectionMatrix(projectionMatrix, inverseProjectionMatrix);
         }
 
         public Icon Seperator;
         public InputBox InputOutputLabel;
+        public Label IndexLabel;
 
-        public static int ReferenceWidth = 91;
-        public static int ReferenceHeight = 90;
+        public TapeVisualItem OwnerTape;
 
-        public TapeCell(ActionGroup Group)
+        public int Index;
+
+        public static int ReferenceCellWidth = 90;
+        public static int ReferenceTotalWidth = 91;
+        public static int ReferenceCellHeight = 90;
+        public static int ReferenceTotalHeight = 120;
+
+        public TapeCell(TapeVisualItem ownerTape, ActionGroup Group)
         {
             Seperator = new Icon(GlobalInterfaceData.Scheme.NonInteractableAccent);
+
             InputOutputLabel = new InputBox(Group);
             InputOutputLabel.OutputLabel.DrawCentered = true;
-            InputOutputLabel.BackgroundColor = GlobalInterfaceData.Scheme.DarkInteractableAccent;
+            InputOutputLabel.BackgroundColor = GlobalInterfaceData.Scheme.DarkInteractableAccent;            
+            InputOutputLabel.EditEvent += UpdatedCell;
 
-            Bounds = new Point(ReferenceWidth, ReferenceHeight);
+            IndexLabel = new Label();
+            IndexLabel.FontSize = 14f;
+            IndexLabel.FontColor = GlobalInterfaceData.Scheme.FontGrayedOutColor;
+            IndexLabel.Text = "";
+
+            Bounds = new Point(ReferenceTotalWidth, ReferenceTotalHeight);
+            OwnerTape = ownerTape;
+        }
+
+        public void UpdatedCell(InputBox Sender)
+        {
+            OwnerTape.UpdateTapeContents(Index, InputOutputLabel);
         }
 
         void MoveLayout()
         {
             InputOutputLabel.Position = position;
             Seperator.Position = InputOutputLabel.Position + new Vector2(InputOutputLabel.Bounds.X, 0);
+            IndexLabel.Position = Position + new Vector2(35, 110);
         }
 
         void ResizeLayout()
         {
-            InputOutputLabel.Bounds = new Point(bounds.X - 1, bounds.Y);            
-            Seperator.Bounds = new Point(1, bounds.Y);
+            InputOutputLabel.Bounds = new Point(ReferenceCellWidth, ReferenceCellHeight);            
+            Seperator.Bounds = new Point(1, ReferenceCellHeight);
         }
 
         public void Draw(Viewport? BoundPort = null)
@@ -85,6 +107,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 InputOutputLabel.Draw(BoundPort);
                 //Background.Draw(BoundPort);
                 Seperator.Draw(BoundPort);
+                IndexLabel.Draw(BoundPort);
             }
         }
 
