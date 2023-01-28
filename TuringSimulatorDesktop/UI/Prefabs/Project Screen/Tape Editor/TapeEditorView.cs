@@ -101,31 +101,33 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Client.SendTCPData(ClientSendPacketFunctions.RequestFile(ID, true));
         }
 
-        public void ReceivedTapeData(Packet Data)
+        public void ReceivedTapeData(object Data)
         {
-            if ((ServerSendPackets)Data.ReadInt() == ServerSendPackets.SentFileMetadata) return;
-
             CustomLogging.Log("CLIENT: Window received Tape Template Data");
 
-            if (Data.ReadGuid() != CurrentlyOpenedFileID)
+            FileDataMessage Message = (FileDataMessage)Data;
+
+            if ((ServerSendPackets)Message.RequestType == ServerSendPackets.SentFileMetadata) return;
+
+            if (Message.GUID != CurrentlyOpenedFileID)
             {
                 CustomLogging.Log("CLIENT: Tape Editor Window Fatal Error, recived unwanted file data!");
                 return;
             }
 
-            Data.ReadInt();
-            title = Data.ReadString();
-            FileVersion = Data.ReadInt();
-
             try
             {
-                OpenedFile = JsonSerializer.Deserialize<TapeTemplate>(Data.ReadByteArray());
+                OpenedFile = JsonSerializer.Deserialize<TapeTemplate>(Message.Data);
             }
             catch
             {
                 CustomLogging.Log("CLIENT: Window - Invalid Tape Template recieved");
                 return;
             }
+
+            title = Message.Name;
+            FileVersion = Message.Version;
+
             ActivelyEditedTape = OpenedFile.Clone(EditorAlphabet);
             VisualTape.SetSourceTape(ActivelyEditedTape);
 

@@ -43,11 +43,6 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             {
                 isActive = value;
                 Group.IsActive = isActive;
-
-                if (IsActive)
-                {
-                    //OwnerWindow.OwnerScreen.
-                }
             }
         }
 
@@ -72,7 +67,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         InputBox EmptyCharacterInputBox;
         InputBox WildcardCharacterInputBox;
-        InputBox AllowedCharactersInputBox;
+        VerticalLayoutBox AllowedCharactersLayoutBox;
+        List<InputBox> AllowedCharactersInputBoxes;
 
         bool FullyLoadedFile;
         Guid CurrentlyOpenedFileID;
@@ -120,10 +116,12 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             AllowedCharactersTitle.FontColor = GlobalInterfaceData.Scheme.FontGrayedOutColor;
             AllowedCharactersTitle.Text = "Allowed Characters";
 
-            AllowedCharactersInputBox = new InputBox(Group);
-            AllowedCharactersInputBox.OutputLabel.FontSize = GlobalInterfaceData.Scale(12);
-            AllowedCharactersInputBox.OutputLabel.FontColor = GlobalInterfaceData.Scheme.FontColor;
-            AllowedCharactersInputBox.OutputLabel.Text = "-";
+            AllowedCharactersLayoutBox = new VerticalLayoutBox();
+            AllowedCharactersLayoutBox.Spacing = 10;
+            AllowedCharactersLayoutBox.Scrollable = true;
+            AllowedCharactersLayoutBox.ScrollFactor = 0.2f;
+            AllowedCharactersLayoutBox.ViewOffsetBoundsMin = new Vector2(0f, 5f);
+            AllowedCharactersLayoutBox.ViewOffset = new Vector2(0f, 5f);
 
             IsActive = false;
 
@@ -142,26 +140,23 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Client.SendTCPData(ClientSendPacketFunctions.RequestFile(ID, true));
         }
 
-        public void ReceivedAlphabetData(Packet Data)
+        public void ReceivedAlphabetData(object Data)
         {
             CustomLogging.Log("CLIENT: Window received Alphabet Data");
 
-            if ((ServerSendPackets)Data.ReadInt() == ServerSendPackets.SentFileMetadata) return;
+            FileDataMessage Message = (FileDataMessage)Data;
 
-            if (Data.ReadGuid() != CurrentlyOpenedFileID)
+            if ((ServerSendPackets)Message.RequestType == ServerSendPackets.SentFileMetadata) return;
+
+            if (Message.GUID != CurrentlyOpenedFileID)
             {
-                CustomLogging.Log("CLIENT: Alphabet Editor Window Fatal Error, recived unwated file data!");
+                CustomLogging.Log("CLIENT: Alphabet Editor Window Fatal Error, recived unwanted file data!");
                 return;
             }
 
-            //file type
-            Data.ReadInt();
-            title = Data.ReadString();
-            FileVersion = Data.ReadInt();
-
             try
             {
-                OpenedFile = JsonSerializer.Deserialize<Alphabet>(Data.ReadByteArray());
+                OpenedFile = JsonSerializer.Deserialize<Alphabet>(Message.Data);
             }
             catch
             {
@@ -169,8 +164,9 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 return;
             }
 
-            //DefenitionIDInputBox.Text = "";
-            //DefenitionIDInputBox.Text = OpenedFile.ID;
+            title = Message.Name;
+            FileVersion = Message.Version;
+
             EmptyCharacterInputBox.Text = OpenedFile.EmptyCharacter;
             WildcardCharacterInputBox.Text = OpenedFile.WildcardCharacter;
 
@@ -181,7 +177,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 Builder.Append("/n");
             }
 
-            AllowedCharactersInputBox.Text = Builder.ToString();
+            //AllowedCharactersInputBox.Text = Builder.ToString();
             FullyLoadedFile = true;
         }
 
@@ -196,7 +192,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             NewAlphabet.FileID = CurrentlyOpenedFileID;
             NewAlphabet.EmptyCharacter = EmptyCharacterInputBox.Text;
             NewAlphabet.WildcardCharacter = WildcardCharacterInputBox.Text;
-            NewAlphabet.Characters = AllowedCharactersInputBox.Text.Split("/n").ToHashSet();
+            //NewAlphabet.Characters = AllowedCharactersInputBox.Text.Split("/n").ToHashSet();
 
             Client.SendTCPData(ClientSendPacketFunctions.UpdateFile(FileVersion, JsonSerializer.SerializeToUtf8Bytes(NewAlphabet, GlobalProjectAndUserData.JsonOptions)));
         }
@@ -214,7 +210,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             EmptyCharacterInputBox.Position = position + GlobalInterfaceData.Scale(new Vector2(10, 60));
             WildcardCharacterInputBox.Position = position + GlobalInterfaceData.Scale(new Vector2(10, 110));
-            AllowedCharactersInputBox.Position = position + GlobalInterfaceData.Scale(new Vector2(200, 20));
+            //AllowedCharactersInputBox.Position = position + GlobalInterfaceData.Scale(new Vector2(200, 20));
         }
 
         void ResizeLayout()
@@ -226,8 +222,15 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             EmptyCharacterInputBox.Bounds = GlobalInterfaceData.Scale(new Point(100, 15));
             WildcardCharacterInputBox.Bounds = GlobalInterfaceData.Scale(new Point(100, 15));
-            AllowedCharactersInputBox.Bounds = GlobalInterfaceData.Scale(new Point(300, 500));
+           // AllowedCharactersInputBox.Bounds = GlobalInterfaceData.Scale(new Point(300, 500));
         }
+
+        /*
+            AllowedCharactersInputBox = new InputBox(Group);
+            AllowedCharactersInputBox.OutputLabel.FontSize = GlobalInterfaceData.Scale(12);
+            AllowedCharactersInputBox.OutputLabel.FontColor = GlobalInterfaceData.Scheme.FontColor;
+            AllowedCharactersInputBox.OutputLabel.Text = "-";
+        */
 
         public void Draw(Viewport? BoundPort = null)
         {
@@ -241,7 +244,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
                 EmptyCharacterInputBox.Draw(BoundPort);
                 WildcardCharacterInputBox.Draw(BoundPort);
-                AllowedCharactersInputBox.Draw(BoundPort);
+              //  AllowedCharactersInputBox.Draw(BoundPort);
             }
         }
 

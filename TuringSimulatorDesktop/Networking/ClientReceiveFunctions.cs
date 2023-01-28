@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using TuringCore;
 using TuringServer;
 using TuringSimulatorDesktop.UI;
+using System.Text.Json;
 
 namespace TuringSimulatorDesktop
 {
@@ -24,48 +25,58 @@ namespace TuringSimulatorDesktop
 
         public static void ReceivedProjectData(Packet Data)
         {
-            GlobalProjectAndUserData.ProjectData = new ConnectedProjectData(Data.ReadString());
+            ProjectDataMessage Message = JsonSerializer.Deserialize<ProjectDataMessage>(Data.ReadByteArray());
+
+            GlobalProjectAndUserData.ProjectData = new ConnectedProjectData(Message.ProjectName);
             UIEventManager.RecievedProjectDataFromServerDelegate?.Invoke(null, null);// = true;
         }
 
         public static void ReceiveErrorNotification(Packet Data)
         {
-            CustomLogging.Log("CLIENT: Received Error Notif: " + Data.ReadString());
+            ErrorNotificationMessage Message = JsonSerializer.Deserialize<ErrorNotificationMessage>(Data.ReadByteArray());
+
+            CustomLogging.Log("CLIENT: Received Error Notif: " + Message.ErrorMessgae);
         }
 
         public static void ReceiveLogData(Packet Data)
         {
-            CustomLogging.Log("CLIENT: LOG DATA FROM SERVER: " + Data.ReadString());
+            LogDataMessage Message = JsonSerializer.Deserialize<LogDataMessage>(Data.ReadByteArray());
+
+            CustomLogging.Log("CLIENT: LOG DATA FROM SERVER: " + Message.LogMessgae);
         }
 
         public static void ReceivedFileFromServer(Packet Data)
         {
             CustomLogging.Log("CLIENT: Recieved FILE Data");
 
-            Guid ID = Data.ReadGuid(false);
-            Data.ReadPointerPosition -= 4;
+            FileDataMessage Message = JsonSerializer.Deserialize<FileDataMessage>(Data.ReadByteArray(false));
 
-           // UIEventManager.PushToListeners(Data.ReadInt(false), Data);
-            UIEventManager.PushFileToListeners(ID, Data);
+            //Guid ID = Data.ReadGuid(false);
+            //Data.ReadPointerPosition -= 4;
+
+            UIEventManager.PushFileToListeners(Message.GUID, Message);
         }
 
+        //deprecate?
         public static void ReceivedFileMetadataFromServer(Packet Data)
         {
             CustomLogging.Log("CLIENT: Recieved METADATA");
 
-            Guid ID = Data.ReadGuid(false);
-            Data.ReadPointerPosition -= 4;
+            FileDataMessage Message = JsonSerializer.Deserialize<FileDataMessage>(Data.ReadByteArray(false));
+           // Guid ID = Data.ReadGuid(false);
+           // Data.ReadPointerPosition -= 4;
 
             // UIEventManager.PushToListeners(Data.ReadInt(false), Data);
-            UIEventManager.PushFileToListeners(ID, Data);
+            UIEventManager.PushFileToListeners(Message.GUID, Message);
         }
 
         public static void ReceivedFolderDataFromServer(Packet Data)
         {
             CustomLogging.Log("CLIENT: Recieved FOLDER Data");
 
-            //UIEventManager.PushToListeners(Data.ReadInt(false), Data);
-            UIEventManager.PushFolderToListeners(Data.ReadInt(false), Data);
+            FolderDataMessage Message = JsonSerializer.Deserialize<FolderDataMessage>(Data.ReadByteArray(false));
+
+            UIEventManager.PushFolderToListeners(Message.ID, Message);
         }
 
     }

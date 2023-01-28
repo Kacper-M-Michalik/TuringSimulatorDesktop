@@ -6,7 +6,7 @@ using TuringSimulatorDesktop.UI;
 
 namespace TuringSimulatorDesktop
 {
-    public delegate void SubscriberDataCallback(Packet Data);
+    public delegate void SubscriberDataCallback(object Data);
 
     public static class UIEventManager
     {
@@ -32,30 +32,30 @@ namespace TuringSimulatorDesktop
             if (GUIDFileUpdateSubscribers.ContainsKey(FileID) && GUIDFileUpdateSubscribers[FileID].Contains(Function)) GUIDFileUpdateSubscribers[FileID].Remove(Function);
         }
 
-        public static void PushFolderToListeners(int FolderID, Packet Data)
+        public static void PushFolderToListeners(int FolderID, FolderDataMessage Data)
         {
             //if (!FileUpdateSubscribers.ContainsKey(FileID)) return;
 
             List<SubscriberDataCallback> Subscribers = FileUpdateSubscribers[FolderID];
-            int BasePointer = Data.ReadPointerPosition;      
+            //int BasePointer = Data.ReadPointerPosition;      
             
             for (int i = Subscribers.Count - 1; i > -1; i--)
             {
                 Subscribers[i](Data);
-                Data.ReadPointerPosition = BasePointer;
+                //Data.ReadPointerPosition = BasePointer;
             }
         }
-        public static void PushFileToListeners(Guid FileID, Packet Data)
+        public static void PushFileToListeners(Guid FileID, FileDataMessage Data)
         {
             //if (!FileUpdateSubscribers.ContainsKey(FileID)) return;
 
             List<SubscriberDataCallback> Subscribers = GUIDFileUpdateSubscribers[FileID];
-            int BasePointer = Data.ReadPointerPosition;
+            //int BasePointer = Data.ReadPointerPosition;
 
             for (int i = Subscribers.Count - 1; i > -1; i--)
             {
                 Subscribers[i](Data);
-                Data.ReadPointerPosition = BasePointer;
+                //Data.ReadPointerPosition = BasePointer;
             }
         }
 

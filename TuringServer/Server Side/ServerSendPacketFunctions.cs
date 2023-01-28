@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using TuringCore;
 using TuringServer.Logging;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace TuringServer
 {
@@ -12,8 +14,12 @@ namespace TuringServer
         {
             Packet Data = new Packet();
 
+            LogDataMessage Payload = new LogDataMessage();
+            Payload.RequestType = (int)ServerSendPackets.LogData;
+            Payload.LogMessgae = LogData;
+
             Data.Write((int)ServerSendPackets.LogData);
-            Data.Write(LogData);
+            Data.Write(JsonSerializer.SerializeToUtf8Bytes(Payload));
 
             return Data;
         }
@@ -24,8 +30,12 @@ namespace TuringServer
 
             CustomLogging.Log("SERVER: Error Notif Copy - " + ErrorString);
 
+            ErrorNotificationMessage Payload = new ErrorNotificationMessage();
+            Payload.RequestType = (int)ServerSendPackets.ErrorNotification;
+            Payload.ErrorMessgae = ErrorString;
+
             Data.Write((int)ServerSendPackets.ErrorNotification);
-            Data.Write(ErrorString);
+            Data.Write(JsonSerializer.SerializeToUtf8Bytes(Payload));
 
             return Data;
         }
@@ -34,9 +44,12 @@ namespace TuringServer
         {
             Packet Data = new Packet();
 
+            ProjectDataMessage Payload = new ProjectDataMessage();
+            Payload.RequestType = (int)ServerSendPackets.SentProjectData;
+            Payload.ProjectName = Server.LoadedProject.ProjectName;
+
             Data.Write((int)ServerSendPackets.SentProjectData);
-            Data.Write(Server.LoadedProject.ProjectName);
-            //add lookup for alphabets here
+            Data.Write(JsonSerializer.SerializeToUtf8Bytes(Payload));
 
             return Data;
         }
@@ -44,16 +57,18 @@ namespace TuringServer
         public static Packet FileData(Guid FileGUID)
         {
             Packet Data = new Packet();
-
-            Data.Write((int)ServerSendPackets.SentOrUpdatedFile);
-
             int FileID = Server.LoadedProject.GuidFileLookup[FileGUID];
 
-            Data.Write(FileGUID);
-            Data.Write((int)Server.LoadedProject.FileDataLookup[FileID].FileType);
-            Data.Write(Server.LoadedProject.FileDataLookup[FileID].Name);
-            Data.Write(Server.LoadedProject.FileDataLookup[FileID].Version);
-            Data.Write(Server.LoadedProject.CacheDataLookup[FileID].FileData);
+            FileDataMessage Payload = new FileDataMessage();            
+            Payload.RequestType = (int)ServerSendPackets.SentOrUpdatedFile;
+            Payload.GUID = FileGUID;
+            Payload.FileType = Server.LoadedProject.FileDataLookup[FileID].FileType;
+            Payload.Name = Server.LoadedProject.FileDataLookup[FileID].Name;
+            Payload.Version = Server.LoadedProject.FileDataLookup[FileID].Version;
+            Payload.Data = Server.LoadedProject.CacheDataLookup[FileID].FileData;
+
+            Data.Write((int)ServerSendPackets.SentOrUpdatedFile);
+            Data.Write(JsonSerializer.SerializeToUtf8Bytes(Payload));
 
             return Data;
         }
@@ -61,15 +76,17 @@ namespace TuringServer
         public static Packet FileMetadata(Guid FileGUID)
         {
             Packet Data = new Packet();
-
-            Data.Write((int)ServerSendPackets.SentFileMetadata);
-
             int FileID = Server.LoadedProject.GuidFileLookup[FileGUID];
 
-            Data.Write(FileGUID);
-            Data.Write((int)Server.LoadedProject.FileDataLookup[FileID].FileType);
-            Data.Write(Server.LoadedProject.FileDataLookup[FileID].Name);
-            Data.Write(Server.LoadedProject.FileDataLookup[FileID].Version);
+            FileDataMessage Payload = new FileDataMessage();
+            Payload.RequestType = (int)ServerSendPackets.SentFileMetadata;
+            Payload.GUID = FileGUID;
+            Payload.FileType = Server.LoadedProject.FileDataLookup[FileID].FileType;
+            Payload.Name = Server.LoadedProject.FileDataLookup[FileID].Name;
+            Payload.Version = Server.LoadedProject.FileDataLookup[FileID].Version;
+
+            Data.Write((int)ServerSendPackets.SentFileMetadata);
+            Data.Write(JsonSerializer.SerializeToUtf8Bytes(Payload));
 
             return Data;
         }
@@ -78,45 +95,41 @@ namespace TuringServer
         {
             Packet Data = new Packet();
 
-            Data.Write((int)ServerSendPackets.SentFolderData);
-
             DirectoryFolder SendFolder = Server.LoadedProject.FolderDataLookup[FolderID];
 
-            Data.Write(FolderID);
-            Data.Write(SendFolder.Name);
+            FolderDataMessage Payload = new FolderDataMessage();
+            Payload.RequestType = (int)ServerSendPackets.SentFolderData;
+            Payload.ID = FolderID;
+            Payload.Name = SendFolder.Name;
 
             DirectoryFolder CurrentFolder = SendFolder;
-            List<DirectoryFolder> ParentFolders = new List<DirectoryFolder>();
-            int NumberOfParentFolders = 0;
+            List<FolderDataMessage> ParentFolders = new List<FolderDataMessage>();
             while (CurrentFolder.ParentFolder != null)
             {
-                ParentFolders.Add(CurrentFolder.ParentFolder);
+                ParentFolders.Add(new FolderDataMessage() { ID = CurrentFolder.ID, Name = CurrentFolder.Name });
                 CurrentFolder = CurrentFolder.ParentFolder;
-                NumberOfParentFolders++;
             }
 
-            Data.Write(NumberOfParentFolders);
-            
-            for (int i = 0; i < ParentFolders.Count; i++)
-            {
-                Data.Write(ParentFolders[i].Name);
-                Data.Write(ParentFolders[i].ID);
-            }
+            Payload.ParentFolders = ParentFolders;
 
-            Data.Write(Server.LoadedProject.FolderDataLookup[FolderID].SubFolders.Count);
+            List<FolderDataMessage> SubFolders = new List<FolderDataMessage>();
             foreach (DirectoryFolder Folder in SendFolder.SubFolders)
             {
-                Data.Write(Folder.Name);
-                Data.Write(Folder.ID);
+                SubFolders.Add(new FolderDataMessage() { ID = Folder.ID, Name = Folder.Name });
             }
 
-            Data.Write(Server.LoadedProject.FolderDataLookup[FolderID].SubFiles.Count);
+            Payload.SubFolders = SubFolders;
+
+            List<FileDataMessage> Files = new List<FileDataMessage>();
             foreach (DirectoryFile File in SendFolder.SubFiles)
             {
-                Data.Write(File.Name);
-                Data.Write(File.GUID);
-                Data.Write((int)File.FileType);
+                Files.Add(new FileDataMessage() { GUID = File.GUID, FileType = File.FileType, Name = File.Name, Version = File.Version});
             }
+
+            Payload.Files = Files;
+
+            Data.Write((int)ServerSendPackets.SentFolderData);
+            Data.Write(JsonSerializer.SerializeToUtf8Bytes(Payload));
 
             return Data;
         }

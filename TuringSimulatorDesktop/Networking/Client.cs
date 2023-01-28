@@ -5,6 +5,8 @@ using System.Net.Sockets;
 using System.Threading;
 using TuringCore;
 using TuringServer;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace TuringSimulatorDesktop
 {
@@ -197,8 +199,11 @@ namespace TuringSimulatorDesktop
 
                     //Get rid of packet size
                     Data.ReadInt();
-                    //Get Type
+
                     int PacketType = Data.ReadInt();
+
+                    //RequestHeader Header = JsonSerializer.Deserialize<RequestHeader>(Data.ReadByteArray(false));
+
                     //Execute function
                     if (ClientReceiveFunctions.PacketToFunction.ContainsKey(PacketType))
                         ClientReceiveFunctions.PacketToFunction[PacketType](Data);

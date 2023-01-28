@@ -161,22 +161,28 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Client.SendTCPData(ClientSendPacketFunctions.RequestFile(ID, true));
         }
 
-        public void ReceivedStateTransitionFile(Packet Data)
+        public void ReceivedStateTransitionFile(object Data)
         {
-            if ((ServerSendPackets)Data.ReadInt() == ServerSendPackets.SentFileMetadata) return;
+            CustomLogging.Log("CLIENT: Window received State Transition Data");
+
+            FileDataMessage Message = (FileDataMessage)Data;
+
+            if ((ServerSendPackets)Message.RequestType == ServerSendPackets.SentFileMetadata) return;
+
+            if (Message.GUID != CurrentlyOpenedFileID)
+            {
+                CustomLogging.Log("CLIENT: State Transition Editor Fatal Error, recived unwanted file data!");
+                return;
+            }
 
             TransitionItems = new List<StateTransitionItem>();
 
-            //file id
-            Data.ReadGuid();
+            title = Message.Name;
+            FileVersion = Message.Version;
 
-            if ((CoreFileType)Data.ReadInt() != CoreFileType.TransitionFile) throw new Exception("Opened File is not a transition file!");
-
-            title = Data.ReadString();
-            FileVersion = Data.ReadInt();
             try
             {
-                OpenedFile = JsonSerializer.Deserialize<TransitionFile>(Data.ReadByteArray());
+                OpenedFile = JsonSerializer.Deserialize<TransitionFile>(Message.Data);
             }
             catch
             {
@@ -223,16 +229,26 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             TransitionLayout.UpdateLayout();
         }
 
-        public void ReceiveAlphabetMetaData(Packet Data)
+        public void ReceiveAlphabetMetaData(object Data)
         {
-            if ((ServerSendPackets)Data.ReadInt() == ServerSendPackets.SentOrUpdatedFile) return;
+            CustomLogging.Log("CLIENT: Window received State Alphabet Data");
 
+            FileDataMessage Message = (FileDataMessage)Data;
+
+            if ((ServerSendPackets)Message.RequestType == ServerSendPackets.SentOrUpdatedFile) return;
+
+            if (Message.GUID != OpenedFile.DefinitionAlphabetFileID)
+            {
+                CustomLogging.Log("CLIENT: State Transition Editor Fatal Error, recived unwanted alphabet file data!");
+                return;
+            }
+            
+            //may want to change in future
             UIEventManager.Unsubscribe(OpenedFile.DefinitionAlphabetFileID, ReceiveAlphabetMetaData);
 
-            Guid AlphabetID = Data.ReadGuid();
-            Data.ReadInt();
-            string AlphabetFileName = Data.ReadString();
-            int AlphabetFileVersion = Data.ReadInt();
+            Guid AlphabetID = Message.GUID;
+            string AlphabetFileName = Message.Name;
+            int AlphabetFileVersion = Message.Version;
 
             DefenitionAlphabetBox.ReferenceFileData = new FileData(AlphabetFileName, AlphabetID, CoreFileType.Alphabet);
             DefenitionAlphabetBox.FileLabel.Text = AlphabetFileName;

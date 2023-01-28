@@ -150,40 +150,36 @@ namespace TuringSimulatorDesktop.UI.Prefabs
              */
         }
 
-        public void ReceivedStateTableSourceData(Packet Data)
+        public void ReceivedStateTableSourceData(object Data)
         {
-            if ((ServerSendPackets)Data.ReadInt() == ServerSendPackets.SentFileMetadata) return;
+            FileDataMessage Message = (FileDataMessage)Data;
 
-            //get rid of fileID
-            if (CurrentlyOpenedFileID != Data.ReadGuid())
+            if ((ServerSendPackets)Message.RequestType == ServerSendPackets.SentFileMetadata) return;
+
+            if (Message.GUID != CurrentlyOpenedFileID)
             {
                 //new request was sent, throw error or whatver
                 return;
             }
 
-            CoreFileType File = ((CoreFileType)Data.ReadInt());
-
-            if (File != CoreFileType.TransitionFile && File != CoreFileType.SlateFile)
+            //unnecessary check?
+            if (Message.FileType != CoreFileType.TransitionFile && Message.FileType != CoreFileType.SlateFile)
             {
                 //diosplay error to UI HERE
                 CustomLogging.Log("Client: Turing Machine Window Fatal Error, received an unexpected non table source data!");
                 return;            
             }
 
-            CurrentStateTableLabel.Text = Data.ReadString();
-            //get rid of file version
-            Data.ReadInt();
-
             //deserialize on seperate thread later
             try
             {
-                if (File == CoreFileType.TransitionFile)
+                if (Message.FileType == CoreFileType.TransitionFile)
                 {
-                    TempFile = JsonSerializer.Deserialize<TransitionFile>(Data.ReadByteArray());                
+                    TempFile = JsonSerializer.Deserialize<TransitionFile>(Message.Data);                
                 }
                 else
                 {
-                    TempFile = JsonSerializer.Deserialize<SlateFile>(Data.ReadByteArray());
+                    TempFile = JsonSerializer.Deserialize<SlateFile>(Message.Data);
                 }
             }
             catch
@@ -193,40 +189,36 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 return;
             }
 
-            //curre
+            CurrentStateTableLabel.Text = Message.Name;
 
             CurrentlyOpenedAlphabetID = TempFile.DefinitionAlphabetFileID;
             UIEventManager.Subscribe(CurrentlyOpenedAlphabetID, ReceivedAlphabetData);
             Client.SendTCPData(ClientSendPacketFunctions.RequestFile(CurrentlyOpenedAlphabetID, true));
-
-            //CompileSourceFile();
         }
 
         
-        public void ReceivedAlphabetData(Packet Data)
+        public void ReceivedAlphabetData(object Data)
         {
-            if ((ServerSendPackets)Data.ReadInt() == ServerSendPackets.SentFileMetadata) return;
+            FileDataMessage Message = (FileDataMessage)Data;
+            if ((ServerSendPackets)Message.RequestType == ServerSendPackets.SentFileMetadata) return;
 
-            if (CurrentlyOpenedAlphabetID != Data.ReadGuid())
+            if (Message.GUID != CurrentlyOpenedAlphabetID)
             {
                 //new request was sent, throw error or whatver
                 return;
             }
 
-            CoreFileType File = ((CoreFileType)Data.ReadInt());
-
-            if (File != CoreFileType.Alphabet)
+            //unnecessary check?
+            if (Message.FileType != CoreFileType.Alphabet)
             {
+                //diosplay error to UI HERE
                 CustomLogging.Log("Client: Turing Machine Window Fatal Error, received an unexpected non alphabet!");
                 return;
             }
 
-            Data.ReadString();
-            Data.ReadInt();
-
             try
             {                
-                TempAlphabet = JsonSerializer.Deserialize<Alphabet>(Data.ReadByteArray());               
+                TempAlphabet = JsonSerializer.Deserialize<Alphabet>(Message.Data);               
             }
             catch
             {
@@ -264,29 +256,28 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Client.SendTCPData(ClientSendPacketFunctions.RequestFile(CurrentlyOpenedTapeID, true));
         }
 
-        public void ReceivedTapeData(Packet Data)
+        public void ReceivedTapeData(object Data)
         {
-            if (CurrentlyOpenedTapeID != Data.ReadGuid())
+            FileDataMessage Message = (FileDataMessage)Data;
+            if ((ServerSendPackets)Message.RequestType == ServerSendPackets.SentFileMetadata) return;
+
+            if (Message.GUID != CurrentlyOpenedTapeID)
             {
                 //new request was sent, throw error or whatver
                 return;
             }
 
-            CoreFileType File = ((CoreFileType)Data.ReadInt());
-
-            if (File != CoreFileType.Tape)
+            if (Message.FileType != CoreFileType.Tape)
             {
+                //diosplay error to UI HERE
                 CustomLogging.Log("Client: Turing Machine Window Fatal Error, received an unexpected non tape!");
                 return;
             }
 
-            Data.ReadString();
-            Data.ReadInt();
-
             TapeTemplate Tape;
             try
             {
-                Tape = JsonSerializer.Deserialize<TapeTemplate>(Data.ReadByteArray());
+                Tape = JsonSerializer.Deserialize<TapeTemplate>(Message.Data);
             }
             catch
             {

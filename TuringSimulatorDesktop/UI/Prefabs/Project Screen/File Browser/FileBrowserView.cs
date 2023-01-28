@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using TuringCore;
 using TuringSimulatorDesktop.Input;
@@ -128,25 +129,27 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Client.SendTCPData(ClientSendPacketFunctions.RequestFolderData(ID,true));
         }
 
-        public void FolderUpdated(Packet Data)
+        public void FolderUpdated(object Data)
         {
             CustomLogging.Log("CLIENT: Window received Folder Data");
 
-            FileLayout.Clear();
-            Files.Clear();
+            FolderDataMessage Message = (FolderDataMessage)Data;
 
-            if (Data.ReadInt() != CurrentlyOpenedFolderID)
+            if (Message.ID != CurrentlyOpenedFolderID)
             {
                 CustomLogging.Log("Client: File Browser Window Fatal Error, recived unwated folder data!");
                 return;
             }
 
+            FileLayout.Clear();
+            Files.Clear();
+
             HierarchyLayout.Clear();
 
-            string FolderName = Data.ReadString();
+            string FolderName = Message.Name;
             List<IVisualElement> Items = new List<IVisualElement>();
 
-            int Max = Data.ReadInt();
+            int Max = Message.ParentFolders.Count;
             for (int i = 0; i < Max; i++)
             {
                 Label TransitionLabel = new Label();
@@ -157,7 +160,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 TransitionLabel.DrawCentered = true;
                 TransitionLabel.Bounds = TransitionLabel.Bounds + GlobalInterfaceData.Scale(new Point(FolderHierarchyItem.ReferencePadding, 0));
                 Items.Add(TransitionLabel);
-                Items.Add(new FolderHierarchyItem(new FileData(Data.ReadString(), Data.ReadInt()), this, HierarchyLayout.Group));
+                Items.Add(new FolderHierarchyItem(new FileData(Message.ParentFolders[i].Name, Message.ParentFolders[i].ID), this, HierarchyLayout.Group));
             }
 
             for (int i = Items.Count - 1; i > -1; i--)
@@ -177,18 +180,18 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             HierarchyLayout.UpdateLayout();
 
-            int FolderCount = Data.ReadInt();
+            int FolderCount = Message.SubFolders.Count;
             for (int i = 0; i < FolderCount; i++)
             {
-                FileDisplayItem Item = new FileDisplayItem(new FileData(Data.ReadString(), Data.ReadInt()), this, FileLayout.Group);
+                FileDisplayItem Item = new FileDisplayItem(new FileData(Message.SubFolders[i].Name, Message.SubFolders[i].ID), this, FileLayout.Group);
                 Item.Bounds = new Point(FileLayout.Bounds.X, 0);
                 Files.Add(Item);
                 FileLayout.AddElement(Item);
             }
-            int FileCount = Data.ReadInt();
+            int FileCount = Message.Files.Count;
             for (int i = 0; i < FileCount; i++)
             {
-                FileDisplayItem Item = new FileDisplayItem(new FileData(Data.ReadString(), Data.ReadGuid(), (CoreFileType)Data.ReadInt()), this, FileLayout.Group);
+                FileDisplayItem Item = new FileDisplayItem(new FileData(Message.Files[i].Name, Message.Files[i].GUID, Message.Files[i].FileType), this, FileLayout.Group);
                 Item.Bounds = new Point(FileLayout.Bounds.X, 0);
                 Files.Add(Item);
                 FileLayout.AddElement(Item);
