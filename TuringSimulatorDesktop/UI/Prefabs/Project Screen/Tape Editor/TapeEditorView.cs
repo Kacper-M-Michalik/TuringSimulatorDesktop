@@ -88,7 +88,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             IsActive = false;
 
-            SwitchOpenedTape(FileToDisplay);
+            if (FileToDisplay != Guid.Empty) SwitchOpenedTape(FileToDisplay);
         }
 
         public void SwitchOpenedTape(Guid ID)
@@ -168,7 +168,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 VisualTape.CameraMin = (Matrix.CreateTranslation(Canvas.Position.X, 0, 0) * Canvas.InverseMatrix).Translation.X;
                 VisualTape.CameraMax = (Matrix.CreateTranslation(Canvas.Position.X + Canvas.Bounds.X, 0, 0) * Canvas.InverseMatrix).Translation.X;
                 VisualTape.UpdateLayout();
-                Canvas.Draw();
+                Canvas.Draw(BoundPort);
             }
         }
 

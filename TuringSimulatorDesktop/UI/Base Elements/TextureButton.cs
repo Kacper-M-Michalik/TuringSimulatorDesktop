@@ -52,6 +52,9 @@ namespace TuringSimulatorDesktop.UI
             Group = group;
             group.ClickableObjects.Add(this);
             group.PollableObjects.Add(this);
+
+            Bounds = new Point(10, 10);
+            Position = Vector2.Zero;
         }
         public TextureButton(int width, int height, ActionGroup group)
         {

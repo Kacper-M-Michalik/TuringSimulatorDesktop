@@ -62,6 +62,8 @@ namespace TuringSimulatorDesktop.UI
             NewProjectButton.AddElement(CreateButton);
             NewProjectButton.AddElement(CreateIcon);
             NewProjectButton.AddElement(CreateLabel);
+
+            NewProjectButton.Offsets[2] = new Vector2(0, CreateButton.Bounds.Y * 0.5f);
             NewProjectButton.Position = new Vector2(14, 50);
 
 
@@ -85,6 +87,8 @@ namespace TuringSimulatorDesktop.UI
             LoadProjectButton.AddElement(LoadButton);
             LoadProjectButton.AddElement(LoadIcon);
             LoadProjectButton.AddElement(LoadLabel);
+
+            LoadProjectButton.Offsets[2] = new Vector2(0, LoadButton.Bounds.Y * 0.5f);
             LoadProjectButton.Position = new Vector2(14, 158);
 
 
@@ -108,6 +112,8 @@ namespace TuringSimulatorDesktop.UI
             HostProjectButton.AddElement(HostButton);
             HostProjectButton.AddElement(HostIcon);
             HostProjectButton.AddElement(HostLabel);
+
+            HostProjectButton.Offsets[2] = new Vector2(0, HostButton.Bounds.Y * 0.5f);
             HostProjectButton.Position = new Vector2(14, 266);
 
 
@@ -131,6 +137,8 @@ namespace TuringSimulatorDesktop.UI
             JoinProjectButton.AddElement(JoinButton);
             JoinProjectButton.AddElement(JoinIcon);
             JoinProjectButton.AddElement(JoinLabel);
+
+            JoinProjectButton.Offsets[2] = new Vector2(0, JoinButton.Bounds.Y * 0.5f);
             JoinProjectButton.Position = new Vector2(14, 374);
 
 

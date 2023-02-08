@@ -77,10 +77,9 @@ namespace TuringSimulatorDesktop.Input
                             {
                                 if (LeftMousePressed || RightMousePressed)
                                 {
-                                    ActionGroups[i].ClickableObjects[j].Clicked();
                                     if (PreviouslyClickedObject != null && ActionGroups[i].ClickableObjects[j] != PreviouslyClickedObject) PreviouslyClickedObject.ClickedAway();
                                     PreviouslyClickedObject = ActionGroups[i].ClickableObjects[j];
-                                    
+                                    ActionGroups[i].ClickableObjects[j].Clicked();                                    
                                 }                  
                                 else
                                 {
@@ -179,6 +178,13 @@ namespace TuringSimulatorDesktop.Input
                 debug.Position = new Vector2(ActionGroups[i].X, ActionGroups[i].Y);
                 debug.Draw();
             }
+        }
+
+        public static void ManuallyClickElement(IClickable Element)
+        {
+            if (PreviouslyClickedObject != null && Element != PreviouslyClickedObject) PreviouslyClickedObject.ClickedAway();
+            PreviouslyClickedObject = Element;
+            Element.Clicked();
         }
 
         public static ActionGroup CreateActionGroup(int X, int Y, int Width, int Height)

@@ -33,7 +33,19 @@ namespace TuringSimulatorDesktop.UI
             }
         }
 
-        public bool IsActive { get; set; } = true;
+        bool isActive;
+        public bool IsActive 
+        {
+            get => isActive;
+            set
+            {
+                isActive = value;
+                for (int i = 0; i < Elements.Count; i++)
+                {
+                    Elements[i].IsActive = value;
+                }
+            }        
+        }
 
         public bool IsMarkedForDeletion { get; set; }
 
@@ -59,7 +71,8 @@ namespace TuringSimulatorDesktop.UI
         {
             Group = InputManager.CreateActionGroup();
             Group.PollableObjects.Add(this);
-            
+
+
             Elements = new List<ICanvasInteractable>();
             Port = new Viewport();
 
@@ -67,6 +80,7 @@ namespace TuringSimulatorDesktop.UI
             OffsetMatrix = Matrix.Identity;
             ZoomMatrix = Matrix.Identity;
 
+            IsActive = true;
             Bounds = new Point(0, 0);
             Position = Vector2.Zero;
         }

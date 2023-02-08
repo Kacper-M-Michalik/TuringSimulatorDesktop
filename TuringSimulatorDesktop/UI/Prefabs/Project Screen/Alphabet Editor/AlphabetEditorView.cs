@@ -67,8 +67,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         InputBox EmptyCharacterInputBox;
         InputBox WildcardCharacterInputBox;
-        VerticalLayoutBox AllowedCharactersLayoutBox;
-        List<InputBox> AllowedCharactersInputBoxes;
+
+        AlphabetCharacterInputItem CharacterInputItem;
 
         bool FullyLoadedFile;
         Guid CurrentlyOpenedFileID;
@@ -90,44 +90,39 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Background = new Icon(GlobalInterfaceData.Scheme.Background);
 
             EmptyCharacterTitle = new Label();
-            EmptyCharacterTitle.FontSize = GlobalInterfaceData.Scale(10);
+            EmptyCharacterTitle.FontSize = GlobalInterfaceData.Scale(12);
             EmptyCharacterTitle.FontColor = GlobalInterfaceData.Scheme.FontGrayedOutColor;
             EmptyCharacterTitle.Text = "Empty Character";
 
             EmptyCharacterInputBox = new InputBox(Group);
+            EmptyCharacterInputBox.BackgroundColor = GlobalInterfaceData.Scheme.InteractableAccent;
             EmptyCharacterInputBox.OutputLabel.FontSize = GlobalInterfaceData.Scale(20);
             EmptyCharacterInputBox.OutputLabel.FontColor = GlobalInterfaceData.Scheme.FontColor;
-            EmptyCharacterInputBox.OutputLabel.Text = "-";
+            EmptyCharacterInputBox.OutputLabel.Text = "";
             EmptyCharacterInputBox.Modifiers.AllowsNewLine = false;
 
             WildcardCharacterTitle = new Label();
-            WildcardCharacterTitle.FontSize = GlobalInterfaceData.Scale(10);
+            WildcardCharacterTitle.FontSize = GlobalInterfaceData.Scale(12);
             WildcardCharacterTitle.FontColor = GlobalInterfaceData.Scheme.FontGrayedOutColor;
             WildcardCharacterTitle.Text = "Wildcard Character";
 
             WildcardCharacterInputBox = new InputBox(Group);
+            WildcardCharacterInputBox.BackgroundColor = GlobalInterfaceData.Scheme.InteractableAccent;
             WildcardCharacterInputBox.OutputLabel.FontSize = GlobalInterfaceData.Scale(20);
             WildcardCharacterInputBox.OutputLabel.FontColor = GlobalInterfaceData.Scheme.FontColor;
-            WildcardCharacterInputBox.OutputLabel.Text = "-";
+            WildcardCharacterInputBox.OutputLabel.Text = "*";
             WildcardCharacterInputBox.Modifiers.AllowsNewLine = false;
 
             AllowedCharactersTitle = new Label();
-            AllowedCharactersTitle.FontSize = GlobalInterfaceData.Scale(20);
+            AllowedCharactersTitle.FontSize = GlobalInterfaceData.Scale(12);
             AllowedCharactersTitle.FontColor = GlobalInterfaceData.Scheme.FontGrayedOutColor;
             AllowedCharactersTitle.Text = "Allowed Characters";
 
-            AllowedCharactersLayoutBox = new VerticalLayoutBox();
-            AllowedCharactersLayoutBox.Spacing = 10;
-            AllowedCharactersLayoutBox.Scrollable = true;
-            AllowedCharactersLayoutBox.ScrollFactor = 0.2f;
-            AllowedCharactersLayoutBox.ViewOffsetBoundsMin = new Vector2(0f, 5f);
-            AllowedCharactersLayoutBox.ViewOffset = new Vector2(0f, 5f);
+            CharacterInputItem = new AlphabetCharacterInputItem(Group);
 
             IsActive = false;
 
-            SwitchOpenedAlphabet(FileToDisplay);
-
-            CurrentlyOpenedFileID = FileToDisplay;
+            if (FileToDisplay != Guid.Empty) SwitchOpenedAlphabet(FileToDisplay);
         }
 
         public void SwitchOpenedAlphabet(Guid ID)
@@ -173,11 +168,9 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             StringBuilder Builder = new StringBuilder();
             foreach (string Character in OpenedFile.Characters)
             {
-                Builder.Append(Character);
-                Builder.Append("/n");
+
             }
 
-            //AllowedCharactersInputBox.Text = Builder.ToString();
             FullyLoadedFile = true;
         }
 
@@ -192,7 +185,14 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             NewAlphabet.FileID = CurrentlyOpenedFileID;
             NewAlphabet.EmptyCharacter = EmptyCharacterInputBox.Text;
             NewAlphabet.WildcardCharacter = WildcardCharacterInputBox.Text;
-            //NewAlphabet.Characters = AllowedCharactersInputBox.Text.Split("/n").ToHashSet();
+
+            HashSet<string> AllowedCharacters = new HashSet<string>();
+            for (int i = 0; i < CharacterInputItem.InputBoxes.Count; i++)
+            {
+                AllowedCharacters.Add(CharacterInputItem.InputBoxes[i].Text);
+            }
+
+            NewAlphabet.Characters = AllowedCharacters;
 
             Client.SendTCPData(ClientSendPacketFunctions.UpdateFile(FileVersion, JsonSerializer.SerializeToUtf8Bytes(NewAlphabet, GlobalProjectAndUserData.JsonOptions)));
         }
@@ -204,13 +204,15 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             Background.Position = position;
 
-            EmptyCharacterTitle.Position = position + GlobalInterfaceData.Scale(new Vector2(10, 50));
-            WildcardCharacterTitle.Position = position + GlobalInterfaceData.Scale(new Vector2(10, 100));
-            AllowedCharactersTitle.Position = position + GlobalInterfaceData.Scale(new Vector2(200, 10));
+            EmptyCharacterTitle.Position = position + GlobalInterfaceData.Scale(new Vector2(22, 18));
+            EmptyCharacterInputBox.Position = position + GlobalInterfaceData.Scale(new Vector2(20, 30));
 
-            EmptyCharacterInputBox.Position = position + GlobalInterfaceData.Scale(new Vector2(10, 60));
-            WildcardCharacterInputBox.Position = position + GlobalInterfaceData.Scale(new Vector2(10, 110));
-            //AllowedCharactersInputBox.Position = position + GlobalInterfaceData.Scale(new Vector2(200, 20));
+            WildcardCharacterTitle.Position = position + GlobalInterfaceData.Scale(new Vector2(22, 82));
+            WildcardCharacterInputBox.Position = position + GlobalInterfaceData.Scale(new Vector2(20, 94));
+
+
+            AllowedCharactersTitle.Position = position + GlobalInterfaceData.Scale(new Vector2(185, 18));
+            CharacterInputItem.Position = position + GlobalInterfaceData.Scale(new Vector2(200, 20));
         }
 
         void ResizeLayout()
@@ -220,9 +222,9 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             Background.Bounds = bounds;
 
-            EmptyCharacterInputBox.Bounds = GlobalInterfaceData.Scale(new Point(100, 15));
-            WildcardCharacterInputBox.Bounds = GlobalInterfaceData.Scale(new Point(100, 15));
-           // AllowedCharactersInputBox.Bounds = GlobalInterfaceData.Scale(new Point(300, 500));
+            EmptyCharacterInputBox.Bounds = GlobalInterfaceData.Scale(new Point(120, 30));
+            WildcardCharacterInputBox.Bounds = GlobalInterfaceData.Scale(new Point(120, 30));
+            CharacterInputItem.Bounds = GlobalInterfaceData.Scale(new Point(300, 500));
         }
 
         /*
@@ -239,12 +241,13 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 Background.Draw(BoundPort);
 
                 EmptyCharacterTitle.Draw(BoundPort);
-                WildcardCharacterTitle.Draw(BoundPort);
-                AllowedCharactersTitle.Draw(BoundPort);
-
                 EmptyCharacterInputBox.Draw(BoundPort);
+
+                WildcardCharacterTitle.Draw(BoundPort);
                 WildcardCharacterInputBox.Draw(BoundPort);
-              //  AllowedCharactersInputBox.Draw(BoundPort);
+
+                AllowedCharactersTitle.Draw(BoundPort);
+                CharacterInputItem.Draw(BoundPort);
             }
         }
 

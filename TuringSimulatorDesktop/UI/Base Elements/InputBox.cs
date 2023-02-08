@@ -86,7 +86,7 @@ namespace TuringSimulatorDesktop.UI
             GlobalInterfaceData.OSWindow.TextInput += TextInput;
 
             OutputLabel = new Label(0, 0);
-            Bounds = Point.Zero;
+            Bounds = new Point(20, 20);
             Position = Vector2.Zero;
         }
 
@@ -121,6 +121,7 @@ namespace TuringSimulatorDesktop.UI
 
         public void TextInput(object Sender, TextInputEventArgs Args)
         {
+            bool IllegalInput = false;
             if (IsActive && IsFocused)
             {
                 switch (Args.Key)
@@ -130,6 +131,7 @@ namespace TuringSimulatorDesktop.UI
                         break;
                     case Keys.Enter:
                         if (Modifiers.AllowsNewLine) Builder.Append("/n");
+                        else IllegalInput = true;
                         break;
                     case Keys.Back:
                         if (Builder.Length > 0)
@@ -145,7 +147,7 @@ namespace TuringSimulatorDesktop.UI
 
                 OutputLabel.Text = Builder.ToString();
 
-                EditEvent?.Invoke(this);            
+                if (!IllegalInput) EditEvent?.Invoke(this);            
             }
            
         }

@@ -39,6 +39,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             set
             {
                 isActive = value;
+                CellLayoutBox.IsActive = value;
                 for (int i = 0; i < Cells.Count; i++)
                 {
                     Cells[i].IsActive = value;
@@ -162,6 +163,11 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             {
                 Sender.Text = "";
             }
+        }
+
+        public Vector2 GetIndexWorldPosition(int Index)
+        {
+            return Position + new Vector2(TapeCell.ReferenceTotalWidth * Index + TapeCell.ReferenceTotalWidth * 0.5f, Position.Y + TapeCell.ReferenceCellHeight * 0.5f);
         }
 
         void MoveLayout()

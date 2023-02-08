@@ -15,8 +15,10 @@ namespace TuringSimulatorDesktop.UI
             get => position;
             set
             {
-                position = new Vector2(MathF.Round(value.X), MathF.Round(value.Y));
-                Background.Position = position - new Vector2(0, RichText.Size.Y/2f);
+                Vector2 RoundedPosition = new Vector2(MathF.Round(value.X), MathF.Round(value.Y - RichText.Size.Y * 0.5f));
+
+                position = RoundedPosition + new Vector2(0, RichText.Size.Y * 0.5f);
+                Background.Position = RoundedPosition;
             }
         }
 
@@ -35,7 +37,7 @@ namespace TuringSimulatorDesktop.UI
 
         public bool IsActive { get; set; } = true;
 
-        RichTextLayout RichText;
+        RichTextLayout RichText = new RichTextLayout() { };// Text = " " };
         RenderTarget2D RenderTexture;
         public FontSystem Font = GlobalInterfaceData.StandardRegularFont;
         public Color FontColor = GlobalInterfaceData.Scheme.FontColor;
@@ -64,7 +66,6 @@ namespace TuringSimulatorDesktop.UI
         public Label(int width, int height)
         {
             Background = new Icon();
-            RichText = new RichTextLayout();
             RichText.VerticalSpacing = 0;
 
             Bounds = new Point(width, height);
@@ -73,7 +74,6 @@ namespace TuringSimulatorDesktop.UI
         public Label(int width, int height, FontSystem font)
         {
             Background = new Icon();
-            RichText = new RichTextLayout();
             RichText.VerticalSpacing = 0;
             Font = font;
 
@@ -83,7 +83,6 @@ namespace TuringSimulatorDesktop.UI
         public Label(int width, int height, Vector2 position, FontSystem font)
         {
             Background = new Icon();
-            RichText = new RichTextLayout();
             RichText.VerticalSpacing = 0;
             Font = font;
 
@@ -93,7 +92,6 @@ namespace TuringSimulatorDesktop.UI
         public Label(int width, int height, Vector2 position)
         {
             Background = new Icon();
-            RichText = new RichTextLayout();
             RichText.VerticalSpacing = 0;
 
             Bounds = new Point(width, height);
@@ -129,6 +127,8 @@ namespace TuringSimulatorDesktop.UI
 
         public void DrawTextToTexture()
         {
+            Background.Position = new Vector2(MathF.Round(position.X), MathF.Round(position.Y - RichText.Size.Y * 0.5f));
+
             GlobalInterfaceData.Device.SetRenderTarget(RenderTexture);
             GlobalInterfaceData.Device.Clear(Color.Transparent);
 
