@@ -36,22 +36,18 @@ namespace TuringSimulatorDesktop.UI
 
         public bool IsMarkedForDeletion { get; set; }
 
-        ActionGroup Group;
-
         ColorButton Background;
         VerticalLayoutBox LayoutBox;
         public List<InputBox> InputBoxes;
 
-        public AlphabetCharacterInputItem(ActionGroup group)
+        public AlphabetCharacterInputItem(ActionGroup Group)
         {
-            Group = group;
+            LayoutBox = new VerticalLayoutBox();
+            LayoutBox.DrawBounded = true;
 
             Background = new ColorButton(Group);
             Background.BaseColor = (GlobalInterfaceData.Scheme.InteractableAccent);
             Background.OnClickedEvent += Clicked;
-
-            LayoutBox = new VerticalLayoutBox();
-            LayoutBox.DrawBounded = true;
 
             InputBoxes = new List<InputBox>();
 
@@ -65,15 +61,26 @@ namespace TuringSimulatorDesktop.UI
 
         public void LastInputBoxEdited(InputBox Sender)
         {
+            AddNewTextBox("");
+        }
+
+        public void Reset()
+        {
+            LayoutBox.Clear();
+            InputBoxes.Clear();
+        }
+
+        public void AddNewTextBox(string Value)
+        {
             if (InputBoxes.Count > 0) InputBoxes[InputBoxes.Count - 1].EditEvent -= LastInputBoxEdited;
 
-            InputBox NewInput = new InputBox(Group);
+            InputBox NewInput = new InputBox(LayoutBox.Group);
             NewInput.BackgroundColor = GlobalInterfaceData.Scheme.InteractableAccent;
             NewInput.OutputLabel.AutoSizeMesh = true;
             NewInput.Modifiers.AllowsNewLine = false;
             NewInput.OutputLabel.FontColor = GlobalInterfaceData.Scheme.FontColor;
             NewInput.OutputLabel.FontSize = 16;
-            NewInput.Text = "";
+            NewInput.Text = Value;
             NewInput.EditEvent += LastInputBoxEdited;
 
             InputBoxes.Add(NewInput);

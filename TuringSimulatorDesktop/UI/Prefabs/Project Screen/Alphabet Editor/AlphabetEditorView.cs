@@ -165,10 +165,11 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             EmptyCharacterInputBox.Text = OpenedFile.EmptyCharacter;
             WildcardCharacterInputBox.Text = OpenedFile.WildcardCharacter;
 
+            CharacterInputItem.Reset();
             StringBuilder Builder = new StringBuilder();
             foreach (string Character in OpenedFile.Characters)
             {
-
+                CharacterInputItem.AddNewTextBox(Character);
             }
 
             FullyLoadedFile = true;

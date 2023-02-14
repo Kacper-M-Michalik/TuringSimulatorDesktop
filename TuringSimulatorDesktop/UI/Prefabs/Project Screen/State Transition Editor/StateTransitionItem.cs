@@ -48,6 +48,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             //Background = new Icon(GlobalInterfaceData.Scheme.Background);
 
             CurrentStateTextBox = new InputBox(25, 20,group);
+
             TapeValueTextBox = new InputBox(25, 20, group);
             NewStateTextBox = new InputBox(25, 20, group);
             NewTapeValueTextBox = new InputBox(25, 20, group);

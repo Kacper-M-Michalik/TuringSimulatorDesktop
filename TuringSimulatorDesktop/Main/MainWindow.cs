@@ -62,7 +62,7 @@ namespace TuringSimulatorDesktop
             Window.AllowUserResizing = false;
             Window.ClientSizeChanged += OnResize;
             Window.AllowAltF4 = true;
-            //IsMouseVisible = false;            
+            IsMouseVisible = false;            
 
             IsFixedTimeStep = false;            
         }
