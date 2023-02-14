@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 namespace TuringCore
 {
     [Serializable]
-    public class TapeTemplate : SaveFile
+    public class TapeTemplate
     {
         //[JsonInclude]
         //public string ID;

@@ -149,75 +149,47 @@ namespace TuringServer
 
                 string[] Files = Directory.GetFiles(FolderInfo.Item1);
                 for (int i = 0; i < Files.Length; i++)
-                {                    
-                    SaveFile FileData = null;
-                    bool Failed = false;
-                    byte[] Data = File.ReadAllBytes(Files[i]);
-                    try
+                {
+                    ObjectMetadataFile MetadataFile = null;
+
+                    if (Files[i].EndsWith("tmeta"))
                     {
-                        FileData = JsonSerializer.Deserialize<SaveFile>(Data);
-                    }
-                    catch
-                    {
-                        Failed = true;
-                    }
+                        bool Failed;
 
-                    Guid GuidID = Guid.Empty;                        
-
-                    int ID = GetNewFileID();
-                    string Name = GetFileNameFromPath(Files[i]);
-                    string Extension = GetFileExtensionFromPath(Files[i]);
-
-                    //if (ExtensionToFileType(Extension) == CreateFileType.Alphabet) NewProjectAlphabetLookup.Add(Name, ID);
-
-                    if (Failed || FileData == null || FileData.FileID == Guid.Empty)
-                    {
-                        GuidID = Guid.NewGuid();
-                        CoreFileType FileType = ExtensionToFileType(Extension);
-                        switch (FileType)
+                        byte[] Data = File.ReadAllBytes(Files[i]);
+                        try
                         {
-                            case CoreFileType.Alphabet:
-                                Alphabet AlphabetFile = JsonSerializer.Deserialize<Alphabet>(Data);
-                                if (AlphabetFile == null) AlphabetFile = new Alphabet();
-                                AlphabetFile.FileID = GuidID;
-                                File.WriteAllBytes(Files[i], JsonSerializer.SerializeToUtf8Bytes(AlphabetFile, Options));
-                                break;
-                            case CoreFileType.Tape:
-                                TapeTemplate TapeFile = JsonSerializer.Deserialize<TapeTemplate>(Data);
-                                if (TapeFile == null) TapeFile = new TapeTemplate();
-                                TapeFile.FileID = GuidID;
-                                File.WriteAllBytes(Files[i], JsonSerializer.SerializeToUtf8Bytes(TapeFile, Options));
-                                break;
-                            case CoreFileType.TransitionFile:
-                                TransitionFile TransitionFile = JsonSerializer.Deserialize<TransitionFile>(Data);
-                                if (TransitionFile == null) TransitionFile = new TransitionFile();
-                                TransitionFile.FileID = GuidID;
-                                File.WriteAllBytes(Files[i], JsonSerializer.SerializeToUtf8Bytes(TransitionFile, Options));
-                                break;
-                            case CoreFileType.SlateFile:
-                                SlateFile SlateFile = JsonSerializer.Deserialize<SlateFile>(Data);
-                                if (SlateFile == null) SlateFile = new SlateFile();
-                                SlateFile.FileID = GuidID;
-                                File.WriteAllBytes(Files[i], JsonSerializer.SerializeToUtf8Bytes(SlateFile, Options));
-                                break;
+                            MetadataFile = JsonSerializer.Deserialize<ObjectMetadataFile>(Data);
+
+                            Failed = !File.Exists(FolderInfo.Item1 + Path.DirectorySeparatorChar + MetadataFile.FileName + FileManager.FileTypeToExtension(MetadataFile.FileType));
+                        }
+                        catch
+                        {
+                            Failed = true;
+                        }
+
+                        if (!Failed)
+                        {
+                            int ID = GetNewFileID();
+
+                            NewGuidFileLookup.Add(MetadataFile.FileGUID, ID);
+                            DirectoryFile NewFileData = new DirectoryFile(ID, MetadataFile.FileGUID, MetadataFile.FileName, MetadataFile.FileType, NewFolder);
+                            NewFileDataLookup.Add(NewFileData.ID, NewFileData);
+                            NewFolder.SubFiles.Add(NewFileData);
+                        }
+                        else
+                        {
+                            //write error here
                         }
                     }
-                    else
-                    {
-                        GuidID = FileData.FileID;
-                    }
-
-                    NewGuidFileLookup.Add(GuidID, ID);
-                    DirectoryFile NewFileData = new DirectoryFile(ID, GuidID, Name, Extension, NewFolder);
-                    NewFileDataLookup.Add(NewFileData.ID, NewFileData);
-                    NewFolder.SubFiles.Add(NewFileData);
                 }
 
                 string[] Folders = Directory.GetDirectories(FolderInfo.Item1); 
                 for (int i = 0; i < Folders.Length; i++)
                 {
                     FolderQueue.Enqueue((Folders[i], NewFolder));
-                }
+                }               
+                
             }
 
             return new ProjectData()
@@ -234,7 +206,7 @@ namespace TuringServer
                 FolderDataLookup = NewFolderDataLookup,
                 GuidFileLookup = NewGuidFileLookup                
             };            
-
+            
         }
 
         public static bool LoadFileIntoCache(int FileID)

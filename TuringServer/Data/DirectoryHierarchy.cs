@@ -78,6 +78,11 @@ namespace TuringServer
         {
             return ParentFolder.LocalPath + Name + Extension;
         }
+
+        public string GetMetadataLocalPath()
+        {
+            return ParentFolder.LocalPath + Name + ".tmeta";
+        }
     }
 
 }

@@ -216,15 +216,9 @@ namespace TuringServer
                 return;
             }
 
-            int FileID = Server.LoadedProject.GuidFileLookup[FileGUID];
-
             Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.FileMetadata(FileGUID));
         }
 
-        /* -PACKET LAYOUT-
-         * int Folder ID
-         * string File Name (Is Name + Extension)
-         */
         public static void UserCreatedNewFile(int SenderClientID, Packet Data)
         {
             CustomLogging.Log("SERVER INSTRUCTION: User created file.");
@@ -282,30 +276,34 @@ namespace TuringServer
                     Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to create file - File already exists/too many default name files currently exist."));
                     return;
                 }
-
             }
 
             Guid FileGUID = Guid.NewGuid();
 
             try
             {
-                FileStream Fs = File.Create(NewFileLocation); 
+                FileStream MetadataFilestream = File.Create(Server.LoadedProject.BasePath + ParentFolder.LocalPath + FinalFileName + ".tmeta");
+                MetadataFilestream.Write(JsonSerializer.SerializeToUtf8Bytes(new ObjectMetadataFile() { FileGUID = FileGUID, FileName = FinalFileName, FileType = FileType }));
+                MetadataFilestream.Close(); 
+
+
+                FileStream DataFileStream = File.Create(NewFileLocation);
                 switch (FileType)
                 {
                     case CoreFileType.Alphabet:
-                        Fs.Write(JsonSerializer.SerializeToUtf8Bytes(new Alphabet() { FileID = FileGUID }));
+                        DataFileStream.Write(JsonSerializer.SerializeToUtf8Bytes(new Alphabet()));
                         break;
                     case CoreFileType.Tape:
-                        Fs.Write(JsonSerializer.SerializeToUtf8Bytes(new TapeTemplate() { FileID = FileGUID }));
+                        DataFileStream.Write(JsonSerializer.SerializeToUtf8Bytes(new TapeTemplate()));
                         break;
                     case CoreFileType.TransitionFile:
-                        Fs.Write(JsonSerializer.SerializeToUtf8Bytes(new TransitionFile() { FileID = FileGUID }));
+                        DataFileStream.Write(JsonSerializer.SerializeToUtf8Bytes(new TransitionFile()));
                         break;
                     case CoreFileType.SlateFile:
-                        Fs.Write(JsonSerializer.SerializeToUtf8Bytes(new SlateFile() { FileID = FileGUID }));
+                        DataFileStream.Write(JsonSerializer.SerializeToUtf8Bytes(new SlateFile()));
                         break;
                 }
-                Fs.Close();
+                DataFileStream.Close();
             }
             catch (Exception E)
             {
@@ -328,12 +326,7 @@ namespace TuringServer
                 Server.SendTCPData(SubscriberID, SendPacket);
             }
         }
-                     
-        /* -PACKET LAYOUT-
-         * int File ID
-         * int File Version
-         * byte[] New File Data
-         */
+
         public static void UserUpdatedFile(int SenderClientID, Packet Data)
         {
             CustomLogging.Log("SERVER INSTRUCTION: User updated file.");
@@ -344,10 +337,9 @@ namespace TuringServer
 
             try
             {
+                FileGUID = Data.ReadGuid();
                 FileVersion = Data.ReadInt();
                 NewData = Data.ReadByteArray();
-                SaveFile TempFile = JsonSerializer.Deserialize<SaveFile>(NewData);
-                FileGUID = TempFile.FileID;
             }
             catch
             {
@@ -380,7 +372,6 @@ namespace TuringServer
 
             try
             {
-                //Replace with async here later?
                 File.WriteAllBytes(Server.LoadedProject.BasePath + FileData.GetLocalPath(), NewData);
             }
             catch (Exception E)
@@ -416,10 +407,6 @@ namespace TuringServer
             }            
         }
 
-        /* -PACKET LAYOUT-
-         * int File ID
-         * string New File Name
-         */
         public static void UserRenamedFile(int SenderClientID, Packet Data)
         {
             CustomLogging.Log("SERVER INSTRUCTION: User renamed file.");
@@ -463,7 +450,8 @@ namespace TuringServer
 
             DirectoryFile FileData = Server.LoadedProject.FileDataLookup[FileID];
 
-            string NewFileLocation = Server.LoadedProject.BasePath + FileData.ParentFolder.LocalPath + Path.DirectorySeparatorChar + NewFileName;
+            string NewFileLocation = Server.LoadedProject.BasePath + FileData.ParentFolder.LocalPath + Path.DirectorySeparatorChar + NewFileName + FileManager.FileTypeToExtension(FileData.FileType);
+            string NewMetafileLocation = Server.LoadedProject.BasePath + FileData.ParentFolder.LocalPath + Path.DirectorySeparatorChar + NewFileName + ".tmeta";
 
             if (File.Exists(NewFileLocation))
             {
@@ -474,6 +462,7 @@ namespace TuringServer
             try
             {
                 //Replace with async here later?
+                File.WriteAllBytes(NewMetafileLocation + ".tmeta", JsonSerializer.SerializeToUtf8Bytes(new ObjectMetadataFile() { FileName = NewFileName, FileGUID = FileGUID, FileType = FileData.FileType }));
                 File.WriteAllBytes(NewFileLocation, Server.LoadedProject.CacheDataLookup[FileID].FileData);               
             }
             catch (Exception E)
@@ -483,10 +472,11 @@ namespace TuringServer
                 return;
             }
 
-            if (!FileManager.DeleteFileByPath(Server.LoadedProject.BasePath + FileData.GetLocalPath())) 
+            if (!FileManager.DeleteFileByPath(Server.LoadedProject.BasePath + FileData.GetLocalPath()) || !FileManager.DeleteFileByPath(Server.LoadedProject.BasePath + FileData.GetMetadataLocalPath())) 
             {
                 Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to rename file - Server failed to clean old file."));
                 FileManager.DeleteFileByPath(NewFileLocation);
+                FileManager.DeleteFileByPath(NewMetafileLocation);
                 return;
             }
             
@@ -508,10 +498,7 @@ namespace TuringServer
             //Server.SendTCPToAllClients(ServerSendPacketFunctions.FileRenamed(FileID));
         }
 
-        /* -PACKET LAYOUT-
-         * int File ID
-         * int New Folder ID
-         */
+        //TODO THIS ONE
         public static void UserMovedFile(int SenderClientID, Packet Data)
         {
             CustomLogging.Log("SERVER INSTRUCTION: User moved file.");
@@ -602,9 +589,6 @@ namespace TuringServer
             //Server.SendTCPToAllClients(ServerSendPacketFunctions.FileMoved(FileID));
         }
 
-        /* -PACKET LAYOUT-
-         * int File ID
-         */
         public static void UserDeletedFile(int SenderClientID, Packet Data)
         {
             CustomLogging.Log("SERVER INSTRUCTION: User deleted file.");
@@ -632,6 +616,7 @@ namespace TuringServer
             DirectoryFile FileData = Server.LoadedProject.FileDataLookup[FileID];
 
             FileManager.DeleteFileByPath(Server.LoadedProject.BasePath + FileData.GetLocalPath());
+            FileManager.DeleteFileByPath(Server.LoadedProject.BasePath + FileData.GetMetadataLocalPath());
 
             FileData.ParentFolder.SubFiles.Remove(FileData);
 
@@ -653,9 +638,9 @@ namespace TuringServer
             //Server.SendTCPToAllClients(ServerSendPacketFunctions.FileDeleted(FileID));
         }
 
-        /* -PACKET LAYOUT-
-         * int File ID
-         */
+
+
+
         public static void UserUnsubscribedFromFileUpdates(int SenderClientID, Packet Data)
         {
             CustomLogging.Log("SERVER INSTRUCTION: User unsubbed from file.");
@@ -691,9 +676,6 @@ namespace TuringServer
             Server.LoadedProject.FileDataLookup[FileID].SubscriberIDs.Remove(SenderClientID);
         }
 
-        /*
-         * 
-         */
         public static void UserUnsubscribedFromFolderUpdates(int SenderClientID, Packet Data)
         {
             CustomLogging.Log("SERVER INSTRUCTION: User unsubbed from folder.");
@@ -721,10 +703,8 @@ namespace TuringServer
             Server.LoadedProject.FolderDataLookup[FolderID].SubscriberIDs.Remove(SenderClientID);
         }
 
-        /* -PACKET LAYOUT-
-         * int Parent Folder ID
-         * string Folder Name
-         */
+
+
         public static void UserCreatedFolder(int SenderClientID, Packet Data)
         {
             CustomLogging.Log("SERVER INSTRUCTION: User created folder.");
@@ -790,10 +770,6 @@ namespace TuringServer
             //Server.SendTCPToAllClients(ServerSendPacketFunctions.FolderCreated(NewID));
         }
 
-        /* -PACKET LAYOUT-
-         * int Folder ID
-         * string New Folder Name
-         */
         public static void UserRenamedFolder(int SenderClientID, Packet Data)
         {
             CustomLogging.Log("SERVER INSTRUCTION: User renamed folder.");
@@ -875,10 +851,6 @@ namespace TuringServer
             //Server.SendTCPToAllClients(ServerSendPacketFunctions.FolderRenamed(FolderID));
         }
 
-        /* -PACKET LAYOUT-
-         * int Folder ID
-         * int Target Folder ID
-         */
         public static void UserMovedFolder(int SenderClientID, Packet Data)
         {
             CustomLogging.Log("SERVER INSTRUCTION: User moved folder.");
@@ -971,9 +943,6 @@ namespace TuringServer
             //Server.SendTCPToAllClients(ServerSendPacketFunctions.FolderMoved(FolderID));
         }
 
-        /* -PACKET LAYOUT-
-         * int Folder ID
-         */
         public static void UserDeletedFolder(int SenderClientID, Packet Data)
         {
             CustomLogging.Log("SERVER INSTRUCTION: User deleted folder.");

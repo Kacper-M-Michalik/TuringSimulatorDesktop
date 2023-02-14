@@ -143,12 +143,11 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             TapeTemplate NewTemplate = new TapeTemplate();
 
-            NewTemplate.FileID = CurrentlyOpenedFileID;
             NewTemplate.Data = ActivelyEditedTape.Data;
             NewTemplate.HighestIndex = ActivelyEditedTape.HighestIndex;
             NewTemplate.LowestIndex = ActivelyEditedTape.LowestIndex;
 
-            Client.SendTCPData(ClientSendPacketFunctions.UpdateFile(FileVersion, JsonSerializer.SerializeToUtf8Bytes(NewTemplate, GlobalProjectAndUserData.JsonOptions)));
+            Client.SendTCPData(ClientSendPacketFunctions.UpdateFile(CurrentlyOpenedFileID, FileVersion, JsonSerializer.SerializeToUtf8Bytes(NewTemplate, GlobalProjectAndUserData.JsonOptions)));
         }
 
         void MoveLayout()

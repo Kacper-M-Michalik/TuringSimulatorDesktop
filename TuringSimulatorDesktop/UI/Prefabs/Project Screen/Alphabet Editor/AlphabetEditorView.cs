@@ -183,7 +183,6 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             }
 
             Alphabet NewAlphabet = new Alphabet();
-            NewAlphabet.FileID = CurrentlyOpenedFileID;
             NewAlphabet.EmptyCharacter = EmptyCharacterInputBox.Text;
             NewAlphabet.WildcardCharacter = WildcardCharacterInputBox.Text;
 
@@ -195,7 +194,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             NewAlphabet.Characters = AllowedCharacters;
 
-            Client.SendTCPData(ClientSendPacketFunctions.UpdateFile(FileVersion, JsonSerializer.SerializeToUtf8Bytes(NewAlphabet, GlobalProjectAndUserData.JsonOptions)));
+            Client.SendTCPData(ClientSendPacketFunctions.UpdateFile(CurrentlyOpenedFileID, FileVersion, JsonSerializer.SerializeToUtf8Bytes(NewAlphabet, GlobalProjectAndUserData.JsonOptions)));
         }
 
         void MoveLayout()

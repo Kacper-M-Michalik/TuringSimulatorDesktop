@@ -266,8 +266,6 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             TransitionFile NewFile = new TransitionFile();
 
-            NewFile.FileID = CurrentlyOpenedFileID;
-
             if (DefenitionAlphabetBox.ReferenceFileData != null)
             {
                 NewFile.DefinitionAlphabetFileID = DefenitionAlphabetBox.ReferenceFileData.GUID;
@@ -309,7 +307,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 NewFile.Transitions.Add(NewTransition);
             }
 
-            Client.SendTCPData(ClientSendPacketFunctions.UpdateFile(FileVersion, JsonSerializer.SerializeToUtf8Bytes(NewFile, GlobalProjectAndUserData.JsonOptions)));
+            Client.SendTCPData(ClientSendPacketFunctions.UpdateFile(CurrentlyOpenedFileID, FileVersion, JsonSerializer.SerializeToUtf8Bytes(NewFile, GlobalProjectAndUserData.JsonOptions)));
         }
 
         void MoveLayout()

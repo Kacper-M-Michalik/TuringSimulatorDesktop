@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 namespace TuringCore
 {
     [Serializable]
-    public class Alphabet : SaveFile
+    public class Alphabet
     {
         //[JsonInclude]
         //public string ID;

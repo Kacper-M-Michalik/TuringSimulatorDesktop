@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace TuringCore
 {
     [Serializable]
-    public abstract class CompilableFile : SaveFile
+    public abstract class CompilableFile
     {
         [JsonInclude]
         public Guid DefinitionAlphabetFileID = Guid.Empty;
