@@ -164,6 +164,24 @@ namespace TuringSimulatorDesktop.UI
             }
         }
 
+        public void Clear()
+        {
+            Group.IsDirtyClickable = true;
+            Group.IsDirtyPollable = true;
+            for (int i = 0; i < Group.ClickableObjects.Count; i++)
+            {
+                if (Group.ClickableObjects[i] != this)
+                {
+                    Group.ClickableObjects[i].IsMarkedForDeletion = true;
+                }
+            }
+            for (int i = 0; i < Group.PollableObjects.Count; i++)
+            {                
+                Group.PollableObjects[i].IsMarkedForDeletion = true;                
+            }
+            Elements.Clear();
+        }
+
         public void Close()
         {
             Group.IsMarkedForDeletion = true;

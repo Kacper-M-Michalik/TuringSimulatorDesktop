@@ -45,7 +45,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             {
                 isActive = value;
                 Group.IsActive = isActive;
-                TransitionLayout.Group.IsActive = isActive;
+                TransitionCanvas.Group.IsActive = isActive;
             }
         }       
 
@@ -71,22 +71,17 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         ActionGroup Group;
 
+
         Icon Background;
 
         Label DefenitionAlphabetTitle;
         DefenitionAlphabetInputItem DefenitionAlphabetBox;
 
         Label HaltStatesTitle;
-
-        //VerticalLayoutBox HaltStatesLayout;
-        //List<InputBox> HaltStateInputBoxes;
         InputBox HaltStateInputBox;
 
-        Label TransitionsTitle;
-        ColorButton AddTransitionButton;
+        DraggableCanvas TransitionCanvas;
 
-        VerticalLayoutBox TransitionLayout;
-        List<StateTransitionItem> TransitionItems;
 
 
         bool FullyLoadedFile;
@@ -100,29 +95,21 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Group = InputManager.CreateActionGroup();
             Group.PollableObjects.Add(this);
 
+
             Background = new Icon(GlobalInterfaceData.Scheme.Background);
 
             DefenitionAlphabetTitle = new Label();
             DefenitionAlphabetTitle.Text = "Defenition Alphabet ID:";
 
             DefenitionAlphabetBox = new DefenitionAlphabetInputItem(Group);
-
-
+            
             HaltStatesTitle = new Label();
             HaltStatesTitle.Text = "Halt States:";
 
             HaltStateInputBox = new InputBox(Group);
 
-            TransitionsTitle = new Label();
-            TransitionsTitle.Text = "Transitions:";
+            TransitionCanvas = new DraggableCanvas();
 
-            AddTransitionButton = new ColorButton(Group);
-            AddTransitionButton.BaseColor = GlobalInterfaceData.Scheme.InteractableAccent;
-            AddTransitionButton.OnClickedEvent += AddTransitionItem;
-
-            TransitionLayout = new VerticalLayoutBox();
-            TransitionLayout.Scrollable = true;
-            TransitionLayout.Spacing = 5f;
 
             IsActive = false;
 
@@ -141,14 +128,6 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         public bool IsMouseOver()
         {
             return (IsActive && InputManager.MouseData.X >= Position.X && InputManager.MouseData.X <= Position.X + bounds.X && InputManager.MouseData.Y >= Position.Y && InputManager.MouseData.Y <= Position.Y + bounds.Y);
-        }
-
-        public void AddTransitionItem(Button Sender)
-        {
-            StateTransitionItem Item = new StateTransitionItem(TransitionLayout.Group);
-            TransitionLayout.AddElement(Item);
-            TransitionItems.Add(Item);
-            TransitionLayout.UpdateLayout();    
         }
 
         public void SwitchOpenedFile(Guid ID)
@@ -175,8 +154,6 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 return;
             }
 
-            TransitionItems = new List<StateTransitionItem>();
-
             title = Message.Name;
             FileVersion = Message.Version;
 
@@ -196,14 +173,24 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             DefenitionAlphabetBox.FileLabel.Text = "";
 
             //request metadata
-            UIEventManager.Subscribe(OpenedFile.DefinitionAlphabetFileID, ReceiveAlphabetMetaData);
-            Client.SendTCPData(ClientSendPacketFunctions.RequestFileMetadata(OpenedFile.DefinitionAlphabetFileID));
+            if (OpenedFile.DefinitionAlphabetFileID != Guid.Empty)
+            {
+                UIEventManager.Subscribe(OpenedFile.DefinitionAlphabetFileID, ReceiveAlphabetMetaData);
+                Client.SendTCPData(ClientSendPacketFunctions.RequestFileMetadata(OpenedFile.DefinitionAlphabetFileID));
+            }
+            else
+            {
+                DefenitionAlphabetBox.ReferenceFileData = null;
+                DefenitionAlphabetBox.FileLabel.Text = "No Referenced Alphabet";
+                FullyLoadedFile = true;
+            }
 
-            TransitionLayout.Clear();
+
+            TransitionCanvas.Clear();
 
             for (int i = 0; i < OpenedFile.Transitions.Count; i++)
             {
-                StateTransitionItem Item = new StateTransitionItem(TransitionLayout.Group);
+                StateTransitionItem Item = new StateTransitionItem(TransitionCanvas.Group);
                 Item.CurrentStateTextBox.Text = OpenedFile.Transitions[i].CurrentState;
                 Item.TapeValueTextBox.Text = OpenedFile.Transitions[i].CurrentState;
                 Item.NewStateTextBox.Text = OpenedFile.Transitions[i].CurrentState;
@@ -222,11 +209,10 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                     Item.CurrentStateTextBox.Text = "";
                 }
                 
-                TransitionLayout.AddElement(Item);
-                TransitionItems.Add(Item);
+                TransitionCanvas.Elements.Add(Item);
             }
 
-            TransitionLayout.UpdateLayout();
+            TransitionCanvas.ApplyMatrices();
         }
 
         public void ReceiveAlphabetMetaData(object Data)
@@ -282,20 +268,24 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             //    NewFile.HaltStates.Add(HaltStateInputBoxes[i].Text);
            // }
 
-            for (int i = 0; i < TransitionItems.Count; i++)
+            for (int i = 0; i < TransitionCanvas.Elements.Count; i++)
             {
                 Transition NewTransition = new Transition();
 
-                NewTransition.CurrentState = TransitionItems[i].CurrentStateTextBox.Text;
-                NewTransition.TapeValue = TransitionItems[i].TapeValueTextBox.Text;
-                NewTransition.NewState = TransitionItems[i].NewStateTextBox.Text;
-                NewTransition.NewTapeValue = TransitionItems[i].NewTapeValueTextBox.Text;
+                StateTransitionItem TransitionSource = (StateTransitionItem)TransitionCanvas.Elements[i];
 
-                if (TransitionItems[i].CurrentStateTextBox.Text == "L")
+                NewTransition.X = TransitionSource.Position.X;
+                NewTransition.Y = TransitionSource.Position.Y;
+                NewTransition.CurrentState = TransitionSource.CurrentStateTextBox.Text;
+                NewTransition.TapeValue = TransitionSource.TapeValueTextBox.Text;
+                NewTransition.NewState = TransitionSource.NewStateTextBox.Text;
+                NewTransition.NewTapeValue = TransitionSource.NewTapeValueTextBox.Text;
+
+                if (TransitionSource.CurrentStateTextBox.Text == "L")
                 {
                     NewTransition.MoveDirection = MoveHeadDirection.Left;
                 }
-                else if (TransitionItems[i].CurrentStateTextBox.Text == "R")
+                else if (TransitionSource.CurrentStateTextBox.Text == "R")
                 {
                     NewTransition.MoveDirection = MoveHeadDirection.Right;
                 }
@@ -323,10 +313,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             HaltStatesTitle.Position = new Vector2(position.X + 10, position.Y + 60);
             //HaltStatesLayout.Position = new Vector2(position.X + 10, position.Y + 80);
             HaltStateInputBox.Position = new Vector2(position.X + 10, position.Y + 80);
-
-            TransitionsTitle.Position = new Vector2(position.X + 100, position.Y + 10); 
-            AddTransitionButton.Position = new Vector2(position.X + 100, position.Y+5);
-            TransitionLayout.Position = new Vector2(position.X + 100, position.Y + 30);
+            
+            TransitionCanvas.Position = position;
         }
 
         void ResizeLayout()
@@ -342,10 +330,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             HaltStatesTitle.Bounds = new Point(70, 15);
             //HaltStatesLayout.Bounds = new Point(45, 80);
             HaltStateInputBox.Bounds = new Point(70, 80);
-
-            TransitionsTitle.Bounds = new Point(70, 15); 
-            AddTransitionButton.Bounds = new Point(15, 15);
-            TransitionLayout.Bounds = new Point(300, 300);            
+        
         }
 
         public void Draw(Viewport? BoundPort = null)
@@ -359,15 +344,12 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 HaltStatesTitle.Draw(BoundPort);
                 HaltStateInputBox.Draw(BoundPort);
 
-                TransitionsTitle.Draw(BoundPort);
-                AddTransitionButton.Draw(BoundPort);
-                TransitionLayout.Draw(BoundPort);
             }
         }
 
         public void Close()
         {
-            TransitionLayout.Close();
+            TransitionCanvas.Close();
             Group.IsMarkedForDeletion = true;
         }
     }

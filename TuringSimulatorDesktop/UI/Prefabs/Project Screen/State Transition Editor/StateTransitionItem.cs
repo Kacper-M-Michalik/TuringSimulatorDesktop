@@ -10,7 +10,7 @@ using TuringSimulatorDesktop.Input;
 
 namespace TuringSimulatorDesktop.UI.Prefabs
 {
-    public class StateTransitionItem: IVisualElement
+    public class StateTransitionItem: IVisualElement, ICanvasInteractable
     {
         Vector2 position;
         public Vector2 Position
@@ -33,19 +33,25 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             }
         }
 
+        public void SetProjectionMatrix(Matrix projectionMatrix, Matrix inverseProjectionMatrix)
+        {
+
+        }
+
         public bool IsActive { get; set; } = true;
 
-        //Icon Background;
+        public Icon Background;
         public InputBox CurrentStateTextBox;
         public InputBox TapeValueTextBox;
         public InputBox NewStateTextBox;
         public InputBox NewTapeValueTextBox;
         public InputBox MoveDirectionTextBox;
-        Label TransitionLabel;
+        public Icon Arrow;        
 
         public StateTransitionItem(ActionGroup group)
         {
-            //Background = new Icon(GlobalInterfaceData.Scheme.Background);
+            Background = new Icon(GlobalInterfaceData.Scheme.Background);
+            Arrow = new Icon();
 
             CurrentStateTextBox = new InputBox(25, 20,group);
 
@@ -58,9 +64,6 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             NewStateTextBox.EditEvent += EditBoxResize;
             NewTapeValueTextBox.EditEvent += EditBoxResize;
             MoveDirectionTextBox.EditEvent += EditBoxResize;
-
-            TransitionLabel = new Label();
-            TransitionLabel.Text = ") => (";
         }
 
         void EditBoxResize(InputBox Sender)
@@ -70,24 +73,27 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         void MoveLayout()
         {
-           // Background.Position = position;
-            CurrentStateTextBox.Position = position;
+            Background.Position = position;
+            CurrentStateTextBox.Position = position + new Vector2(5, 5);
             TapeValueTextBox.Position = CurrentStateTextBox.Position + new Vector2(CurrentStateTextBox.Bounds.X + 2, 0);
 
-            TransitionLabel.Position = TapeValueTextBox.Position + new Vector2(TapeValueTextBox.Bounds.X + 2, 0);
+            Arrow.Position = TapeValueTextBox.Position + new Vector2(TapeValueTextBox.Bounds.X + 2, 0);
 
-            NewStateTextBox.Position = TransitionLabel.Position + new Vector2(TransitionLabel.Bounds.X + 2, 0);
+            NewStateTextBox.Position = Arrow.Position + new Vector2(Arrow.Bounds.X + 2, 0);
             NewTapeValueTextBox.Position = NewStateTextBox.Position + new Vector2(NewStateTextBox.Bounds.X + 2, 0);
             MoveDirectionTextBox.Position = NewTapeValueTextBox.Position + new Vector2(NewTapeValueTextBox.Bounds.X + 2, 0);
 
             Vector2 Size = MoveDirectionTextBox.Position + new Vector2(MoveDirectionTextBox.Bounds.X, MoveDirectionTextBox.Bounds.Y) - position;
-            bounds = new Point(UIUtils.ConvertFloatToInt(Size.X), 20); 
-            //Background.Bounds = new Point(UIUtils.ConvertFloatToInt(Size.X), 15);
+            bounds = new Point(UIUtils.ConvertFloatToInt(Size.X), 100); 
+
+            Background.Bounds = new Point(UIUtils.ConvertFloatToInt(Size.X), 100);
         }
 
         public void Draw(Viewport? BoundPort = null)
         {
-            //Background.Draw(BoundPort);
+            Background.Draw(BoundPort);
+            Arrow.Draw(BoundPort);
+
             CurrentStateTextBox.Draw(BoundPort);
             TapeValueTextBox.Draw(BoundPort);
             NewStateTextBox.Draw(BoundPort);

@@ -73,6 +73,10 @@ namespace TuringCore
     public class Transition
     {
         [JsonInclude]
+        public float X;
+        [JsonInclude]
+        public float Y;
+        [JsonInclude]
         public string CurrentState;
         [JsonInclude]
         public string TapeValue;
@@ -87,8 +91,10 @@ namespace TuringCore
         {
         }
 
-        public Transition(string currentState, string tapeValue, string newState, string newTapeValue, MoveHeadDirection moveDirection)
+        public Transition(float x, float y, string currentState, string tapeValue, string newState, string newTapeValue, MoveHeadDirection moveDirection)
         {
+            X = x;
+            Y = y;
             CurrentState = currentState;
             TapeValue = tapeValue;
             NewState = newState;
