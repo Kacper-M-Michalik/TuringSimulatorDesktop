@@ -55,14 +55,10 @@ namespace TuringSimulatorDesktop.UI
             Background = new Icon(GlobalInterfaceData.Scheme.InteractableAccent);
 
             Title = new Label();
-            Title.FontSize = 12f;
-            Title.Font = GlobalInterfaceData.StandardBoldFont;
+            Title.FontSize = 16f;
+            Title.Font = GlobalInterfaceData.StandardRegularFont;
             Title.FontColor = GlobalInterfaceData.Scheme.FontColorBright;
             Title.Text = "Create New Project";
-
-
-
-
         }
 
 
@@ -70,7 +66,7 @@ namespace TuringSimulatorDesktop.UI
         {
             Background.Position = position;
             Header.Position = position;
-            Title.Position = new Vector2(position.X, position.Y);
+            Title.Position = new Vector2(position.X + 17, position.Y + Header.Bounds.Y * 0.5f);
 
 
         }
@@ -78,7 +74,7 @@ namespace TuringSimulatorDesktop.UI
         void ResizeLayout()
         {
             Background.Bounds = bounds;
-            Header.Bounds = new Point(bounds.X, 24);
+            Header.Bounds = new Point(bounds.X, 28);
 
         }
 
@@ -92,8 +88,8 @@ namespace TuringSimulatorDesktop.UI
 
         public void Close()
         {
-            ProjectTitleInputBox.Close();
-            ProjectLocationSelectionButton.Close();
+           // ProjectTitleInputBox.Close();
+          //  ProjectLocationSelectionButton.Close();
         }
 
     }

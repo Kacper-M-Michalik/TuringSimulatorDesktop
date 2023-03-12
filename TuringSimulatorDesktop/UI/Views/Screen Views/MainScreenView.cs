@@ -28,7 +28,6 @@ namespace TuringSimulatorDesktop.UI
         ElementCollection NewProjectButton;
         ElementCollection LoadProjectButton;
         ElementCollection JoinProjectButton;
-        ElementCollection HostProjectButton;
 
         IVisualElement OpenMenu;
 
@@ -40,12 +39,16 @@ namespace TuringSimulatorDesktop.UI
             CloseButton = new TextureButton(45, 32, new Vector2(705, 0), Group);
             CloseButton.OnClickedEvent += Close;
             CloseButton.HighlightOnMouseOver = true;
+            CloseButton.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.CloseApplicationIcon];
+            CloseButton.HighlightTexture = GlobalInterfaceData.TextureLookup[UILookupKey.CloseApplicationHighlightIcon];
+
 
 
             NewProjectButton = new ElementCollection(); 
 
             ColorButton CreateButton = new ColorButton(Group);
-            CreateButton.Bounds = new Point(250, 90);
+            CreateButton.Bounds = new Point(250, 60);
+            
             CreateButton.BaseColor = GlobalInterfaceData.Scheme.InteractableAccent;
             CreateButton.HighlightColor = GlobalInterfaceData.Scheme.DarkInteractableAccent;
             CreateButton.HighlightOnMouseOver = true;
@@ -56,7 +59,10 @@ namespace TuringSimulatorDesktop.UI
             CreateIcon.Position = new Vector2();
 
             Label CreateLabel = new Label();
-            CreateLabel.FontSize = 24;
+            CreateLabel.DrawCentered = true;
+            CreateLabel.AutoSizeMesh = false;
+            CreateLabel.Bounds = new Point(250, 60);
+            CreateLabel.FontSize = 20;
             CreateLabel.Text = "Create Project";
 
             NewProjectButton.AddElement(CreateButton);
@@ -70,7 +76,7 @@ namespace TuringSimulatorDesktop.UI
             LoadProjectButton = new ElementCollection();
 
             ColorButton LoadButton = new ColorButton(Group);
-            LoadButton.Bounds = new Point(250, 90);
+            LoadButton.Bounds = new Point(250, 60);
             LoadButton.BaseColor = GlobalInterfaceData.Scheme.InteractableAccent;
             LoadButton.HighlightColor = GlobalInterfaceData.Scheme.DarkInteractableAccent;
             LoadButton.HighlightOnMouseOver = true;
@@ -81,7 +87,10 @@ namespace TuringSimulatorDesktop.UI
             LoadIcon.Position = new Vector2();
 
             Label LoadLabel = new Label();
-            LoadLabel.FontSize = 24;
+            LoadLabel.DrawCentered = true;
+            LoadLabel.AutoSizeMesh = false;
+            LoadLabel.Bounds = new Point(250, 60);
+            LoadLabel.FontSize = 20;
             LoadLabel.Text = "Load Project";
 
             LoadProjectButton.AddElement(LoadButton);
@@ -89,49 +98,29 @@ namespace TuringSimulatorDesktop.UI
             LoadProjectButton.AddElement(LoadLabel);
 
             LoadProjectButton.Offsets[2] = new Vector2(0, LoadButton.Bounds.Y * 0.5f);
-            LoadProjectButton.Position = new Vector2(14, 158);
+            LoadProjectButton.Position = new Vector2(14, 126);
 
-
-            HostProjectButton = new ElementCollection();
-
-            ColorButton HostButton = new ColorButton(Group);
-            HostButton.Bounds = new Point(250, 90);
-            HostButton.BaseColor = GlobalInterfaceData.Scheme.InteractableAccent;
-            HostButton.HighlightColor = GlobalInterfaceData.Scheme.DarkInteractableAccent;
-            HostButton.HighlightOnMouseOver = true;
-            HostButton.OnClickedEvent += HostProject;
-
-            Icon HostIcon = new Icon();
-            HostIcon.Bounds = new Point();
-            HostIcon.Position = new Vector2();
-
-            Label HostLabel = new Label();
-            HostLabel.FontSize = 24;
-            HostLabel.Text = "Host Project";
-
-            HostProjectButton.AddElement(HostButton);
-            HostProjectButton.AddElement(HostIcon);
-            HostProjectButton.AddElement(HostLabel);
-
-            HostProjectButton.Offsets[2] = new Vector2(0, HostButton.Bounds.Y * 0.5f);
-            HostProjectButton.Position = new Vector2(14, 266);
 
 
             JoinProjectButton = new ElementCollection();
 
             ColorButton JoinButton = new ColorButton(Group);
-            JoinButton.Bounds = new Point(250, 90);
+            JoinButton.Bounds = new Point(250, 60);
             JoinButton.BaseColor = GlobalInterfaceData.Scheme.InteractableAccent;
             JoinButton.HighlightColor = GlobalInterfaceData.Scheme.DarkInteractableAccent;
             JoinButton.HighlightOnMouseOver = true;
-            JoinButton.OnClickedEvent += HostProject;
+            JoinButton.OnClickedEvent += JoinProject;
 
             Icon JoinIcon = new Icon();
-            JoinIcon.Bounds = new Point();
-            JoinIcon.Position = new Vector2();
+            JoinIcon.DrawTexture = GlobalInterfaceData.TextureLookup[UILookupKey.ConnectIcon];
+            JoinIcon.Bounds = new Point(12, 28);
+            JoinIcon.Position = new Vector2(25, 16);
 
             Label JoinLabel = new Label();
-            JoinLabel.FontSize = 24;
+            JoinLabel.DrawCentered = true;
+            JoinLabel.AutoSizeMesh = false;
+            JoinLabel.Bounds = new Point(250, 60);
+            JoinLabel.FontSize = 20;
             JoinLabel.Text = "Join Project";
 
             JoinProjectButton.AddElement(JoinButton);
@@ -139,7 +128,7 @@ namespace TuringSimulatorDesktop.UI
             JoinProjectButton.AddElement(JoinLabel);
 
             JoinProjectButton.Offsets[2] = new Vector2(0, JoinButton.Bounds.Y * 0.5f);
-            JoinProjectButton.Position = new Vector2(14, 374);
+            JoinProjectButton.Position = new Vector2(14, 202);
 
 
             Title = new Label(GlobalInterfaceData.MediumRegularFont);
@@ -149,7 +138,7 @@ namespace TuringSimulatorDesktop.UI
             Title.Position = new Vector2(0, Title.Bounds.Y * 0.5f);
 
             RecentFilesMenu Viewer = new RecentFilesMenu(this);
-            Viewer.Bounds = new Point(454, GlobalInterfaceData.MainMenuHeight - 36 - 32);
+            Viewer.Bounds = new Point(450, GlobalInterfaceData.MainMenuHeight - 36 - 32);
             Viewer.Position = new Vector2(282, 50);
 
             if (GlobalProjectAndUserData.UserData != null)
@@ -165,7 +154,30 @@ namespace TuringSimulatorDesktop.UI
 
         public void CreateNewProject(Button Sender)
         {
+            if (OpenMenu is RecentFilesMenu) ((RecentFilesMenu)OpenMenu).Close();
+            if (OpenMenu is CreateProjectMenu) ((CreateProjectMenu)OpenMenu).Close();
+            if (OpenMenu is JoinProjectMenu) ((JoinProjectMenu)OpenMenu).Close();
+            if (OpenMenu is LoadProjectMenu) ((LoadProjectMenu)OpenMenu).Close();
 
+            CreateProjectMenu Menu = new CreateProjectMenu(this);
+            Menu.Bounds = new Point(450, GlobalInterfaceData.MainMenuHeight - 36 - 32);
+            Menu.Position = new Vector2(282, 50);
+
+            OpenMenu = Menu;
+        }
+
+        public void JoinProject(Button Sender)
+        {
+            if (OpenMenu is RecentFilesMenu) ((RecentFilesMenu)OpenMenu).Close();
+            if (OpenMenu is CreateProjectMenu) ((CreateProjectMenu)OpenMenu).Close();
+            if (OpenMenu is JoinProjectMenu) ((JoinProjectMenu)OpenMenu).Close();
+            if (OpenMenu is LoadProjectMenu) ((LoadProjectMenu)OpenMenu).Close();
+
+            JoinProjectMenu Menu = new JoinProjectMenu(this);
+            Menu.Bounds = new Point(450, GlobalInterfaceData.MainMenuHeight - 36 - 32);
+            Menu.Position = new Vector2(282, 50);
+
+            OpenMenu = Menu;
         }
 
         string Location;
@@ -244,16 +256,6 @@ namespace TuringSimulatorDesktop.UI
             GlobalInterfaceData.MainWindow.CurrentView = ProjectView;
         }
 
-        public void HostProject(Button Sender)
-        {
-
-        }
-
-        public void JoinProject(Button Sender)
-        {
-
-        }
-
         public void Minimise(Button Sender)
         {
             GlobalInterfaceData.MainWindow.MinimiseWindow();
@@ -279,7 +281,6 @@ namespace TuringSimulatorDesktop.UI
             NewProjectButton.Draw();
             LoadProjectButton.Draw();
             JoinProjectButton.Draw();
-            HostProjectButton.Draw();
 
             OpenMenu.Draw();
         }

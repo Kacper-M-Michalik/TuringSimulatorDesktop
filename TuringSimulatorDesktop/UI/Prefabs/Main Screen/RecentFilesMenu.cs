@@ -49,8 +49,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Background = new Icon(GlobalInterfaceData.Scheme.InteractableAccent);
 
             Title = new Label();
-            Title.FontSize = 12f;
-            Title.Font = GlobalInterfaceData.StandardBoldFont;
+            Title.FontSize = 16f;
+            Title.Font = GlobalInterfaceData.StandardRegularFont;
             Title.FontColor = GlobalInterfaceData.Scheme.FontColorBright;
             Title.Text = "Recently Opened Projects";
 
@@ -78,16 +78,16 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         {
             Background.Position = position;
             Header.Position = position;
-            Title.Position = new Vector2(position.X, position.Y);
+            Title.Position = new Vector2(position.X + 17, position.Y + Header.Bounds.Y * 0.5f);
 
-            LayoutBox.Position = new Vector2(position.X, position.Y + 24);
+            LayoutBox.Position = new Vector2(position.X, position.Y + 28);
         }
 
         void ResizeLayout()
         {
             Background.Bounds = bounds;
-            Header.Bounds = new Point(bounds.X, 24);
-            LayoutBox.Bounds = new Point(bounds.X, bounds.Y - 24);
+            Header.Bounds = new Point(bounds.X, 28);
+            LayoutBox.Bounds = new Point(bounds.X, bounds.Y - 28);
         }
 
         public void Draw(Viewport? BoundPort = null)
@@ -136,8 +136,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         FileInfoWrapper FileInfo;
         MainScreenView MainScreen;
 
-        public static int ReferenceWidth = 250;
-        public static int ReferenceHeight = 90;
+        public static int ReferenceWidth = 420;
+        public static int ReferenceHeight = 60;
 
         public RecentFileCard(FileInfoWrapper Info, MainScreenView Screen, ActionGroup group)
         {
@@ -151,6 +151,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Background.OnClickedEvent += LoadRecentProject;
 
             FileName = new Label();
+            FileName.FontSize = 20;
+
             FileLocation = new Label();
             FileLastAccessed = new Label();
 

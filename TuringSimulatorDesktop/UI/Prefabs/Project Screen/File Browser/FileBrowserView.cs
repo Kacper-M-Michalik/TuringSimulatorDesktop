@@ -240,6 +240,12 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             FilterFiles(null);
         }
 
+        public void CreateFolder(Button Sender)
+        {
+            OpenMenu?.Close();
+            Client.SendTCPData(ClientSendPacketFunctions.CreateFolder(CurrentlyOpenedFolderID, "Empty Folder"));
+            //add auto select of fodler to rename here
+        }
         public void CreateTransitionFile(Button Sender)
         {
             OpenMenu?.Close();

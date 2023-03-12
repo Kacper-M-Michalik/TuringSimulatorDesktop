@@ -67,7 +67,7 @@ namespace TuringSimulatorDesktop
             return Texture;
         }
 
-        const int ManuallyGeneratedMaxEnum = 13;
+        const int ManuallyGeneratedMaxEnum = 18;
         public static void BakeTextures()
         {
             for (int i = 0; i < ManuallyGeneratedMaxEnum + 1; i++)
@@ -237,12 +237,24 @@ namespace TuringSimulatorDesktop
     {
         MouseIcon,
         TypingIcon,
+
         MinimiseIcon,
-        MaximiseIcon,
-        CloseIcon,
+        MinimiseHighlightIcon,
+
+        FullscreenIcon,
+        FullscreenHighlightIcon,
+
+        CloseApplicationIcon,
+        CloseApplicationHighlightIcon,
+
+        ConnectIcon,
+        LoadIcon,
+
         UndoIcon,
         RedoIcon,
+
         SaveIcon,
+
         //
         RunIcon,
         AlphabetIcon,

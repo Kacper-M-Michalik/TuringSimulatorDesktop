@@ -47,10 +47,12 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         Icon Background;
         Icon Divider1;
         Icon Divider2;
+        ColorButton CreateFolderButton;
         ColorButton CreateTransitionFileButton;
         ColorButton CreateSlateFileButton;
         ColorButton CreateTapeFileButton;
         ColorButton CreateAlphabetFileButton;
+        Label CreateFolderLabel;
         Label CreateTransitionFileLabel;
         Label CreateSlateFileLabel;
         Label CreateTapeFileLabel;
@@ -64,6 +66,12 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             Divider1 = new Icon(GlobalInterfaceData.Scheme.NonInteractableAccent);
             Divider2 = new Icon(GlobalInterfaceData.Scheme.NonInteractableAccent);
+
+            CreateFolderButton = new ColorButton(Group);
+            CreateFolderButton.BaseColor = GlobalInterfaceData.Scheme.InteractableAccent;
+            CreateFolderButton.HighlightColor = GlobalInterfaceData.Scheme.DarkInteractableAccent;
+            CreateFolderButton.HighlightOnMouseOver = true;
+            CreateFolderButton.OnClickedEvent += browser.CreateFolder;
 
             CreateTransitionFileButton = new ColorButton(Group);
             CreateTransitionFileButton.BaseColor = GlobalInterfaceData.Scheme.InteractableAccent;
@@ -89,6 +97,10 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             CreateAlphabetFileButton.HighlightOnMouseOver = true;
             CreateAlphabetFileButton.OnClickedEvent += browser.CreateAlphabetFile;
 
+            CreateFolderLabel = new Label();
+            CreateFolderLabel.FontSize = 12;
+            CreateFolderLabel.FontColor = GlobalInterfaceData.Scheme.FontColor;
+            CreateFolderLabel.Text = "Create Folder";
             CreateTransitionFileLabel = new Label();
             CreateTransitionFileLabel.FontSize = 12;
             CreateTransitionFileLabel.FontColor = GlobalInterfaceData.Scheme.FontColor;
@@ -121,6 +133,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Divider1.Position = Position + GlobalInterfaceData.Scale(new Vector2(0, 53));
             Divider2.Position = Position + GlobalInterfaceData.Scale(new Vector2(0, 78));
 
+            CreateFolderButton.Position = Position + GlobalInterfaceData.Scale(new Vector2(0, 5));
             CreateTransitionFileButton.Position = Position + GlobalInterfaceData.Scale(new Vector2(0, 5));
             CreateSlateFileButton.Position = Position + GlobalInterfaceData.Scale(new Vector2(0, 29));
             CreateTapeFileButton.Position = Position + GlobalInterfaceData.Scale(new Vector2(0, 54));
@@ -142,12 +155,14 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Divider1.Bounds = GlobalInterfaceData.Scale(new Point(225, 1));
             Divider2.Bounds = GlobalInterfaceData.Scale(new Point(225, 1));
 
+            CreateFolderButton.Bounds = GlobalInterfaceData.Scale(new Point(225, 24));
             CreateTransitionFileButton.Bounds = GlobalInterfaceData.Scale(new Point(225, 24));
             CreateSlateFileButton.Bounds = GlobalInterfaceData.Scale(new Point(225, 24));
             CreateTapeFileButton.Bounds = GlobalInterfaceData.Scale(new Point(225, 24));
             CreateAlphabetFileButton.Bounds = GlobalInterfaceData.Scale(new Point(225, 24));
 
             float FontSize = GlobalInterfaceData.Scale(12);
+            CreateFolderLabel.FontSize = FontSize;
             CreateTransitionFileLabel.FontSize = FontSize;
             CreateSlateFileLabel.FontSize = FontSize;
             CreateTapeFileLabel.FontSize = FontSize;
@@ -163,11 +178,13 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 Divider1.Draw();
                 Divider2.Draw();
 
+                CreateFolderButton.Draw();
                 CreateTransitionFileButton.Draw();
                 CreateSlateFileButton.Draw();
                 CreateTapeFileButton.Draw();
-                CreateAlphabetFileButton.Draw(); 
-                
+                CreateAlphabetFileButton.Draw();
+
+                CreateFolderLabel.Draw();
                 CreateTransitionFileLabel.Draw();
                 CreateSlateFileLabel.Draw();
                 CreateTapeFileLabel.Draw();

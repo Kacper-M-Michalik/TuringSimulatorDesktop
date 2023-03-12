@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace TuringSimulatorDesktop.UI.Prefabs
 {
-    public class JoinProjectMenu : IVisualElement
+    public class LoadProjectMenu : IVisualElement
     {
         Vector2 position;
         public Vector2 Position
@@ -41,7 +41,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         MainScreenView MainScreen;
 
-        public JoinProjectMenu(MainScreenView Screen)
+        public LoadProjectMenu(MainScreenView Screen)
         {
             MainScreen = Screen;
 
@@ -50,9 +50,9 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             Title = new Label();
             Title.FontSize = 16f;
-            Title.Font = GlobalInterfaceData.StandardRegularFont;
+            Title.Font = GlobalInterfaceData.StandardBoldFont;
             Title.FontColor = GlobalInterfaceData.Scheme.FontColorBright;
-            Title.Text = "Join Project";
+            Title.Text = "Load Project";
 
         }
 
@@ -61,7 +61,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         {
             Background.Position = position;
             Header.Position = position;
-            Title.Position = new Vector2(position.X + 17, position.Y + Header.Bounds.Y * 0.5f);
+            Title.Position = new Vector2(position.X, position.Y);
 
 
         }

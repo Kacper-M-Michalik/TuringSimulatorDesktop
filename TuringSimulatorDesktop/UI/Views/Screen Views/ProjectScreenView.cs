@@ -25,6 +25,10 @@ namespace TuringSimulatorDesktop.UI
         //view drop dwon
         //help dropdown
 
+        TextureButton CloseButton;
+        TextureButton FullscreenIcon;
+        TextureButton MinimiseIcon;
+
         HorizontalLayoutBox ToolbarLayout;
 
         TextureButton UndoButton;
@@ -52,12 +56,30 @@ namespace TuringSimulatorDesktop.UI
             Group = InputManager.CreateActionGroup();
             Group.PollableObjects.Add(this);
 
+            CloseButton = new TextureButton(45, 32, new Vector2(GlobalInterfaceData.Device.PresentationParameters.BackBufferWidth - 45, 0), Group);
+            CloseButton.OnClickedEvent += Close;
+            CloseButton.HighlightOnMouseOver = true;
+            CloseButton.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.CloseApplicationIcon];
+            CloseButton.HighlightTexture = GlobalInterfaceData.TextureLookup[UILookupKey.CloseApplicationHighlightIcon];
+
+            FullscreenIcon = new TextureButton(45, 32, new Vector2(GlobalInterfaceData.Device.PresentationParameters.BackBufferWidth - 90, 0), Group);
+            FullscreenIcon.OnClickedEvent += Maximise;
+            FullscreenIcon.HighlightOnMouseOver = true;
+            FullscreenIcon.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.FullscreenIcon];
+            FullscreenIcon.HighlightTexture = GlobalInterfaceData.TextureLookup[UILookupKey.FullscreenHighlightIcon];
+
+            MinimiseIcon = new TextureButton(45, 32, new Vector2(GlobalInterfaceData.Device.PresentationParameters.BackBufferWidth - 135, 0), Group);
+            MinimiseIcon.OnClickedEvent += Minimise;
+            MinimiseIcon.HighlightOnMouseOver = true;
+            MinimiseIcon.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.MinimiseIcon];
+            MinimiseIcon.HighlightTexture = GlobalInterfaceData.TextureLookup[UILookupKey.MinimiseHighlightIcon];
+
             Windows = new List<Window>();
 
-            Window Temp = new Window(new Vector2(0, 60), new Point(1200, 900), this);
+            Window Temp = new Window(new Vector2(0, 70), new Point(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width - 410, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height - 70), this);
             Windows.Add(Temp);
             LastActiveWindow = Temp;
-            Temp = new Window(new Vector2(1210, 60), new Point(400, 900), this);
+            Temp = new Window(new Vector2(Temp.Bounds.X + 10, 70), new Point(400, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height - 70), this);
             Temp.AddView(new FileBrowserView());
             Windows.Add(Temp);
 
@@ -173,6 +195,18 @@ namespace TuringSimulatorDesktop.UI
             Windows.Add(NewWindow);
         }
 
+        public void Minimise(Button Sender)
+        {
+            GlobalInterfaceData.MainWindow.MinimiseWindow();
+        }
+        public void Maximise(Button Sender)
+        {
+            GlobalInterfaceData.MainWindow.MaximiseWindow();
+        }
+        public void Close(Button Sender)
+        {
+            GlobalInterfaceData.MainWindow.Exit();
+        }
 
         public void Undo(Button Sender)
         {
@@ -224,6 +258,10 @@ namespace TuringSimulatorDesktop.UI
             ProjectTitle.Draw();
             AppTitle.Draw();
 
+            CloseButton.Draw();
+            FullscreenIcon.Draw();
+            MinimiseIcon.Draw();
+
             UndoButton.Draw();
             RedoButton.Draw();
 
@@ -254,6 +292,10 @@ namespace TuringSimulatorDesktop.UI
             Header.Bounds = new Point(Width, UIUtils.ConvertFloatToMinInt(GlobalInterfaceData.Scale(32), 1));
             Header.Position = Vector2.Zero;
 
+            CloseButton.Position = new Vector2(GlobalInterfaceData.Device.PresentationParameters.BackBufferWidth - 45, 0);
+            FullscreenIcon.Position = new Vector2(GlobalInterfaceData.Device.PresentationParameters.BackBufferWidth - 90, 0);
+            MinimiseIcon.Position = new Vector2(GlobalInterfaceData.Device.PresentationParameters.BackBufferWidth - 135, 0);
+
             UndoButton.Bounds = GlobalInterfaceData.Scale(new Point(20, 20));
             RedoButton.Bounds = GlobalInterfaceData.Scale(new Point(20, 20));
             SaveButton.Bounds = GlobalInterfaceData.Scale(new Point(20, 20));
@@ -265,7 +307,7 @@ namespace TuringSimulatorDesktop.UI
             RunProjectButton.ResizeLayout();
 
             AppTitle.Bounds = GlobalInterfaceData.Scale(new Point(45, 32));
-            AppTitle.Position = new Vector2(0,AppTitle.Bounds.Y / 2f);
+            AppTitle.Position = new Vector2(0, AppTitle.Bounds.Y / 2f);
 
             ProjectTitle.Bounds = GlobalInterfaceData.Scale(new Point(Width, 32));
             ProjectTitle.Position = GlobalInterfaceData.Scale(new Vector2(0, 16));
