@@ -135,7 +135,7 @@ namespace TuringSimulatorDesktop.UI
             Title.FontSize = 20;
             Title.FontColor = GlobalInterfaceData.Scheme.FontColorBright;
             Title.Text = "T";
-            Title.Position = new Vector2(0, Title.Bounds.Y * 0.5f);
+            Title.Position = new Vector2(16, 16);
 
             RecentFilesMenu Viewer = new RecentFilesMenu(this);
             Viewer.Bounds = new Point(450, GlobalInterfaceData.MainMenuHeight - 36 - 32);

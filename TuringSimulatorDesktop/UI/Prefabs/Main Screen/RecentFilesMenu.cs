@@ -58,8 +58,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             LayoutBox.Spacing = 10;
             LayoutBox.Scrollable = true;
             LayoutBox.ScrollFactor = 0.2f;
-            LayoutBox.ViewOffsetBoundsMin = new Vector2(0f, 5f);
-            LayoutBox.ViewOffset = new Vector2(0f, 5f);
+            LayoutBox.ViewOffsetBoundsMin = new Vector2(15f, 5f);
+            LayoutBox.ViewOffset = new Vector2(15f, 5f);
             
             //Bounds = new Point(width, height);
             //Position = position;
@@ -172,9 +172,9 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         void MoveLayout()
         {
             Background.Position = Position;
-            FileName.Position = new Vector2(Position.X + 5, Position.Y + 5);
-            FileLocation.Position = new Vector2(Position.X + 5, Position.Y + 35);
-            FileLastAccessed.Position = new Vector2(Position.X + 50, Position.Y + 5);
+            FileName.Position = new Vector2(Position.X + 8, Position.Y + 19);
+            FileLocation.Position = new Vector2(Position.X + 8, Position.Y + 45);
+            FileLastAccessed.Position = new Vector2(Position.X + ReferenceWidth - FileLastAccessed.Bounds.X - 10, Position.Y + 19);
         }
 
         public void Draw(Viewport? BoundPort = null)
