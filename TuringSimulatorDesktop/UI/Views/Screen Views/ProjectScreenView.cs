@@ -88,7 +88,7 @@ namespace TuringSimulatorDesktop.UI
             Header = new Icon(GlobalInterfaceData.Scheme.Header);
 
             AppTitle = new Label();
-            AppTitle.FontColor = Color.White;//GlobalInterfaceData.Scheme.w;
+            AppTitle.FontColor = Color.White;
             AppTitle.Font = GlobalInterfaceData.StandardBoldFont;
             AppTitle.FontSize = GlobalInterfaceData.Scale(20);
             AppTitle.Text = "T";

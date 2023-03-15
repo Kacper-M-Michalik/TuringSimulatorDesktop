@@ -44,7 +44,6 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         public FileData Data;
         FileBrowserView Browser;
         bool ClickedOnce;
-        bool DisplayingMenu;
 
         public FileDisplayItem(FileData data, FileBrowserView browser, ActionGroup group)
         {            
@@ -92,10 +91,16 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         public void Clicked()
         {
+            Background.DrawColor = GlobalInterfaceData.Scheme.InteractableAccent;
+
             if (InputManager.RightMousePressed)
             {
-                    //make menu appear
-                    return;
+                Browser.OpenMenu?.Close();
+                FileEditMenu Menu = new FileEditMenu(Browser, this);
+                Menu.DeleteFileButton.OnClickedEvent += Delete;
+                Browser.OpenMenu = Menu;
+                Browser.OpenMenu.Position = new Vector2(InputManager.MouseData.X, InputManager.MouseData.Y);
+                return;
             }
 
             if (ClickedOnce && InputManager.LeftMousePressed)
@@ -114,12 +119,24 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 return;
             }
                           
-            ClickedOnce = true;            
-            Background.DrawColor = GlobalInterfaceData.Scheme.InteractableAccent;      
+            ClickedOnce = true;              
+        }
+
+        public void Delete(Button Sender)
+        {
+            if (Data.IsFolder)
+            {
+                Client.SendTCPData(ClientSendPacketFunctions.DeleteFolder(Data.ID));
+            }
+            else
+            {
+                Client.SendTCPData(ClientSendPacketFunctions.DeleteFile(Data.GUID));
+            }
         }
 
         public void ClickedAway()
         {
+            Browser.OpenMenu?.Close();
             ClickedOnce = false;
             Background.DrawColor = GlobalInterfaceData.Scheme.Background;
         }

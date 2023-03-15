@@ -77,7 +77,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         
         int CurrentlyOpenedFolderID;
         List<FileDisplayItem> Files = new List<FileDisplayItem>();
-        FileCreationMenu OpenMenu;
+        public IClosable OpenMenu;
 
         string DefaultText = "Search:";
 
@@ -245,6 +245,17 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             OpenMenu?.Close();
             Client.SendTCPData(ClientSendPacketFunctions.CreateFolder(CurrentlyOpenedFolderID, "Empty Folder"));
             //add auto select of fodler to rename here
+        }
+        public void DeleteFolder( )
+        {
+            OpenMenu?.Close();
+
+
+        }
+        public void DeleteFile(Button Sender)
+        {
+            OpenMenu?.Close();
+
         }
         public void CreateTransitionFile(Button Sender)
         {

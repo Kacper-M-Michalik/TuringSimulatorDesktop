@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TuringSimulatorDesktop.Input;
+using TuringServer;
 
 namespace TuringSimulatorDesktop.UI
 {
@@ -53,12 +54,17 @@ namespace TuringSimulatorDesktop.UI
         TextureButton TemplateOption;
 
         TextureButton HostOption;
+        Label HostLabel;
+
         Label ClientsTitle;
         InputBox ClientsInputBox;
 
         TextureButton CreateButton;
 
         MainScreenView MainScreen;
+
+        bool IsHosting = false;
+        bool IsEmptyProject = true;
 
         public CreateProjectMenu(MainScreenView Screen)
         {
@@ -102,23 +108,91 @@ namespace TuringSimulatorDesktop.UI
             ProjectLocationInputBox.OutputLabel.FontColor = GlobalInterfaceData.Scheme.FontGrayedOutColor;
 
 
+            ProjectSettingsTitle = new Label();
+            ProjectSettingsTitle.AutoSizeMesh = true;
+            ProjectSettingsTitle.FontSize = 20f;
+            ProjectSettingsTitle.FontColor = GlobalInterfaceData.Scheme.FontColor;
+            ProjectSettingsTitle.Text = "Project Settings";
 
+            EmptyOption = new TextureButton(Group);
+            EmptyOption.OnClickedEvent += SelectEmptyProject;
 
+            TemplateOption = new TextureButton(Group);
+            TemplateOption.OnClickedEvent += SelectTemplateProject;
+
+            HostOption = new TextureButton(Group);
+            HostOption.OnClickedEvent += ToggleHost;
+
+            HostLabel = new Label();
+            HostLabel.AutoSizeMesh = true;
+            HostLabel.FontSize = 20f;
+            HostLabel.FontColor = GlobalInterfaceData.Scheme.FontColor;
+            HostLabel.Text = "Host Publicly";
 
             ClientsTitle = new Label();
             ClientsTitle.AutoSizeMesh = true;
             ClientsTitle.FontSize = 20f;
-            ClientsTitle.FontColor = GlobalInterfaceData.Scheme.FontColor;
+            ClientsTitle.FontColor = GlobalInterfaceData.Scheme.FontGrayedOutColor;
             ClientsTitle.Text = "Maximum Clients";
+            ClientsTitle.IsActive = false;
 
             ClientsInputBox = new InputBox(Group);
             ClientsInputBox.BackgroundColor = GlobalInterfaceData.Scheme.Background;
             ClientsInputBox.OutputLabel.DrawCentered = true;
             ClientsInputBox.OutputLabel.FontSize = 20f;
-            ClientsInputBox.OutputLabel.FontColor = GlobalInterfaceData.Scheme.FontColorBright;
+            ClientsInputBox.OutputLabel.FontColor = GlobalInterfaceData.Scheme.FontColor;
+            ClientsInputBox.IsActive = false;
 
+            CreateButton = new TextureButton(Group);
+            CreateButton.OnClickedEvent += CreateProject;
         }
 
+        public void SelectEmptyProject(Button Sender)
+        {
+            IsEmptyProject = true;
+        }
+
+        public void SelectTemplateProject(Button Sender)
+        {
+            IsEmptyProject = false;
+        }
+
+        public void ToggleHost(Button Sender)
+        {
+            IsHosting = !IsHosting;
+
+            if (IsHosting)
+            {
+                ClientsTitle.IsActive = true;
+                ClientsInputBox.IsActive = true;
+            }
+            else
+            {
+                ClientsTitle.IsActive = false;
+                ClientsInputBox.IsActive = false;
+            }
+        }
+
+        public void CreateProject(Button Sender)
+        {
+            if (IsEmptyProject)
+            {
+                FileManager.CreateProject(ProjectTitleInputBox.Text, ProjectLocationInputBox.Text, TuringCore.TuringProjectType.NonClassical);
+            }
+            else
+            {
+
+            }
+
+            if (IsHosting)
+            {
+                MainScreen.SelectedProject(ProjectLocationInputBox.Text, int.Parse(ClientsInputBox.Text));
+            }
+            else
+            {
+                MainScreen.SelectedProject(ProjectLocationInputBox.Text, 1);
+            }
+        }
 
         void MoveLayout()
         {
@@ -135,8 +209,19 @@ namespace TuringSimulatorDesktop.UI
             ProjectLocationTitle.Position = Position + new Vector2(17, 150);
             ProjectLocationInputBox.Position = Position + new Vector2(16, 176);
 
-            ClientsTitle.Position = Position + new Vector2(17, 480);
-            ClientsInputBox.Position = Position + new Vector2(16, 506);
+            ProjectSettingsTitle.Position = position + new Vector2(17, 246);
+
+            EmptyOption.Position = Position + new Vector2(16, 272);
+            TemplateOption.Position = Position + new Vector2(232, 272);
+
+            HostOption.Position = Position + new Vector2(16, 410);
+            HostLabel.Position = Position + new Vector2(54, 423);
+
+            ClientsTitle.Position = Position + new Vector2(17, 460);
+            ClientsInputBox.Position = Position + new Vector2(16, 486);
+
+            //create  utton label
+            CreateButton.Position = Position + new Vector2(16, 630);
         }
 
         void ResizeLayout()
@@ -153,6 +238,11 @@ namespace TuringSimulatorDesktop.UI
             //ProjectLocationTitle.Bounds = new Point(300, 42);
             ProjectLocationInputBox.Bounds = new Point(300, 42);
 
+            EmptyOption.Bounds = new Point(200, 105);
+            TemplateOption.Bounds = new Point(200, 105);
+            HostOption.Bounds = new Point(25, 25);
+            CreateButton.Bounds = new Point(150, 40);
+
             ClientsInputBox.Bounds = new Point(300, 42);
         }
 
@@ -168,18 +258,22 @@ namespace TuringSimulatorDesktop.UI
             ProjectLocationTitle.Draw();
             ProjectLocationInputBox.Draw();
 
+            ProjectSettingsTitle.Draw();
+            EmptyOption.Draw();
+            TemplateOption.Draw();
+
+            HostOption.Draw();
+            HostLabel.Draw();
+
             ClientsTitle.Draw();
             ClientsInputBox.Draw();
+
+            CreateButton.Draw();
         }
 
         public void Close()
         {
             Group.IsMarkedForDeletion = true;
-
-            //ProjectTitleInputBox.Close();
-            //ProjectLocationInputBox.Close();
-
-          //  ProjectLocationSelectionButton.Close();
         }
 
     }

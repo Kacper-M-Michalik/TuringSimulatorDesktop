@@ -9,7 +9,7 @@ using TuringSimulatorDesktop.Input;
 
 namespace TuringSimulatorDesktop.UI.Prefabs
 {
-    public class FileCreationMenu : IVisualElement, IClosable
+    public class FileEditMenu : IVisualElement, IClosable
     {
         Vector2 position;
         public Vector2 Position
@@ -45,19 +45,29 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         ActionGroup Group;
 
         Icon Background;
-        ColorButton CreateFolderButton;
+        public ColorButton RenameFileButton;
+        public ColorButton DeleteFileButton;
+
         Icon Divider1;
+        Icon Divider2;
+
+        ColorButton CreateFolderButton;
+
         ColorButton CreateTransitionFileButton;
         ColorButton CreateSlateFileButton;
         ColorButton CreateTapeFileButton;
         ColorButton CreateAlphabetFileButton;
+
+        Label RenameFileLabel;
+        Label DeleteFileLabel;
+
         Label CreateFolderLabel;
         Label CreateTransitionFileLabel;
         Label CreateSlateFileLabel;
         Label CreateTapeFileLabel;
         Label CreateAlphabetFileLabel;
 
-        public FileCreationMenu(FileBrowserView browser)
+        public FileEditMenu(FileBrowserView browser, FileDisplayItem item)
         {
             Group = InputManager.CreateActionGroup();
 
@@ -69,7 +79,18 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             CreateFolderButton.HighlightOnMouseOver = true;
             CreateFolderButton.OnClickedEvent += browser.CreateFolder;
 
+            RenameFileButton = new ColorButton(Group);
+            RenameFileButton.BaseColor = GlobalInterfaceData.Scheme.InteractableAccent;
+            RenameFileButton.HighlightColor = GlobalInterfaceData.Scheme.DarkInteractableAccent;
+            RenameFileButton.HighlightOnMouseOver = true;
+
+            DeleteFileButton = new ColorButton(Group);
+            DeleteFileButton.BaseColor = GlobalInterfaceData.Scheme.InteractableAccent;
+            DeleteFileButton.HighlightColor = GlobalInterfaceData.Scheme.DarkInteractableAccent;
+            DeleteFileButton.HighlightOnMouseOver = true;
+
             Divider1 = new Icon(GlobalInterfaceData.Scheme.NonInteractableAccent);
+            Divider2 = new Icon(GlobalInterfaceData.Scheme.NonInteractableAccent);
 
             CreateTransitionFileButton = new ColorButton(Group);
             CreateTransitionFileButton.BaseColor = GlobalInterfaceData.Scheme.InteractableAccent;
@@ -95,6 +116,14 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             CreateAlphabetFileButton.HighlightOnMouseOver = true;
             CreateAlphabetFileButton.OnClickedEvent += browser.CreateAlphabetFile;
 
+            RenameFileLabel = new Label();
+            RenameFileLabel.FontSize = 12;
+            RenameFileLabel.FontColor = GlobalInterfaceData.Scheme.FontColor;
+            RenameFileLabel.Text = "Rename";
+            DeleteFileLabel = new Label();
+            DeleteFileLabel.FontSize = 12;
+            DeleteFileLabel.FontColor = GlobalInterfaceData.Scheme.FontColor;
+            DeleteFileLabel.Text = "Delete";
             CreateFolderLabel = new Label();
             CreateFolderLabel.FontSize = 12;
             CreateFolderLabel.FontColor = GlobalInterfaceData.Scheme.FontColor;
@@ -116,7 +145,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             CreateAlphabetFileLabel.FontColor = GlobalInterfaceData.Scheme.FontColor;
             CreateAlphabetFileLabel.Text = "Create Alphabet";
 
-            bounds = GlobalInterfaceData.Scale(new Point(225, 132));
+            bounds = GlobalInterfaceData.Scale(new Point(225, 181));
             ResizeLayout();
             Position = Vector2.Zero;
         }
@@ -128,20 +157,28 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             Background.Position = Position;
 
-            CreateFolderButton.Position = Position + GlobalInterfaceData.Scale(new Vector2(0, 5));
+            RenameFileButton.Position = Position + GlobalInterfaceData.Scale(new Vector2(0, 5));
+            DeleteFileButton.Position = Position + GlobalInterfaceData.Scale(new Vector2(0, 29));
 
-            Divider1.Position = Position + GlobalInterfaceData.Scale(new Vector2(0, 29));
+            Divider1.Position = Position + GlobalInterfaceData.Scale(new Vector2(0, 54));
 
-            CreateTransitionFileButton.Position = Position + GlobalInterfaceData.Scale(new Vector2(0, 30));
-            CreateSlateFileButton.Position = Position + GlobalInterfaceData.Scale(new Vector2(0, 54));
-            CreateTapeFileButton.Position = Position + GlobalInterfaceData.Scale(new Vector2(0, 78));
-            CreateAlphabetFileButton.Position = Position + GlobalInterfaceData.Scale(new Vector2(0, 102));
+            CreateFolderButton.Position = Position + GlobalInterfaceData.Scale(new Vector2(0, 55));
 
-            CreateFolderLabel.Position = Position + new Vector2(30, 16);
-            CreateTransitionFileLabel.Position = Position + GlobalInterfaceData.Scale(new Vector2(30, 41));
-            CreateSlateFileLabel.Position = Position + GlobalInterfaceData.Scale(new Vector2(30, 65));
-            CreateTapeFileLabel.Position = Position + GlobalInterfaceData.Scale(new Vector2(30, 89));
-            CreateAlphabetFileLabel.Position = Position + GlobalInterfaceData.Scale(new Vector2(30, 113));
+            Divider2.Position = Position + GlobalInterfaceData.Scale(new Vector2(0, 79));
+
+            CreateTransitionFileButton.Position = Position + GlobalInterfaceData.Scale(new Vector2(0, 80));
+            CreateSlateFileButton.Position = Position + GlobalInterfaceData.Scale(new Vector2(0, 104));
+            CreateTapeFileButton.Position = Position + GlobalInterfaceData.Scale(new Vector2(0, 128));
+            CreateAlphabetFileButton.Position = Position + GlobalInterfaceData.Scale(new Vector2(0, 152));
+
+            RenameFileLabel.Position = Position + new Vector2(30, 16);
+            DeleteFileLabel.Position = Position + new Vector2(30, 40);
+
+            CreateFolderLabel.Position = Position + new Vector2(30, 66);
+            CreateTransitionFileLabel.Position = Position + GlobalInterfaceData.Scale(new Vector2(30, 91));
+            CreateSlateFileLabel.Position = Position + GlobalInterfaceData.Scale(new Vector2(30, 115));
+            CreateTapeFileLabel.Position = Position + GlobalInterfaceData.Scale(new Vector2(30, 139));
+            CreateAlphabetFileLabel.Position = Position + GlobalInterfaceData.Scale(new Vector2(30, 163));
         }
 
         void ResizeLayout()
@@ -152,7 +189,10 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Background.Bounds = bounds;
 
             Divider1.Bounds = GlobalInterfaceData.Scale(new Point(225, 1));
+            Divider2.Bounds = GlobalInterfaceData.Scale(new Point(225, 1));
 
+            RenameFileButton.Bounds = GlobalInterfaceData.Scale(new Point(225, 24));
+            DeleteFileButton.Bounds = GlobalInterfaceData.Scale(new Point(225, 24));
             CreateFolderButton.Bounds = GlobalInterfaceData.Scale(new Point(225, 24));
             CreateTransitionFileButton.Bounds = GlobalInterfaceData.Scale(new Point(225, 24));
             CreateSlateFileButton.Bounds = GlobalInterfaceData.Scale(new Point(225, 24));
@@ -160,6 +200,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             CreateAlphabetFileButton.Bounds = GlobalInterfaceData.Scale(new Point(225, 24));
 
             float FontSize = GlobalInterfaceData.Scale(12);
+            RenameFileLabel.FontSize = FontSize;
+            DeleteFileLabel.FontSize = FontSize;
             CreateFolderLabel.FontSize = FontSize;
             CreateTransitionFileLabel.FontSize = FontSize;
             CreateSlateFileLabel.FontSize = FontSize;
@@ -173,16 +215,25 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             {
                 Background.Draw();
 
-                CreateFolderButton.Draw();
+                RenameFileButton.Draw();
+                DeleteFileButton.Draw();
 
                 Divider1.Draw();
+
+                CreateFolderButton.Draw();
+
+                Divider2.Draw();
 
                 CreateTransitionFileButton.Draw();
                 CreateSlateFileButton.Draw();
                 CreateTapeFileButton.Draw();
                 CreateAlphabetFileButton.Draw();
 
+                RenameFileLabel.Draw();
+                DeleteFileLabel.Draw();
+
                 CreateFolderLabel.Draw();
+
                 CreateTransitionFileLabel.Draw();
                 CreateSlateFileLabel.Draw();
                 CreateTapeFileLabel.Draw();

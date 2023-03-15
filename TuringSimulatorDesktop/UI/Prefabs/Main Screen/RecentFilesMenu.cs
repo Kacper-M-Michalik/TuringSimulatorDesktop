@@ -166,7 +166,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         void LoadRecentProject(Button Sender)
         {
-            MainScreen.SelectedProject(FileInfo.FullPath);
+            MainScreen.SelectedProject(FileInfo.FullPath, 1);
         }
 
         void MoveLayout()

@@ -202,14 +202,13 @@ namespace TuringSimulatorDesktop.UI
 
             if (Dialog.ShowDialog() == DialogResult.OK)
             {
-                SelectedProject(Dialog.FileName);
+                SelectedProject(Dialog.FileName, 1);
             }
         }
 
-        public void SelectedProject(string location)
+        public void SelectedProject(string location, int MaxClientCount)
         {
-            //2 TEMP
-            BackendInterface.StartProjectServer(2, 28104);
+            BackendInterface.StartProjectServer(MaxClientCount, 28104);
             Location = location;
             UIEventManager.ClientSuccessConnectingDelegate = ConnectedToLocalServer;
             UIEventManager.ClientFailedConnectingDelegate = ResetConnection;

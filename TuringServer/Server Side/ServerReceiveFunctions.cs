@@ -630,7 +630,7 @@ namespace TuringServer
             }
 
             SendPacket = ServerSendPacketFunctions.FileDeleted(FileData.GUID);
-            foreach (int SubscriberID in Server.LoadedProject.FileDataLookup[FileData.ID].SubscriberIDs)
+            foreach (int SubscriberID in FileData.SubscriberIDs)
             {
                 Server.SendTCPData(SubscriberID, SendPacket);
             }
