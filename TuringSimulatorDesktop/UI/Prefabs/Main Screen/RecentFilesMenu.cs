@@ -9,7 +9,7 @@ using TuringSimulatorDesktop.Input;
 
 namespace TuringSimulatorDesktop.UI.Prefabs
 {
-    public class RecentFilesMenu : IVisualElement
+    public class RecentFilesMenu : IVisualElement, IClosable
     {
         Vector2 position;
         public Vector2 Position

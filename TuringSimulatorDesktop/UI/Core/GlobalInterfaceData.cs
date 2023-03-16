@@ -67,7 +67,7 @@ namespace TuringSimulatorDesktop
             return Texture;
         }
 
-        const int ManuallyGeneratedMaxEnum = 18;
+        const int ManuallyGeneratedMaxEnum = 19;
         public static void BakeTextures()
         {
             for (int i = 0; i < ManuallyGeneratedMaxEnum + 1; i++)
@@ -76,10 +76,24 @@ namespace TuringSimulatorDesktop
                 TextureLookup.Add(Key, SVGToTexture(Environment.CurrentDirectory + @"\Assets\SVG\" + Key.ToString() + @".svg"));
             }
 
-            TextureLookup.Add(UILookupKey.DebugTexture, GenerateFilledTexture(1,1, Scheme.UIOverlayDebugColor1));
+            TextureLookup.Add(UILookupKey.Execute, PNGToTexture(Environment.CurrentDirectory + @"\Assets\PNG\" + "Execute" + @".png"));
+            TextureLookup.Add(UILookupKey.ExecuteHighlight, PNGToTexture(Environment.CurrentDirectory + @"\Assets\PNG\" + "ExecuteHighlight" + @".png"));
+            TextureLookup.Add(UILookupKey.Restart, PNGToTexture(Environment.CurrentDirectory + @"\Assets\PNG\" + "Restart" + @".png"));
+            TextureLookup.Add(UILookupKey.RestartHighlight, PNGToTexture(Environment.CurrentDirectory + @"\Assets\PNG\" + "RestartHighlight" + @".png"));
+            TextureLookup.Add(UILookupKey.Step, PNGToTexture(Environment.CurrentDirectory + @"\Assets\PNG\" + "Step" + @".png"));
+            TextureLookup.Add(UILookupKey.StepHighlight, PNGToTexture(Environment.CurrentDirectory + @"\Assets\PNG\" + "StepHighlight" + @".png"));
+            TextureLookup.Add(UILookupKey.AutoStep, PNGToTexture(Environment.CurrentDirectory + @"\Assets\PNG\" + "AutoStep" + @".png"));
+            TextureLookup.Add(UILookupKey.AutoStepHighlight, PNGToTexture(Environment.CurrentDirectory + @"\Assets\PNG\" + "AutoStepHighlight" + @".png"));
+            TextureLookup.Add(UILookupKey.Pause, PNGToTexture(Environment.CurrentDirectory + @"\Assets\PNG\" + "Pause" + @".png"));
+            TextureLookup.Add(UILookupKey.PauseHighlight, PNGToTexture(Environment.CurrentDirectory + @"\Assets\PNG\" + "PauseHighlight" + @".png"));
+            TextureLookup.Add(UILookupKey.SpeedOne, PNGToTexture(Environment.CurrentDirectory + @"\Assets\PNG\" + "SpeedOne" + @".png"));
+            TextureLookup.Add(UILookupKey.SpeedOneHighlight, PNGToTexture(Environment.CurrentDirectory + @"\Assets\PNG\" + "SpeedOneHighlight" + @".png"));
+            TextureLookup.Add(UILookupKey.SpeedTwo, PNGToTexture(Environment.CurrentDirectory + @"\Assets\PNG\" + "SpeedTwo" + @".png"));
+            TextureLookup.Add(UILookupKey.SpeedTwoHighlight, PNGToTexture(Environment.CurrentDirectory + @"\Assets\PNG\" + "SpeedTwoHighlight" + @".png"));
+            TextureLookup.Add(UILookupKey.SpeedThree, PNGToTexture(Environment.CurrentDirectory + @"\Assets\PNG\" + "SpeedThree" + @".png"));
+            TextureLookup.Add(UILookupKey.SpeedThreeHighlight, PNGToTexture(Environment.CurrentDirectory + @"\Assets\PNG\" + "SpeedThreeHighlight" + @".png"));
 
-            //manually implement per ui
-            //paint background, paint on icons, text
+            TextureLookup.Add(UILookupKey.DebugTexture, GenerateFilledTexture(1,1, Scheme.UIOverlayDebugColor1));
         }
 
         static Texture2D GenerateFilledTexture(int Width, int Height, Color Fill)
@@ -255,6 +269,8 @@ namespace TuringSimulatorDesktop
 
         SaveIcon,
 
+        Header,
+
         //
         RunIcon,
         AlphabetIcon,
@@ -262,6 +278,25 @@ namespace TuringSimulatorDesktop
         SlateFileTCIcon,
         SlateFileTICIcon,
         TransitionTableIcon,
+
+        Execute,
+        ExecuteHighlight,
+        Step,
+        StepHighlight,
+        Restart,
+        RestartHighlight,
+        AutoStep,
+        AutoStepHighlight,
+        Pause,
+        PauseHighlight,
+        SpeedOne,
+        SpeedOneHighlight,
+        SpeedTwo,
+        SpeedTwoHighlight,
+        SpeedThree,
+        SpeedThreeHighlight,
+
+
         DebugTexture
     }
 

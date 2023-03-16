@@ -74,6 +74,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             InputOutputLabel.EditEvent += UpdatedCell;
 
             IndexLabel = new Label();
+            IndexLabel.AutoSizeMesh = true;
             IndexLabel.FontSize = 14f;
             IndexLabel.FontColor = GlobalInterfaceData.Scheme.FontGrayedOutColor;
             IndexLabel.Text = "";
@@ -91,7 +92,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         {
             InputOutputLabel.Position = position;
             Seperator.Position = InputOutputLabel.Position + new Vector2(InputOutputLabel.Bounds.X, 0);
-            IndexLabel.Position = Position + new Vector2(35, 110);
+            IndexLabel.Position = Position + new Vector2((ReferenceCellWidth - IndexLabel.Bounds.X)*0.5f, 110);
         }
 
         void ResizeLayout()

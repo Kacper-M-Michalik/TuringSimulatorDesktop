@@ -255,11 +255,13 @@ namespace TuringServer
         public static bool CreateProject(string Name, string ProjectDirectory, TuringProjectType RuleType)
         {
             JsonSerializerOptions Options = new JsonSerializerOptions() { WriteIndented = true };
-            string ProjectPath = ProjectDirectory + Path.DirectorySeparatorChar + Name + ".tproj";
+            string BaseFolder = ProjectDirectory + Path.DirectorySeparatorChar + Name;
+            string ProjectPath = BaseFolder + Path.DirectorySeparatorChar + Name + ".tproj";
             try
             {
+                Directory.CreateDirectory(BaseFolder);
                 File.WriteAllBytes(ProjectPath, JsonSerializer.SerializeToUtf8Bytes(new ProjectSaveFile(Name, Name + "Data", RuleType), Options));
-                Directory.CreateDirectory(ProjectDirectory + Path.DirectorySeparatorChar + Name + "Data");
+                Directory.CreateDirectory(BaseFolder + Path.DirectorySeparatorChar + Name + "Data");
             }
             catch (Exception E)
             {

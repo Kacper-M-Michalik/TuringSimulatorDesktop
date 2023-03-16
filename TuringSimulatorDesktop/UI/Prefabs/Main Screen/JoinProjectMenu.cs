@@ -9,7 +9,7 @@ using TuringSimulatorDesktop.Input;
 
 namespace TuringSimulatorDesktop.UI.Prefabs
 {
-    public class JoinProjectMenu : IVisualElement
+    public class JoinProjectMenu : IVisualElement, IClosable
     {
         Vector2 position;
         public Vector2 Position
@@ -76,8 +76,16 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             HostIPInputBox.OutputLabel.FontColor = GlobalInterfaceData.Scheme.FontGrayedOutColor;
 
             JoinButton = new TextureButton(Group);
+            JoinButton.OnClickedEvent += Join;
         }
 
+        public void Join(Button Sender)
+        {
+            if (System.Net.IPAddress.TryParse(HostIPInputBox.Text, out System.Net.IPAddress IP))
+            {
+                MainScreen.ConnectToOtherDevice(IP);
+            }
+        }
 
         void MoveLayout()
         {

@@ -129,7 +129,7 @@ namespace TuringSimulatorDesktop.UI
             ProjectTitle.AutoSizeMesh = false;
             ProjectTitle.DrawCentered = true;
             ProjectTitle.FontSize = GlobalInterfaceData.Scale(14);
-            ProjectTitle.FontColor = GlobalInterfaceData.Scheme.FontColor;
+            ProjectTitle.FontColor = GlobalInterfaceData.Scheme.FontColorBright;
             ProjectTitle.Font = GlobalInterfaceData.StandardRegularFont;
 
             ScreenResize();

@@ -10,6 +10,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using TuringSimulatorDesktop.UI.Prefabs;
 using System.Windows.Forms;
+using System.Net;
 
 namespace TuringSimulatorDesktop.UI
 {
@@ -29,7 +30,7 @@ namespace TuringSimulatorDesktop.UI
         ElementCollection LoadProjectButton;
         ElementCollection JoinProjectButton;
 
-        IVisualElement OpenMenu;
+        IClosable OpenMenu;
 
         public MainScreenView()
         {          
@@ -154,10 +155,7 @@ namespace TuringSimulatorDesktop.UI
 
         public void CreateNewProject(Button Sender)
         {
-            if (OpenMenu is RecentFilesMenu) ((RecentFilesMenu)OpenMenu).Close();
-            if (OpenMenu is CreateProjectMenu) ((CreateProjectMenu)OpenMenu).Close();
-            if (OpenMenu is JoinProjectMenu) ((JoinProjectMenu)OpenMenu).Close();
-            if (OpenMenu is LoadProjectMenu) ((LoadProjectMenu)OpenMenu).Close();
+            OpenMenu.Close();
 
             CreateProjectMenu Menu = new CreateProjectMenu(this);
             Menu.Bounds = new Point(450, GlobalInterfaceData.MainMenuHeight - 36 - 32);
@@ -168,10 +166,7 @@ namespace TuringSimulatorDesktop.UI
 
         public void JoinProject(Button Sender)
         {
-            if (OpenMenu is RecentFilesMenu) ((RecentFilesMenu)OpenMenu).Close();
-            if (OpenMenu is CreateProjectMenu) ((CreateProjectMenu)OpenMenu).Close();
-            if (OpenMenu is JoinProjectMenu) ((JoinProjectMenu)OpenMenu).Close();
-            if (OpenMenu is LoadProjectMenu) ((LoadProjectMenu)OpenMenu).Close();
+            OpenMenu.Close();
 
             JoinProjectMenu Menu = new JoinProjectMenu(this);
             Menu.Bounds = new Point(450, GlobalInterfaceData.MainMenuHeight - 36 - 32);
@@ -180,31 +175,18 @@ namespace TuringSimulatorDesktop.UI
             OpenMenu = Menu;
         }
 
-        string Location;
         public void LoadProject(Button Sender)
         {
-            OpenFileDialog Dialog = new OpenFileDialog
-            {
-                InitialDirectory = @"C:\",
-                Title = "Browse tproj Files",
+            OpenMenu.Close();
 
-                CheckFileExists = true,
-                CheckPathExists = true,
+            LoadProjectMenu Menu = new LoadProjectMenu(this);
+            Menu.Bounds = new Point(450, GlobalInterfaceData.MainMenuHeight - 36 - 32);
+            Menu.Position = new Vector2(282, 50);
 
-                DefaultExt = "tproj",
-                Filter = "tproj files (*.tproj)|*.tproj",
-                FilterIndex = 2,
-                RestoreDirectory = true,
-
-                ReadOnlyChecked = true,
-                ShowReadOnly = true
-            };
-
-            if (Dialog.ShowDialog() == DialogResult.OK)
-            {
-                SelectedProject(Dialog.FileName, 1);
-            }
+            OpenMenu = Menu;
         }
+
+        string Location;
 
         public void SelectedProject(string location, int MaxClientCount)
         {
@@ -212,7 +194,7 @@ namespace TuringSimulatorDesktop.UI
             Location = location;
             UIEventManager.ClientSuccessConnectingDelegate = ConnectedToLocalServer;
             UIEventManager.ClientFailedConnectingDelegate = ResetConnection;
-            Client.ConnectToServer(System.Net.IPAddress.Parse("127.0.0.1"), 28104);
+            Client.ConnectToServer(IPAddress.Parse("127.0.0.1"), 28104);
         }
         void ConnectedToLocalServer(object sender, EventArgs e)
         {
@@ -229,11 +211,11 @@ namespace TuringSimulatorDesktop.UI
         }
 
 
-        void ConnectToOtherDevice(string IP)
+        public void ConnectToOtherDevice(IPAddress IP)
         {
             UIEventManager.RecievedProjectDataFromServerDelegate = FullyConnectedToServer;
             UIEventManager.ClientFailedConnectingDelegate = ResetConnection;
-            Client.ConnectToServer(System.Net.IPAddress.Parse(IP), 28104);
+            Client.ConnectToServer(IP, 28104);
         }
 
         void ResetConnection(object sender, EventArgs e)
@@ -253,6 +235,8 @@ namespace TuringSimulatorDesktop.UI
             ProjectScreenView ProjectView = new ProjectScreenView();
             UIEventManager.RecievedProjectDataFromServerDelegate = ProjectView.UpdatedProject;
             GlobalInterfaceData.MainWindow.CurrentView = ProjectView;
+            //temp?
+            ProjectView.UpdatedProject(null, null);
         }
 
         public void Minimise(Button Sender)

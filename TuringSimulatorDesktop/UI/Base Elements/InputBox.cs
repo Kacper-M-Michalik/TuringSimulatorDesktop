@@ -140,8 +140,8 @@ namespace TuringSimulatorDesktop.UI
                             else Builder.Remove(Builder.Length - 1, 1);
                         }
                         break;
-                    default:
-                        Builder.Append(Args.Character);
+                    default:                        
+                        if ((char.IsNumber(Args.Character) && Modifiers.AllowsNumbers) || (char.IsLetter(Args.Character) && Modifiers.AllowsCharacters) || (char.IsSymbol(Args.Character) && Modifiers.AllowsSymbols)) Builder.Append(Args.Character);
                         break;
                 }
 

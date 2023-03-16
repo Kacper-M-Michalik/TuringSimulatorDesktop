@@ -169,23 +169,39 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             ControlBox1.Scrollable = false;
 
             AutoStepButton = new TextureButton(Group);
+            AutoStepButton.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.AutoStep];
+            AutoStepButton.HighlightTexture = GlobalInterfaceData.TextureLookup[UILookupKey.AutoStepHighlight];
+            AutoStepButton.HighlightOnMouseOver = true;
             AutoStepButton.OnClickedEvent += AutoStep;
             PauseButton = new TextureButton(Group);
+            PauseButton.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.Pause];
+            PauseButton.HighlightTexture = GlobalInterfaceData.TextureLookup[UILookupKey.PauseHighlight];
+            PauseButton.HighlightOnMouseOver = true;
             PauseButton.OnClickedEvent += Pause;
             StepButton = new TextureButton(Group);
+            StepButton.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.Step];
+            StepButton.HighlightTexture = GlobalInterfaceData.TextureLookup[UILookupKey.StepHighlight];
+            StepButton.HighlightOnMouseOver = true;
             StepButton.OnClickedEvent += Step;
 
             Speed1Button = new TextureButton(Group);
+            Speed1Button.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.SpeedOne];
+            Speed1Button.HighlightTexture = GlobalInterfaceData.TextureLookup[UILookupKey.SpeedOneHighlight];
+            Speed1Button.HighlightOnMouseOver = true;
             Speed1Button.OnClickedEvent += SetSpeed1;
             Speed2Button = new TextureButton(Group);
+            Speed2Button.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.SpeedTwo];
+            Speed2Button.HighlightTexture = GlobalInterfaceData.TextureLookup[UILookupKey.SpeedTwoHighlight];
+            Speed2Button.HighlightOnMouseOver = true;
             Speed2Button.OnClickedEvent += SetSpeed2;
             Speed3Button = new TextureButton(Group);
+            Speed3Button.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.SpeedThree];
+            Speed3Button.HighlightTexture = GlobalInterfaceData.TextureLookup[UILookupKey.SpeedThreeHighlight];
+            Speed3Button.HighlightOnMouseOver = true;
             Speed3Button.OnClickedEvent += SetSpeed3;
 
             ControlBox1.AddElement(AutoStepButton);
             ControlBox1.AddElement(PauseButton);
-            ControlBox1.AddElement(StepButton);
-            ControlBox1.AddElement(AutoStepButton);
             ControlBox1.AddElement(Speed1Button);
             ControlBox1.AddElement(Speed2Button);
             ControlBox1.AddElement(Speed3Button);
@@ -196,14 +212,19 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             ControlBox2.Scrollable = false;
 
             ExecuteButton = new TextureButton(Group);
+            ExecuteButton.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.Execute];
+            ExecuteButton.HighlightTexture = GlobalInterfaceData.TextureLookup[UILookupKey.ExecuteHighlight];
+            ExecuteButton.HighlightOnMouseOver = true;
             ExecuteButton.OnClickedEvent += Execute;
             RestartButton = new TextureButton(Group);
+            RestartButton.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.Restart];
+            RestartButton.HighlightTexture = GlobalInterfaceData.TextureLookup[UILookupKey.RestartHighlight];
+            RestartButton.HighlightOnMouseOver = true;
             RestartButton.OnClickedEvent += Restart;
 
             ControlBox2.AddElement(ExecuteButton);
             ControlBox2.AddElement(RestartButton);
-
-
+            ControlBox2.AddElement(StepButton);
 
             Canvas = new DraggableCanvas();
 
@@ -215,6 +236,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             VisualTape = new TapeVisualItem(Canvas.Group);
 
             ReadHead = new Icon();
+            ReadHead.DrawTexture = GlobalInterfaceData.TextureLookup[UILookupKey.Header];
             ReadHead.Position = VisualTape.GetIndexWorldPosition(0);
 
             Canvas.Elements.Add(CurrentStateLabel);
@@ -510,7 +532,9 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         public void UpdateUI()
         {
             CurrentStateLabel.Text = Machine.CurrentState;
-            ReadHead.Position = VisualTape.GetIndexWorldPosition(Machine.HeadPosition);
+            Vector2 NewHeadPos = VisualTape.GetIndexWorldPosition(Machine.HeadPosition);
+            CurrentStateLabel.Position = NewHeadPos + new Vector2(-CurrentStateLabel.Bounds.X * 0.5f, 115);
+            ReadHead.Position = VisualTape.GetIndexWorldPosition(Machine.HeadPosition) - new Vector2(ReadHead.Bounds.X * 0.5f, 100.5f);
         }
 
         void MoveLayout()
@@ -522,21 +546,20 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             Canvas.Position = Position;
 
-            CurrentStateTableTitle.Position = Position + new Vector2(20, 20);
-            CurrentStateTableLabel.Position = CurrentStateTableTitle.Position + new Vector2(0, 20);
-            CurrentTapeTitle.Position = CurrentStateTableLabel.Position + new Vector2(0, 20);
-            CurrentTapeLabel.Position = CurrentTapeTitle.Position + new Vector2(0, 20);
+            //CurrentStateTableTitle.Position = Position + new Vector2(20, 20);
+           // CurrentStateTableLabel.Position = CurrentStateTableTitle.Position + new Vector2(0, 20);
+           // CurrentTapeTitle.Position = CurrentStateTableLabel.Position + new Vector2(0, 20);
+            //CurrentTapeLabel.Position = CurrentTapeTitle.Position + new Vector2(0, 20);
 
-            StartStateTitle.Position = CurrentTapeLabel.Position + new Vector2(0, 20);
-            StartStateInputBox.Position = StartStateTitle.Position + new Vector2(0, 20);
-            StartIndexTitle.Position = StartStateInputBox.Position + new Vector2(0, 20);
-            StartIndexInputBox.Position = StartIndexTitle.Position + new Vector2(0, 20);
+            //StartStateTitle.Position = CurrentTapeLabel.Position + new Vector2(0, 20);
+           // StartStateInputBox.Position = StartStateTitle.Position + new Vector2(0, 20);
+            //StartIndexTitle.Position = StartStateInputBox.Position + new Vector2(0, 20);
+           // StartIndexInputBox.Position = StartIndexTitle.Position + new Vector2(0, 20);
 
-            ControlBox1.Position = Position + new Vector2(330, 30);
+            ControlBox1.Position = Position + new Vector2(520, 20);
             ControlBox1.UpdateLayout();
 
-            //autobounds are not implemented for now
-            ControlBox2.Position = ControlBox1.Position + new Vector2(ControlBox1.Bounds.X + 300, 0);
+            ControlBox2.Position = Position + new Vector2(300, 20);
             ControlBox2.UpdateLayout();
 
         }
@@ -547,6 +570,19 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Group.Height = bounds.Y;
 
             Background.Bounds = bounds;
+
+            ExecuteButton.Bounds = new Point(65, 65);
+            RestartButton.Bounds = new Point(65, 65);
+            StepButton.Bounds = new Point(65, 65);
+            AutoStepButton.Bounds = new Point(65, 65);
+            PauseButton.Bounds = new Point(65, 65);
+            Speed1Button.Bounds = new Point(65, 65);
+            Speed2Button.Bounds = new Point(65, 65);
+            Speed3Button.Bounds = new Point(65, 65);
+
+            ReadHead.Bounds = new Point(155, 177);
+
+            UpdateUI();
 
             Canvas.Bounds = bounds;
         }

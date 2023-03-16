@@ -7,10 +7,11 @@ using System.Text;
 using System.Threading.Tasks;
 using TuringSimulatorDesktop.Input;
 using TuringServer;
+using System.Windows.Forms;
 
 namespace TuringSimulatorDesktop.UI
 {
-    public class CreateProjectMenu : IVisualElement
+    public class CreateProjectMenu : IVisualElement, IClosable
     {
         Vector2 position;
         public Vector2 Position
@@ -46,7 +47,7 @@ namespace TuringSimulatorDesktop.UI
         InputBox ProjectTitleInputBox;
 
         Label ProjectLocationTitle;
-        ColorButton ProjectLocationSelectionButton;
+        TextureButton ProjectLocationSelectionButton;
         InputBox ProjectLocationInputBox;
 
         Label ProjectSettingsTitle;
@@ -107,6 +108,9 @@ namespace TuringSimulatorDesktop.UI
             ProjectLocationInputBox.OutputLabel.FontSize = 20f;
             ProjectLocationInputBox.OutputLabel.FontColor = GlobalInterfaceData.Scheme.FontGrayedOutColor;
 
+            ProjectLocationSelectionButton = new TextureButton(Group);
+            ProjectLocationSelectionButton.HighlightOnMouseOver = true;
+            ProjectLocationSelectionButton.OnClickedEvent += SelectLocation;
 
             ProjectSettingsTitle = new Label();
             ProjectSettingsTitle.AutoSizeMesh = true;
@@ -137,14 +141,31 @@ namespace TuringSimulatorDesktop.UI
             ClientsTitle.IsActive = false;
 
             ClientsInputBox = new InputBox(Group);
+            ClientsInputBox.Modifiers.AllowsCharacters = false;
+            ClientsInputBox.Modifiers.AllowsSymbols = false;
             ClientsInputBox.BackgroundColor = GlobalInterfaceData.Scheme.Background;
             ClientsInputBox.OutputLabel.DrawCentered = true;
             ClientsInputBox.OutputLabel.FontSize = 20f;
             ClientsInputBox.OutputLabel.FontColor = GlobalInterfaceData.Scheme.FontColor;
             ClientsInputBox.IsActive = false;
+            ClientsInputBox.EditEvent += SanitiseClientCount;
 
             CreateButton = new TextureButton(Group);
             CreateButton.OnClickedEvent += CreateProject;
+        }
+
+        public void SelectLocation(Button Sender)
+        {            
+            FolderBrowserDialog Dialog = new FolderBrowserDialog
+            {
+                InitialDirectory = @"C:\",
+            };
+
+            if (Dialog.ShowDialog() == DialogResult.OK)
+            {
+                ProjectLocationInputBox.Text = Dialog.SelectedPath;
+                //MainScreen.SelectedProject(Dialog.FileName, 1);
+            }
         }
 
         public void SelectEmptyProject(Button Sender)
@@ -194,6 +215,11 @@ namespace TuringSimulatorDesktop.UI
             }
         }
 
+        public void SanitiseClientCount(InputBox Sender)
+        {
+            if (!int.TryParse(ClientsInputBox.Text, out int Result) || Result < 1) ClientsInputBox.Text = "1";
+        }
+
         void MoveLayout()
         {
             Group.X = UIUtils.ConvertFloatToInt(Position.X);
@@ -208,6 +234,7 @@ namespace TuringSimulatorDesktop.UI
 
             ProjectLocationTitle.Position = Position + new Vector2(17, 150);
             ProjectLocationInputBox.Position = Position + new Vector2(16, 176);
+            ProjectLocationSelectionButton.Position = Position + new Vector2(316, 176);
 
             ProjectSettingsTitle.Position = position + new Vector2(17, 246);
 
@@ -237,6 +264,7 @@ namespace TuringSimulatorDesktop.UI
 
             //ProjectLocationTitle.Bounds = new Point(300, 42);
             ProjectLocationInputBox.Bounds = new Point(300, 42);
+            ProjectLocationSelectionButton.Bounds = new Point(42, 42);
 
             EmptyOption.Bounds = new Point(200, 105);
             TemplateOption.Bounds = new Point(200, 105);
@@ -257,6 +285,7 @@ namespace TuringSimulatorDesktop.UI
 
             ProjectLocationTitle.Draw();
             ProjectLocationInputBox.Draw();
+            ProjectLocationSelectionButton.Draw();
 
             ProjectSettingsTitle.Draw();
             EmptyOption.Draw();
