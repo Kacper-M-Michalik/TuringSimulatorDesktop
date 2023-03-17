@@ -119,12 +119,15 @@ namespace TuringSimulatorDesktop.UI
             ProjectSettingsTitle.Text = "Project Settings";
 
             EmptyOption = new TextureButton(Group);
+            EmptyOption.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.EmptyProjectSelected];
             EmptyOption.OnClickedEvent += SelectEmptyProject;
 
             TemplateOption = new TextureButton(Group);
+            TemplateOption.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.TemplateProject];
             TemplateOption.OnClickedEvent += SelectTemplateProject;
 
             HostOption = new TextureButton(Group);
+            HostOption.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.TickboxUnticked];
             HostOption.OnClickedEvent += ToggleHost;
 
             HostLabel = new Label();
@@ -147,10 +150,16 @@ namespace TuringSimulatorDesktop.UI
             ClientsInputBox.OutputLabel.DrawCentered = true;
             ClientsInputBox.OutputLabel.FontSize = 20f;
             ClientsInputBox.OutputLabel.FontColor = GlobalInterfaceData.Scheme.FontColor;
+            ClientsInputBox.Text = "Count";
             ClientsInputBox.IsActive = false;
+            ClientsInputBox.ClickEvent += ClearCount;
+            ClientsInputBox.ClickAwayEvent += ClearCount;
             ClientsInputBox.EditEvent += SanitiseClientCount;
 
             CreateButton = new TextureButton(Group);
+            CreateButton.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.CreateButton];
+            CreateButton.HighlightTexture = GlobalInterfaceData.TextureLookup[UILookupKey.CreateButtonHighlight];
+            CreateButton.HighlightOnMouseOver = true;
             CreateButton.OnClickedEvent += CreateProject;
         }
 
@@ -171,11 +180,15 @@ namespace TuringSimulatorDesktop.UI
         public void SelectEmptyProject(Button Sender)
         {
             IsEmptyProject = true;
+            EmptyOption.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.EmptyProjectSelected];
+            TemplateOption.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.TemplateProject];
         }
 
         public void SelectTemplateProject(Button Sender)
         {
             IsEmptyProject = false;
+            EmptyOption.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.EmptyProject];
+            TemplateOption.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.TemplateProjectSelected];
         }
 
         public void ToggleHost(Button Sender)
@@ -184,11 +197,13 @@ namespace TuringSimulatorDesktop.UI
 
             if (IsHosting)
             {
+                HostOption.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.TickboxTicked];
                 ClientsTitle.IsActive = true;
                 ClientsInputBox.IsActive = true;
             }
             else
             {
+                HostOption.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.TickboxUnticked];
                 ClientsTitle.IsActive = false;
                 ClientsInputBox.IsActive = false;
             }
@@ -215,6 +230,10 @@ namespace TuringSimulatorDesktop.UI
             }
         }
 
+        public void ClearCount(InputBox Sender)
+        {
+            if (!int.TryParse(ClientsInputBox.Text, out int Result)) ClientsInputBox.Text = "Count";
+        }
         public void SanitiseClientCount(InputBox Sender)
         {
             if (!int.TryParse(ClientsInputBox.Text, out int Result) || Result < 1) ClientsInputBox.Text = "1";

@@ -9,7 +9,7 @@ using TuringSimulatorDesktop.Input;
 
 namespace TuringSimulatorDesktop.UI.Prefabs
 {    
-    public class TuringMachineView : IView, IPollable
+    public class TuringMachineView : IView, IPollable, IDragListener
     {
         Vector2 position;
         public Vector2 Position
@@ -59,7 +59,6 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         Icon Background;
 
-        Icon InfoBackground;
         Label CurrentStateTableTitle;
         Label CurrentStateTableLabel;
         Label CurrentTapeTitle;
@@ -118,11 +117,11 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Group = InputManager.CreateActionGroup();
             Background = new Icon(GlobalInterfaceData.Scheme.Background);
 
-
-            InfoBackground = new Icon();
+            Group.ClickableObjects.Add(this);
+            Group.PollableObjects.Add(this);
 
             CurrentStateTableTitle = new Label();
-            CurrentStateTableTitle.FontSize = 10;
+            CurrentStateTableTitle.FontSize = 11;
             CurrentStateTableTitle.FontColor = GlobalInterfaceData.Scheme.FontGrayedOutColor;
             CurrentStateTableTitle.Text = "Current State Table";
 
@@ -132,7 +131,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             CurrentStateTableLabel.Text = "NONE";
 
             CurrentTapeTitle = new Label();
-            CurrentTapeTitle.FontSize = 10;
+            CurrentTapeTitle.FontSize = 11;
             CurrentTapeTitle.FontColor = GlobalInterfaceData.Scheme.FontGrayedOutColor;
             CurrentTapeTitle.Text = "Current Tape";
 
@@ -143,7 +142,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
 
             StartStateTitle = new Label();
-            StartStateTitle.FontSize = 10;
+            StartStateTitle.FontSize = 11;
             StartStateTitle.FontColor = GlobalInterfaceData.Scheme.FontGrayedOutColor;
             StartStateTitle.Text = "Start State";
 
@@ -153,7 +152,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             StartStateInputBox.Text = "";
 
             StartIndexTitle = new Label();
-            StartIndexTitle.FontSize = 10;
+            StartIndexTitle.FontSize = 11;
             StartIndexTitle.FontColor = GlobalInterfaceData.Scheme.FontGrayedOutColor;
             StartIndexTitle.Text = "Start Tape Index";
 
@@ -392,8 +391,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             }
 
             CurrentlyOpenedTapeID = FileID;
-            UIEventManager.Subscribe(CurrentlyOpenedTapeID, ReceivedStateTableSourceData);
-            Client.SendTCPData(ClientSendPacketFunctions.RequestFile(CurrentlyOpenedTapeID, true));
+            UIEventManager.Subscribe(CurrentlyOpenedTapeID, ReceivedTapeData);
+            Client.SendTCPData(ClientSendPacketFunctions.RequestFile(CurrentlyOpenedTapeID, false));
         }
 
         public void ReceivedTapeData(object Data)
@@ -427,6 +426,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             }
 
             Machine.SetActiveTape(Tape);
+
+            CurrentTapeLabel.Text = Message.Name;
         }
 
         public void PollInput(bool IsInActionGroupFrame)
@@ -442,6 +443,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                     Step(null);
                     TimeLeftToNextStep = TimeBetweenStepsMS; 
                 }
+                UpdateUI();
             }
         }
 
@@ -458,7 +460,16 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 IsStateTableOutdated = false;
             }
 
+            if (Machine.OriginalTape == null)
+            {
+                Machine.SetActiveTape(new TapeTemplate());
+            }
+
+
             int Code = Machine.Start(StartStateInputBox.Text, Convert.ToInt32(StartIndexInputBox.Text));
+           
+            if (Code == 0) VisualTape.SetSourceTape(Machine.ActiveTape); 
+            
             if (Code == 1)
             {
                 //set error ui
@@ -501,6 +512,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         public void Restart(Button Sender)
         {
             StartMachine();
+            UpdateUI();
         }
         public void AutoStep(Button Sender)
         {
@@ -537,6 +549,30 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             ReadHead.Position = VisualTape.GetIndexWorldPosition(Machine.HeadPosition) - new Vector2(ReadHead.Bounds.X * 0.5f, 100.5f);
         }
 
+        public void RecieveDragData()
+        {
+            FileData Data = InputManager.DragData as FileData;
+            if (Data != null && Data.Type == CoreFileType.Tape)
+            {
+                LoadTape(Data.GUID);
+            }
+        }
+
+        public void Clicked()
+        {
+
+        }
+
+        public void ClickedAway()
+        {
+
+        }
+
+        public bool IsMouseOver()
+        {
+            return (IsActive && InputManager.MouseData.X >= Position.X && InputManager.MouseData.X <= Position.X + bounds.X && InputManager.MouseData.Y >= Position.Y && InputManager.MouseData.Y <= Position.Y + bounds.Y);
+        }
+
         void MoveLayout()
         {
             Group.X = UIUtils.ConvertFloatToInt(position.X);
@@ -546,15 +582,15 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             Canvas.Position = Position;
 
-            //CurrentStateTableTitle.Position = Position + new Vector2(20, 20);
-           // CurrentStateTableLabel.Position = CurrentStateTableTitle.Position + new Vector2(0, 20);
-           // CurrentTapeTitle.Position = CurrentStateTableLabel.Position + new Vector2(0, 20);
-            //CurrentTapeLabel.Position = CurrentTapeTitle.Position + new Vector2(0, 20);
+            CurrentStateTableTitle.Position = Position + new Vector2(22, 27);
+            CurrentStateTableLabel.Position = Position + new Vector2(22, 52);
+            CurrentTapeTitle.Position = Position + new Vector2(22, 80);
+            CurrentTapeLabel.Position = Position + new Vector2(22, 105);
 
-            //StartStateTitle.Position = CurrentTapeLabel.Position + new Vector2(0, 20);
-           // StartStateInputBox.Position = StartStateTitle.Position + new Vector2(0, 20);
-            //StartIndexTitle.Position = StartStateInputBox.Position + new Vector2(0, 20);
-           // StartIndexInputBox.Position = StartIndexTitle.Position + new Vector2(0, 20);
+            StartStateTitle.Position = Position + new Vector2(22, 133);
+            StartStateInputBox.Position = Position + new Vector2(22, 158);
+            StartIndexTitle.Position = Position + new Vector2(22, 186);
+            StartIndexInputBox.Position = Position + new Vector2(22, 211);
 
             ControlBox1.Position = Position + new Vector2(520, 20);
             ControlBox1.UpdateLayout();
@@ -570,6 +606,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Group.Height = bounds.Y;
 
             Background.Bounds = bounds;
+
+            StartIndexInputBox.Bounds = new Point();
 
             ExecuteButton.Bounds = new Point(65, 65);
             RestartButton.Bounds = new Point(65, 65);
@@ -597,7 +635,6 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 VisualTape.UpdateLayout();
                 Canvas.Draw(BoundPort);
 
-                InfoBackground.Draw(BoundPort);
                 CurrentStateTableTitle.Draw(BoundPort);
                 CurrentStateTableLabel.Draw(BoundPort);
                 CurrentTapeTitle.Draw(BoundPort);
@@ -614,9 +651,11 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 ControlBox2.Draw(BoundPort);
             }
         }
+
         public void Close()
         {
             Group.IsMarkedForDeletion = true;
         }
+
     }    
 }

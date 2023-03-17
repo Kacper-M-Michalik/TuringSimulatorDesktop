@@ -22,7 +22,7 @@ namespace TuringCore
 
         public int Start(string StartState, int StartHeadPosition)
         {
-            if (IsActive) return 1;//throw new Exception("Machine already on");
+            //if (IsActive) return 1;//throw new Exception("Machine already on");
             if (ActiveStateTable == null) return 2;//throw new Exception("No state table loaded");
             if (ActiveAlphabet == null) return 3;//throw new Exception("No alphabet loaded");
             if (OriginalTape == null) return 4;//throw new Exception("No tape loaded");
@@ -103,6 +103,7 @@ namespace TuringCore
         {
             //if (ActiveStateTable != null && NewTape.DefenitionAlphabetID != ActiveStateTable.DefenitionAlphabetID) throw new Exception("Incompatible alphabets");
             OriginalTape = NewTape;
+            //if (ActiveAlphabet != null) ActiveTape = NewTape.Clone(ActiveAlphabet);
         }
 
         public void SetActiveStateTable(StateTable Table, Alphabet Alphabet)
