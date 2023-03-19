@@ -67,10 +67,10 @@ namespace TuringSimulatorDesktop
             return Texture;
         }
 
-        const int ManuallyGeneratedMaxEnum = 27;
+        const int ManuallyGeneratedMaxEnum = (int)UILookupKey.TransitionTableIcon + 1;
         public static void BakeTextures()
         {
-            for (int i = 0; i < ManuallyGeneratedMaxEnum + 1; i++)
+            for (int i = 0; i < ManuallyGeneratedMaxEnum; i++)
             {
                 UILookupKey Key = (UILookupKey)i;
                 TextureLookup.Add(Key, SVGToTexture(Environment.CurrentDirectory + @"\Assets\SVG\" + Key.ToString() + @".svg"));
@@ -234,6 +234,7 @@ namespace TuringSimulatorDesktop
         public Color DarkInteractableAccent = new Color(219, 219, 219);
         public Color InteractableAccent = new Color(235, 235, 235);
         public Color NonInteractableAccent = new Color(208, 208, 208);
+        public Color CanvasBackground = new Color(243, 245, 249);
 
         public Color FontColor = Color.Black;
         public Color FontColorBright = Color.White;
@@ -263,6 +264,7 @@ namespace TuringSimulatorDesktop
 
         ConnectIcon,
         LoadIcon,
+        LoadFile,
 
         EmptyProject,
         EmptyProjectSelected,
@@ -272,6 +274,10 @@ namespace TuringSimulatorDesktop
         TickboxUnticked,
         CreateButton,
         CreateButtonHighlight,
+        LoadButton,
+        LoadButtonHighlight,
+        JoinButton,
+        JoinButtonHighlight,
 
         UndoIcon,
         RedoIcon,

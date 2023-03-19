@@ -109,7 +109,8 @@ namespace TuringSimulatorDesktop.UI
             ProjectLocationInputBox.OutputLabel.FontColor = GlobalInterfaceData.Scheme.FontGrayedOutColor;
 
             ProjectLocationSelectionButton = new TextureButton(Group);
-            ProjectLocationSelectionButton.HighlightOnMouseOver = true;
+            ProjectLocationSelectionButton.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.LoadFile];
+            ProjectLocationSelectionButton.HighlightOnMouseOver = false;
             ProjectLocationSelectionButton.OnClickedEvent += SelectLocation;
 
             ProjectSettingsTitle = new Label();

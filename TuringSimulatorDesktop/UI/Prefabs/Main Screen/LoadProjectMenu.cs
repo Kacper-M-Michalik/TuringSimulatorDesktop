@@ -88,10 +88,11 @@ namespace TuringSimulatorDesktop.UI
             ProjectLocationInputBox.OutputLabel.FontColor = GlobalInterfaceData.Scheme.FontGrayedOutColor;
 
             ProjectLocationSelectionButton = new TextureButton(Group);
-            ProjectLocationSelectionButton.HighlightOnMouseOver = true;
+            ProjectLocationSelectionButton.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.LoadFile];
             ProjectLocationSelectionButton.OnClickedEvent += SelectLocation;
 
             HostOption = new TextureButton(Group);
+            HostOption.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.TickboxUnticked];
             HostOption.OnClickedEvent += ToggleHost;
 
             HostLabel = new Label();
@@ -114,11 +115,14 @@ namespace TuringSimulatorDesktop.UI
             ClientsInputBox.BackgroundColor = GlobalInterfaceData.Scheme.Background;
             ClientsInputBox.OutputLabel.DrawCentered = true;
             ClientsInputBox.OutputLabel.FontSize = 20f;
-            ClientsInputBox.OutputLabel.FontColor = GlobalInterfaceData.Scheme.FontColor;
+            ClientsInputBox.OutputLabel.FontColor = GlobalInterfaceData.Scheme.FontGrayedOutColor;
             ClientsInputBox.EditEvent += SanitiseClientCount;
             ClientsInputBox.IsActive = false;
 
             LoadButton = new TextureButton(Group);
+            LoadButton.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.LoadButton];
+            LoadButton.HighlightTexture = GlobalInterfaceData.TextureLookup[UILookupKey.LoadButtonHighlight];
+            LoadButton.HighlightOnMouseOver = true;
             LoadButton.OnClickedEvent += LoadProject;
         }
 
@@ -166,11 +170,13 @@ namespace TuringSimulatorDesktop.UI
 
             if (IsHosting)
             {
+                HostOption.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.TickboxTicked];
                 ClientsTitle.IsActive = true;
                 ClientsInputBox.IsActive = true;
             }
             else
             {
+                HostOption.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.TickboxUnticked];
                 ClientsTitle.IsActive = false;
                 ClientsInputBox.IsActive = false;
             }
@@ -190,15 +196,15 @@ namespace TuringSimulatorDesktop.UI
             Header.Position = position;
             Title.Position = new Vector2(position.X + 17, position.Y + Header.Bounds.Y * 0.5f);
 
-            ProjectLocationTitle.Position = Position + new Vector2(17, 150);
-            ProjectLocationInputBox.Position = Position + new Vector2(16, 176);
-            ProjectLocationSelectionButton.Position = Position + new Vector2(316, 176);
+            ProjectLocationTitle.Position = Position + new Vector2(17, 54);
+            ProjectLocationInputBox.Position = Position + new Vector2(16, 80);
+            ProjectLocationSelectionButton.Position = Position + new Vector2(392, 80);
 
-            HostOption.Position = Position + new Vector2(16, 410);
-            HostLabel.Position = Position + new Vector2(54, 423);
+            HostOption.Position = Position + new Vector2(16, 150);
+            HostLabel.Position = Position + new Vector2(54, 163);
 
-            ClientsTitle.Position = Position + new Vector2(17, 460);
-            ClientsInputBox.Position = Position + new Vector2(16, 486);
+            ClientsTitle.Position = Position + new Vector2(17, 200);
+            ClientsInputBox.Position = Position + new Vector2(16, 226);
 
             LoadButton.Position = Position + new Vector2(16, 630);
         }
@@ -212,7 +218,7 @@ namespace TuringSimulatorDesktop.UI
             Header.Bounds = new Point(bounds.X, 28);
 
             //ProjectLocationTitle.Bounds = new Point(300, 42);
-            ProjectLocationInputBox.Bounds = new Point(300, 42);
+            ProjectLocationInputBox.Bounds = new Point(376, 42);
             ProjectLocationSelectionButton.Bounds = new Point(42, 42);
 
             HostOption.Bounds = new Point(25, 25);

@@ -76,6 +76,9 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             HostIPInputBox.OutputLabel.FontColor = GlobalInterfaceData.Scheme.FontGrayedOutColor;
 
             JoinButton = new TextureButton(Group);
+            JoinButton.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.JoinButton];
+            JoinButton.HighlightTexture = GlobalInterfaceData.TextureLookup[UILookupKey.JoinButtonHighlight];
+            JoinButton.HighlightOnMouseOver = true;
             JoinButton.OnClickedEvent += Join;
         }
 

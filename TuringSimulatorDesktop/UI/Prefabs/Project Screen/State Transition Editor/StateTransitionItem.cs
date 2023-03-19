@@ -35,7 +35,13 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         public void SetProjectionMatrix(Matrix projectionMatrix, Matrix inverseProjectionMatrix)
         {
-
+            Background.SetProjectionMatrix(projectionMatrix, inverseProjectionMatrix);
+            Arrow.SetProjectionMatrix(projectionMatrix, inverseProjectionMatrix);
+            CurrentStateTextBox.SetProjectionMatrix(projectionMatrix, inverseProjectionMatrix);
+            TapeValueTextBox.SetProjectionMatrix(projectionMatrix, inverseProjectionMatrix);
+            NewStateTextBox.SetProjectionMatrix(projectionMatrix, inverseProjectionMatrix);
+            NewTapeValueTextBox.SetProjectionMatrix(projectionMatrix, inverseProjectionMatrix);
+            MoveDirectionTextBox.SetProjectionMatrix(projectionMatrix, inverseProjectionMatrix);
         }
 
         public bool IsActive { get; set; } = true;
@@ -54,11 +60,11 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Arrow = new Icon();
 
             CurrentStateTextBox = new InputBox(25, 20,group);
-
             TapeValueTextBox = new InputBox(25, 20, group);
             NewStateTextBox = new InputBox(25, 20, group);
             NewTapeValueTextBox = new InputBox(25, 20, group);
             MoveDirectionTextBox = new InputBox(25, 20, group);
+
             CurrentStateTextBox.EditEvent += EditBoxResize;
             TapeValueTextBox.EditEvent += EditBoxResize;
             NewStateTextBox.EditEvent += EditBoxResize;

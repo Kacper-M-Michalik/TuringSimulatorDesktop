@@ -13,7 +13,7 @@ using System.Text.Json.Serialization;
 
 namespace TuringSimulatorDesktop.UI.Prefabs
 {    
-    public class TextProgrammingView : IView, IPollable, IRunnable, ISaveable
+    public class TextProgrammingView : IView, IClickable, IPollable, IRunnable, ISaveable
     {
         Vector2 position;
         public Vector2 Position
@@ -44,8 +44,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             set
             {
                 isActive = value;
-                Group.IsActive = isActive;
-                TransitionCanvas.Group.IsActive = isActive;
+                Group.IsActive = value;
+                TransitionCanvas.IsActive = value;
             }
         }       
 
@@ -82,21 +82,20 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         DraggableCanvas TransitionCanvas;
 
-
-
         bool FullyLoadedFile;
         Guid CurrentlyOpenedFileID;
         int FileVersion;
         TransitionFile OpenedFile;
 
+        public IClosable OpenMenu;
 
         public TextProgrammingView(Guid FileToDisplay)
         {
             Group = InputManager.CreateActionGroup();
             Group.PollableObjects.Add(this);
+            Group.ClickableObjects.Add(this);
 
-
-            Background = new Icon(GlobalInterfaceData.Scheme.Background);
+            Background = new Icon(GlobalInterfaceData.Scheme.CanvasBackground);
 
             DefenitionAlphabetTitle = new Label();
             DefenitionAlphabetTitle.Text = "Defenition Alphabet ID:";
@@ -109,7 +108,6 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             HaltStateInputBox = new InputBox(Group);
 
             TransitionCanvas = new DraggableCanvas();
-
 
             IsActive = false;
 
@@ -191,22 +189,23 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             for (int i = 0; i < OpenedFile.Transitions.Count; i++)
             {
                 StateTransitionItem Item = new StateTransitionItem(TransitionCanvas.Group);
+                Item.Position = new Vector2(OpenedFile.Transitions[i].X, OpenedFile.Transitions[i].Y);
                 Item.CurrentStateTextBox.Text = OpenedFile.Transitions[i].CurrentState;
-                Item.TapeValueTextBox.Text = OpenedFile.Transitions[i].CurrentState;
-                Item.NewStateTextBox.Text = OpenedFile.Transitions[i].CurrentState;
-                Item.NewTapeValueTextBox.Text = OpenedFile.Transitions[i].CurrentState;
+                Item.TapeValueTextBox.Text = OpenedFile.Transitions[i].TapeValue;
+                Item.NewStateTextBox.Text = OpenedFile.Transitions[i].NewState;
+                Item.NewTapeValueTextBox.Text = OpenedFile.Transitions[i].NewTapeValue;
 
                 if (OpenedFile.Transitions[i].MoveDirection == MoveHeadDirection.Left)
                 {
-                    Item.CurrentStateTextBox.Text = "L";
+                    Item.MoveDirectionTextBox.Text = "L";
                 }
                 else if (OpenedFile.Transitions[i].MoveDirection == MoveHeadDirection.Right)
                 {
-                    Item.CurrentStateTextBox.Text = "R";
+                    Item.MoveDirectionTextBox.Text = "R";
                 }
                 else
                 {
-                    Item.CurrentStateTextBox.Text = "";
+                    Item.MoveDirectionTextBox.Text = "";
                 }
                 
                 TransitionCanvas.Elements.Add(Item);
@@ -281,11 +280,11 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 NewTransition.NewState = TransitionSource.NewStateTextBox.Text;
                 NewTransition.NewTapeValue = TransitionSource.NewTapeValueTextBox.Text;
 
-                if (TransitionSource.CurrentStateTextBox.Text == "L")
+                if (TransitionSource.MoveDirectionTextBox.Text.ToUpper() == "L")
                 {
                     NewTransition.MoveDirection = MoveHeadDirection.Left;
                 }
-                else if (TransitionSource.CurrentStateTextBox.Text == "R")
+                else if (TransitionSource.MoveDirectionTextBox.Text.ToUpper() == "R")
                 {
                     NewTransition.MoveDirection = MoveHeadDirection.Right;
                 }
@@ -298,6 +297,29 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             }
 
             Client.SendTCPData(ClientSendPacketFunctions.UpdateFile(CurrentlyOpenedFileID, FileVersion, JsonSerializer.SerializeToUtf8Bytes(NewFile, GlobalProjectAndUserData.JsonOptions)));
+        }
+
+        public void Clicked()
+        {
+            if (InputManager.RightMousePressed)
+            {
+                OpenMenu?.Close();
+                OpenMenu = new NodeCreationMenu(this);
+                OpenMenu.Position = new Vector2(InputManager.MouseData.X, InputManager.MouseData.Y);
+            }
+        }
+
+        public void ClickedAway()
+        {
+            OpenMenu?.Close();
+        }
+
+        public void AddNewTransition(Button Sender)
+        {
+            Matrix CanvasPos = TransitionCanvas.InverseMatrix * Matrix.CreateTranslation(OpenMenu.Position.X, OpenMenu.Position.Y, 0);
+            StateTransitionItem NewTransition = new StateTransitionItem(TransitionCanvas.Group);
+            NewTransition.Position = new Vector2(CanvasPos.Translation.X, CanvasPos.Translation.Y);
+            TransitionCanvas.Elements.Add(NewTransition);
         }
 
         void MoveLayout()
@@ -324,6 +346,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             Background.Bounds = bounds;
 
+            TransitionCanvas.Bounds = bounds;
+
             DefenitionAlphabetTitle.Bounds = new Point(70, 15);
             DefenitionAlphabetBox.Bounds = new Point(70, 15);
 
@@ -337,20 +361,24 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         {
             if (IsActive)
             {
-                Background.Draw(BoundPort); 
+                Background.Draw(BoundPort);
+
+                TransitionCanvas.Draw(BoundPort);
+
                 DefenitionAlphabetTitle.Draw(BoundPort);
                 DefenitionAlphabetBox.Draw(BoundPort);
 
                 HaltStatesTitle.Draw(BoundPort);
                 HaltStateInputBox.Draw(BoundPort);
 
+                OpenMenu?.Draw();
             }
         }
 
         public void Close()
         {
             TransitionCanvas.Close();
-            Group.IsMarkedForDeletion = true;
+            IsActive = false;
         }
     }
 }
