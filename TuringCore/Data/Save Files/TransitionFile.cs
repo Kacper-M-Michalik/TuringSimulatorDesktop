@@ -12,13 +12,13 @@ namespace TuringCore
     public class TransitionFile : CompilableFile
     {
         [JsonInclude]
-        public List<string> HaltStates;
+        public HashSet<string> HaltStates;
         [JsonInclude]
         public List<Transition> Transitions;
 
         public TransitionFile()
         {
-            HaltStates = new List<string>();
+            HaltStates = new HashSet<string>();
             Transitions = new List<Transition>();            
         }
 
@@ -28,9 +28,9 @@ namespace TuringCore
             //Table.ID = "NULL NAME";
             //Table.DefinitionAlphabet = DefinitionAlphabet;
 
-            for (int i = 0; i < HaltStates.Count; i++)
+            foreach (string HaltState in HaltStates)
             {
-                Table.AddHaltState(HaltStates[i]);
+                Table.AddHaltState(HaltState);
             }
 
             for (int i = 0; i < Transitions.Count; i++)
@@ -50,8 +50,8 @@ namespace TuringCore
                 }
 
                 InstructionVariant Variant = new InstructionVariant();
-                Variant.Actions.Add(new ChangeStateAction(Transitions[i].NewState));
-                Variant.Actions.Add(new WriteAction(Transitions[i].NewTapeValue));
+                if (Transitions[i].NewState != DefinitionAlphabet.WildcardCharacter) Variant.Actions.Add(new ChangeStateAction(Transitions[i].NewState));
+                if (Transitions[i].NewTapeValue != DefinitionAlphabet.WildcardCharacter) Variant.Actions.Add(new WriteAction(Transitions[i].NewTapeValue));
 
                 if (Transitions[i].MoveDirection == MoveHeadDirection.Left)
                 {

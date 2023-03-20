@@ -10,7 +10,7 @@ using TuringSimulatorDesktop.Input;
 
 namespace TuringSimulatorDesktop.UI.Prefabs
 {
-    public class StateTransitionItem: IVisualElement, ICanvasInteractable
+    public class StateTransitionItem: IVisualElement, ICanvasInteractable, IPollable
     {
         Vector2 position;
         public Vector2 Position
@@ -45,6 +45,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         }
 
         public bool IsActive { get; set; } = true;
+        public bool IsMarkedForDeletion { get; set; }
 
         public ColorButton Background;
         public InputBox CurrentStateTextBox;
@@ -52,23 +53,52 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         public InputBox NewStateTextBox;
         public InputBox NewTapeValueTextBox;
         public InputBox MoveDirectionTextBox;
-        public Icon Arrow;        
+        public Icon Arrow;
 
-        public StateTransitionItem(ActionGroup group)
+        TextProgrammingView ProgrammingView;
+
+        bool LeftClickedOnce = false;
+
+        Matrix Offset;
+
+        ActionGroup Group;
+
+        public StateTransitionItem(ActionGroup group, TextProgrammingView view)
         {
+            Group = group;
+            group.PollableObjects.Add(this);
+            ProgrammingView = view;
+
             Background = new ColorButton(group);
             Background.BaseColor = GlobalInterfaceData.Scheme.Background;
             Background.OnClickedEvent += Clicked;
             Background.OnClickedAwayEvent += ClickedAway;
+            Background.ClickListenType = ClickType.Both;
 
             Arrow = new Icon();
             Arrow.Bounds = new Point(37, 10);
+            Arrow.DrawTexture = GlobalInterfaceData.TextureLookup[UILookupKey.Arrow];
 
             CurrentStateTextBox = new InputBox(54, 34, group);
+            CurrentStateTextBox.OutputLabel.FontSize = 16;
+            CurrentStateTextBox.OutputLabel.DrawCentered = true;
+            CurrentStateTextBox.BackgroundColor = GlobalInterfaceData.Scheme.InteractableAccent;
             TapeValueTextBox = new InputBox(54, 34, group);
+            TapeValueTextBox.OutputLabel.FontSize = 16;
+            TapeValueTextBox.OutputLabel.DrawCentered = true;
+            TapeValueTextBox.BackgroundColor = GlobalInterfaceData.Scheme.InteractableAccent;
             NewStateTextBox = new InputBox(54, 34, group);
+            NewStateTextBox.OutputLabel.FontSize = 16;
+            NewStateTextBox.OutputLabel.DrawCentered = true;
+            NewStateTextBox.BackgroundColor = GlobalInterfaceData.Scheme.InteractableAccent;
             NewTapeValueTextBox = new InputBox(54, 34, group);
+            NewTapeValueTextBox.OutputLabel.FontSize = 16;
+            NewTapeValueTextBox.OutputLabel.DrawCentered = true;
+            NewTapeValueTextBox.BackgroundColor = GlobalInterfaceData.Scheme.InteractableAccent;
             MoveDirectionTextBox = new InputBox(54, 34, group);
+            MoveDirectionTextBox.OutputLabel.FontSize = 16;
+            MoveDirectionTextBox.OutputLabel.DrawCentered = true;
+            MoveDirectionTextBox.BackgroundColor = GlobalInterfaceData.Scheme.InteractableAccent;
 
             CurrentStateTextBox.EditEvent += EditBoxResize;
             TapeValueTextBox.EditEvent += EditBoxResize;
@@ -79,18 +109,39 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         public void Clicked(Button Sender)
         {
+            if (LeftClickedOnce)
+            {
+                ClickedAway(null);
+                return;
+            }
+
+            Offset = Matrix.CreateTranslation(position.X, position.Y, 0) - ProgrammingView.TransitionCanvas.InverseMatrix * Matrix.CreateTranslation(InputManager.MouseData.X, InputManager.MouseData.Y, 0);
+
             Background.BaseColor = GlobalInterfaceData.Scheme.DarkInteractableAccent;
+            ProgrammingView.TransitionCanvas.Draggable = false;
+
+            if (InputManager.RightMousePressed)
+            {
+                ProgrammingView.OpenNodeEditMenu(this);
+            }
+            else
+            {
+                LeftClickedOnce = true;
+            }
         }
         public void ClickedAway(Button Sender)
         {
+            LeftClickedOnce = false;
+            Offset = Matrix.CreateTranslation(0, 0, 0);
             Background.BaseColor = GlobalInterfaceData.Scheme.Background;
+            ProgrammingView.TransitionCanvas.Draggable = true;
         }
 
-        void EditBoxResize(InputBox Sender)
+        public void EditBoxResize(InputBox Sender)
         {
             if (Sender.OutputLabel.RichText.Size.X > Sender.Bounds.X)
             {
-                Sender.Bounds = new Point(Sender.OutputLabel.RichText.Size.X + 2, Sender.Bounds.Y);
+                Sender.Bounds = new Point(Sender.OutputLabel.RichText.Size.X + 4, Sender.Bounds.Y);
             }
 
             MoveLayout();
@@ -102,9 +153,9 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             CurrentStateTextBox.Position = position + new Vector2(12, 12);
             TapeValueTextBox.Position = CurrentStateTextBox.Position + new Vector2(CurrentStateTextBox.Bounds.X + 12, 0);
 
-            Arrow.Position = TapeValueTextBox.Position + new Vector2(TapeValueTextBox.Bounds.X + 9, 0);
+            Arrow.Position = new Vector2(TapeValueTextBox.Position.X + TapeValueTextBox.Bounds.X + 9, position.Y + 23);
 
-            NewStateTextBox.Position = Arrow.Position + new Vector2(Arrow.Bounds.X + 9, 0);
+            NewStateTextBox.Position = new Vector2(Arrow.Position.X + Arrow.Bounds.X + 9, TapeValueTextBox.Position.Y);
             NewTapeValueTextBox.Position = NewStateTextBox.Position + new Vector2(NewStateTextBox.Bounds.X + 12, 0);
             MoveDirectionTextBox.Position = NewTapeValueTextBox.Position + new Vector2(NewTapeValueTextBox.Bounds.X + 12, 0);
 
@@ -124,5 +175,25 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             MoveDirectionTextBox.Draw(BoundPort);
         }
 
+        public void PollInput(bool IsInActionGroupFrame)
+        {
+            if (IsInActionGroupFrame && LeftClickedOnce)
+            {
+                ProgrammingView.MoveTansition(this, Offset);
+            }
+        }
+
+        public void Close()
+        {
+            IsMarkedForDeletion = true;
+            IsActive = false;
+
+            Background.Close();
+            CurrentStateTextBox.Close();
+            TapeValueTextBox.Close();
+            NewTapeValueTextBox.Close();
+            NewStateTextBox.Close();
+            MoveDirectionTextBox.Close();
+        }
     }
 }

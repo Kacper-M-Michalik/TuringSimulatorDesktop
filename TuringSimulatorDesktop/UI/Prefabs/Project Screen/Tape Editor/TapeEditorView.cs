@@ -42,6 +42,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             {
                 isActive = value;
                 Canvas.IsActive = value;
+                
             }
         }
 

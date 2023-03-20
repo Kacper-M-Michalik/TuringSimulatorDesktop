@@ -95,7 +95,7 @@ namespace TuringSimulatorDesktop.UI
             AppTitle.DrawCentered = true;
 
             ToolbarLayout = new HorizontalLayoutBox();
-            ToolbarLayout.Spacing = 0;
+            ToolbarLayout.Spacing = 5;
 
             UndoButton = new TextureButton(Group);
             UndoButton.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.UndoIcon];

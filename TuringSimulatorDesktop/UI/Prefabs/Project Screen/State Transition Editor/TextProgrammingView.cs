@@ -13,7 +13,7 @@ using System.Text.Json.Serialization;
 
 namespace TuringSimulatorDesktop.UI.Prefabs
 {    
-    public class TextProgrammingView : IView, IClickable, IPollable, IRunnable, ISaveable
+    public class TextProgrammingView : IView, IPollable, IRunnable, ISaveable
     {
         Vector2 position;
         public Vector2 Position
@@ -80,7 +80,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         Label HaltStatesTitle;
         InputBox HaltStateInputBox;
 
-        DraggableCanvas TransitionCanvas;
+        public DraggableCanvas TransitionCanvas;
 
         bool FullyLoadedFile;
         Guid CurrentlyOpenedFileID;
@@ -92,10 +92,12 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         public TextProgrammingView(Guid FileToDisplay)
         {
             TransitionCanvas = new DraggableCanvas();
+            TransitionCanvas.OnClickedEvent += Clicked;
+            TransitionCanvas.OnClickedAwayEvent += ClickedAway;
 
             Group = InputManager.CreateActionGroup();
             Group.PollableObjects.Add(this);
-            Group.ClickableObjects.Add(this);
+            //Group.ClickableObjects.Add(this);
 
             Background = new Icon(GlobalInterfaceData.Scheme.CanvasBackground);
 
@@ -108,6 +110,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             HaltStatesTitle.Text = "Halt States:";
 
             HaltStateInputBox = new InputBox(Group);
+            HaltStateInputBox.BackgroundColor = GlobalInterfaceData.Scheme.Background;
 
 
             IsActive = false;
@@ -189,12 +192,16 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             for (int i = 0; i < OpenedFile.Transitions.Count; i++)
             {
-                StateTransitionItem Item = new StateTransitionItem(TransitionCanvas.Group);
+                StateTransitionItem Item = new StateTransitionItem(TransitionCanvas.Group, this);
                 Item.Position = new Vector2(OpenedFile.Transitions[i].X, OpenedFile.Transitions[i].Y);
                 Item.CurrentStateTextBox.Text = OpenedFile.Transitions[i].CurrentState;
+                Item.EditBoxResize(Item.CurrentStateTextBox);
                 Item.TapeValueTextBox.Text = OpenedFile.Transitions[i].TapeValue;
+                Item.EditBoxResize(Item.TapeValueTextBox);
                 Item.NewStateTextBox.Text = OpenedFile.Transitions[i].NewState;
+                Item.EditBoxResize(Item.NewStateTextBox);
                 Item.NewTapeValueTextBox.Text = OpenedFile.Transitions[i].NewTapeValue;
+                Item.EditBoxResize(Item.NewTapeValueTextBox);
 
                 if (OpenedFile.Transitions[i].MoveDirection == MoveHeadDirection.Left)
                 {
@@ -211,6 +218,14 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 
                 TransitionCanvas.Elements.Add(Item);
             }
+
+            StringBuilder Builder = new StringBuilder();
+            foreach (string HaltState in OpenedFile.HaltStates)
+            {
+                Builder.Append(HaltState);
+                Builder.Append("/n");
+            }
+            HaltStateInputBox.Text = Builder.ToString();
 
             TransitionCanvas.ApplyMatrices();
         }
@@ -236,8 +251,11 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             string AlphabetFileName = Message.Name;
             int AlphabetFileVersion = Message.Version;
 
-            DefenitionAlphabetBox.ReferenceFileData = new FileData(AlphabetFileName, AlphabetID, CoreFileType.Alphabet);
-            DefenitionAlphabetBox.FileLabel.Text = AlphabetFileName;
+            DefenitionAlphabetBox.ChangeAlphabet(new FileData(AlphabetFileName, AlphabetID, CoreFileType.Alphabet));
+
+
+         //   DefenitionAlphabetBox.FileLabel.Text = AlphabetFileName;
+           // DefenitionAlphabetBox.Bounds = new Point(DefenitionAlphabetBox.FileLabel.RichText.Size.X + 4 , 15);
 
             //may have to move back 
             FullyLoadedFile = true;
@@ -261,7 +279,12 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 NewFile.DefinitionAlphabetFileID = Guid.Empty;
             }
 
-            NewFile.HaltStates.AddRange(HaltStateInputBox.Text.Split("/n"));
+            string[] HaltStates = HaltStateInputBox.Text.Split("/n");
+
+            for (int i = 0; i < HaltStates.Length; i++)
+            {
+                NewFile.HaltStates.Add(HaltStates[i]);
+            }
 
             //for (int i = 0; i < HaltStateInputBoxes.Count; i++)
             //{
@@ -300,7 +323,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Client.SendTCPData(ClientSendPacketFunctions.UpdateFile(CurrentlyOpenedFileID, FileVersion, JsonSerializer.SerializeToUtf8Bytes(NewFile, GlobalProjectAndUserData.JsonOptions)));
         }
 
-        public void Clicked()
+        public void Clicked(DraggableCanvas Sender)
         {
             if (InputManager.RightMousePressed)
             {
@@ -310,7 +333,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             }
         }
 
-        public void ClickedAway()
+        public void ClickedAway(DraggableCanvas Sender)
         {
             OpenMenu?.Close();
         }
@@ -318,9 +341,46 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         public void AddNewTransition(Button Sender)
         {
             Matrix CanvasPos = TransitionCanvas.InverseMatrix * Matrix.CreateTranslation(OpenMenu.Position.X, OpenMenu.Position.Y, 0);
-            StateTransitionItem NewTransition = new StateTransitionItem(TransitionCanvas.Group);
+            StateTransitionItem NewTransition = new StateTransitionItem(TransitionCanvas.Group, this);
             NewTransition.Position = new Vector2(CanvasPos.Translation.X, CanvasPos.Translation.Y);
             TransitionCanvas.Elements.Add(NewTransition);
+            OpenMenu?.Close();
+        }
+
+        public void OpenNodeEditMenu(StateTransitionItem Node)
+        {
+            OpenMenu?.Close();
+            OpenMenu = new NodeEditMenu(this, Node);
+            OpenMenu.Position = new Vector2(InputManager.MouseData.X, InputManager.MouseData.Y);
+        }
+
+        public void CloneTransition(StateTransitionItem Item)
+        {
+            Matrix CanvasPos = TransitionCanvas.InverseMatrix * Matrix.CreateTranslation(OpenMenu.Position.X, OpenMenu.Position.Y, 0);
+            StateTransitionItem NewTransition = new StateTransitionItem(TransitionCanvas.Group, this);
+            NewTransition.CurrentStateTextBox.Text = Item.CurrentStateTextBox.Text;
+            NewTransition.TapeValueTextBox.Text = Item.TapeValueTextBox.Text;
+            NewTransition.NewTapeValueTextBox.Text = Item.NewTapeValueTextBox.Text;
+            NewTransition.NewStateTextBox.Text = Item.NewStateTextBox.Text;
+            NewTransition.MoveDirectionTextBox.Text = Item.MoveDirectionTextBox.Text;
+            NewTransition.Position = new Vector2(CanvasPos.Translation.X, CanvasPos.Translation.Y);
+            TransitionCanvas.Elements.Add(NewTransition);
+            OpenMenu?.Close();
+        }
+
+        public void DeleteTransition(StateTransitionItem Item)
+        {
+            TransitionCanvas.Elements.Remove(Item);
+            Item.Close();
+            TransitionCanvas.Group.IsDirtyPollable = true;
+            TransitionCanvas.Group.IsDirtyClickable = true;
+            OpenMenu?.Close();
+        }
+
+        public void  MoveTansition(StateTransitionItem Item, Matrix Offset)
+        {
+            Matrix CanvasPos = TransitionCanvas.InverseMatrix * Matrix.CreateTranslation(InputManager.MouseData.X, InputManager.MouseData.Y, 0);
+            Item.Position = new Vector2(CanvasPos.Translation.X + Offset.Translation.X, CanvasPos.Translation.Y + Offset.Translation.Y);
         }
 
         void MoveLayout()
@@ -349,12 +409,12 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             TransitionCanvas.Bounds = bounds;
 
-            DefenitionAlphabetTitle.Bounds = new Point(70, 15);
-            DefenitionAlphabetBox.Bounds = new Point(70, 15);
+            //DefenitionAlphabetTitle.Bounds = new Point(70, 15);
+            //DefenitionAlphabetBox.Bounds = new Point(70, 15);
 
-            HaltStatesTitle.Bounds = new Point(70, 15);
+            //HaltStatesTitle.Bounds = new Point(70, 15);
             //HaltStatesLayout.Bounds = new Point(45, 80);
-            HaltStateInputBox.Bounds = new Point(70, 80);
+            HaltStateInputBox.Bounds = new Point(120, 90);
         
         }
 

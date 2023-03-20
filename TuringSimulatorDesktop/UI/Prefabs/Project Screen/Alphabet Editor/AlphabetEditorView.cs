@@ -68,7 +68,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         InputBox EmptyCharacterInputBox;
         InputBox WildcardCharacterInputBox;
 
-        AlphabetCharacterInputItem CharacterInputItem;
+        InputBox CharacterInputItem;
 
         bool FullyLoadedFile;
         Guid CurrentlyOpenedFileID;
@@ -118,7 +118,9 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             AllowedCharactersTitle.FontColor = GlobalInterfaceData.Scheme.FontGrayedOutColor;
             AllowedCharactersTitle.Text = "Allowed Characters";
 
-            CharacterInputItem = new AlphabetCharacterInputItem(Group);
+            CharacterInputItem = new InputBox(Group);
+            CharacterInputItem.BackgroundColor = GlobalInterfaceData.Scheme.InteractableAccent;
+
 
             IsActive = false;
 
@@ -165,13 +167,13 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             EmptyCharacterInputBox.Text = OpenedFile.EmptyCharacter;
             WildcardCharacterInputBox.Text = OpenedFile.WildcardCharacter;
 
-            CharacterInputItem.Reset();
             StringBuilder Builder = new StringBuilder();
             foreach (string Character in OpenedFile.Characters)
             {
-                CharacterInputItem.AddNewTextBox(Character);
+                Builder.Append(Character);
+                Builder.Append("/n");
             }
-
+            CharacterInputItem.Text = Builder.ToString();
             FullyLoadedFile = true;
         }
 
@@ -187,10 +189,14 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             NewAlphabet.WildcardCharacter = WildcardCharacterInputBox.Text;
 
             HashSet<string> AllowedCharacters = new HashSet<string>();
-            for (int i = 0; i < CharacterInputItem.InputBoxes.Count; i++)
+
+            string[] Symbols = CharacterInputItem.Text.Split("/n");
+            for (int i = 0; i < Symbols.Length; i++)
             {
-                AllowedCharacters.Add(CharacterInputItem.InputBoxes[i].Text);
+                AllowedCharacters.Add(Symbols[i]);
             }
+            AllowedCharacters.Add(EmptyCharacterInputBox.Text);
+            AllowedCharacters.Add(WildcardCharacterInputBox.Text);
 
             NewAlphabet.Characters = AllowedCharacters;
 
@@ -212,7 +218,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
 
             AllowedCharactersTitle.Position = position + GlobalInterfaceData.Scale(new Vector2(185, 18));
-            CharacterInputItem.Position = position + GlobalInterfaceData.Scale(new Vector2(200, 20));
+            CharacterInputItem.Position = position + GlobalInterfaceData.Scale(new Vector2(183, 30));
         }
 
         void ResizeLayout()
@@ -226,13 +232,6 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             WildcardCharacterInputBox.Bounds = GlobalInterfaceData.Scale(new Point(120, 30));
             CharacterInputItem.Bounds = GlobalInterfaceData.Scale(new Point(300, 500));
         }
-
-        /*
-            AllowedCharactersInputBox = new InputBox(Group);
-            AllowedCharactersInputBox.OutputLabel.FontSize = GlobalInterfaceData.Scale(12);
-            AllowedCharactersInputBox.OutputLabel.FontColor = GlobalInterfaceData.Scheme.FontColor;
-            AllowedCharactersInputBox.OutputLabel.Text = "-";
-        */
 
         public void Draw(Viewport? BoundPort = null)
         {

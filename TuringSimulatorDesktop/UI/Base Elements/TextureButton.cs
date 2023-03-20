@@ -6,7 +6,7 @@ using TuringSimulatorDesktop.Input;
 
 namespace TuringSimulatorDesktop.UI
 {
-    public enum ClickType { Left, Right };
+    public enum ClickType { Left, Right, Both };
 
     public class TextureButton : Button, IVisualElement, IClickable, IPollable
     {
@@ -79,7 +79,7 @@ namespace TuringSimulatorDesktop.UI
 
         void IClickable.Clicked()
         {
-            if ((ClickListenType == ClickType.Left && InputManager.LeftMousePressed) || (ClickListenType == ClickType.Right && InputManager.RightMousePressed)) 
+            if ((ClickListenType == ClickType.Both) || (ClickListenType == ClickType.Left && InputManager.LeftMousePressed) || (ClickListenType == ClickType.Right && InputManager.RightMousePressed)) 
                 OnClickedEvent?.Invoke(this);
         }
 

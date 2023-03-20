@@ -53,7 +53,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             BackgroundButton.HighlightOnMouseOver = true;
             BackgroundButton.OnClickedEvent += view.Run;
 
-            RunIcon = new Icon(GlobalInterfaceData.TextureLookup[UILookupKey.RunIcon]);
+            RunIcon = new Icon(GlobalInterfaceData.TextureLookup[UILookupKey.Run]);
 
             CurrentFileTitle = new Label();
             CurrentFileTitle.FontSize = 12;
@@ -76,16 +76,16 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         {
             BackgroundButton.Position = Position;
 
-            RunIcon.Position = Position + GlobalInterfaceData.Scale(new Vector2(10, 10));
+            RunIcon.Position = Position + GlobalInterfaceData.Scale(new Vector2(4, 3.5f));
 
-            CurrentFileTitle.Position = Position + GlobalInterfaceData.Scale(new Vector2(15, 17));
+            CurrentFileTitle.Position = Position + GlobalInterfaceData.Scale(new Vector2(20, 10));
         }
 
         public void ResizeLayout()
         {
             BackgroundButton.Bounds = bounds;
 
-            RunIcon.Bounds = GlobalInterfaceData.Scale(new Point(20, 20));
+            RunIcon.Bounds = GlobalInterfaceData.Scale(new Point(13, 13));
 
             float FontSize = GlobalInterfaceData.Scale(12);
             CurrentFileTitle.FontSize = FontSize;

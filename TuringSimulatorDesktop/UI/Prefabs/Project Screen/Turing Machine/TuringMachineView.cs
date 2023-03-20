@@ -107,16 +107,19 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         bool IsAutoStepActive;
         double TimeLeftToNextStep;
-        const double BaseTimeBetweenSteps = 1000;
+        const double BaseTimeBetweenSteps = 800;
         double TimeBetweenStepsMS;
 
 
 
         public TuringMachineView(Guid FileToDisplay)
         {
-            Group = InputManager.CreateActionGroup();
+            Canvas = new DraggableCanvas();
+            VisualTape = new TapeVisualItem(Canvas.Group);
+
             Background = new Icon(GlobalInterfaceData.Scheme.Background);
 
+            Group = InputManager.CreateActionGroup();
             Group.ClickableObjects.Add(this);
             Group.PollableObjects.Add(this);
 
@@ -138,7 +141,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             CurrentTapeLabel = new Label();
             CurrentTapeLabel.FontSize = 20;
             CurrentTapeLabel.FontColor = GlobalInterfaceData.Scheme.FontColor;
-            CurrentTapeLabel.Text = "NONE";
+            CurrentTapeLabel.Text = "DEFAULT";
 
 
             StartStateTitle = new Label();
@@ -225,14 +228,11 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             ControlBox2.AddElement(RestartButton);
             ControlBox2.AddElement(StepButton);
 
-            Canvas = new DraggableCanvas();
-
             CurrentStateLabel = new Label();
             CurrentStateLabel.FontSize = 48;
             CurrentStateLabel.FontColor = GlobalInterfaceData.Scheme.FontColor;
             CurrentStateLabel.Text = "TEST";
 
-            VisualTape = new TapeVisualItem(Canvas.Group);
 
             ReadHead = new Icon();
             ReadHead.DrawTexture = GlobalInterfaceData.TextureLookup[UILookupKey.Header];
@@ -492,6 +492,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         public void Execute(Button Sender)
         {
+            if (Machine.ReachedHaltState) return;
+
             if (StartMachine() != 0) return;
             //need to add limit of steps
             while (Machine.IsActive) Machine.StepProgram();
@@ -499,6 +501,12 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         }
         public void Step(Button Sender)
         {
+            if (Machine.ReachedHaltState)
+            {
+                IsAutoStepActive = false;
+                return;
+            }
+
             if (Machine.IsActive)
             {
                 Machine.StepProgram();
@@ -507,7 +515,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             {
                 if (StartMachine() != 0) return;
             }
-            UpdateUI();
+            UpdateUI();            
         }
         public void Restart(Button Sender)
         {

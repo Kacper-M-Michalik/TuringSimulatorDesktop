@@ -10,6 +10,7 @@ namespace TuringCore
         const string HaltError = "HALT-ERROR";
 
         public bool IsActive { get; private set; } = false;
+        public bool ReachedHaltState { get; private set; } = false;
         public string CurrentState { get; set; } = "Null";
         public int HeadPosition { get; set; } = 0;
         public InstructionVariant NextInstruction { get; private set; } = null;
@@ -64,6 +65,7 @@ namespace TuringCore
 
             if (CurrentState == HaltError || ActiveStateTable.IsHaltState(CurrentState))
             {
+                ReachedHaltState = true;
                 IsActive = false;
                 return;
             }
@@ -90,11 +92,13 @@ namespace TuringCore
                 }
                 else
                 {
+                    ReachedHaltState = true;
                     CurrentState = HaltError;
                 }
             }
             else
             {
+                ReachedHaltState = true;
                 CurrentState = HaltError;
             }
         }
@@ -116,6 +120,7 @@ namespace TuringCore
 
         public void ShallowClear()
         {
+            ReachedHaltState = false;
             IsActive = false;
             CurrentState = "Null";
             HeadPosition = 0;

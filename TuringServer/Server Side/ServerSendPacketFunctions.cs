@@ -106,7 +106,7 @@ namespace TuringServer
             List<FolderDataMessage> ParentFolders = new List<FolderDataMessage>();
             while (CurrentFolder.ParentFolder != null)
             {
-                ParentFolders.Add(new FolderDataMessage() { ID = CurrentFolder.ID, Name = CurrentFolder.Name });
+                ParentFolders.Add(new FolderDataMessage() { ID = CurrentFolder.ParentFolder.ID, Name = CurrentFolder.ParentFolder.Name });
                 CurrentFolder = CurrentFolder.ParentFolder;
             }
 

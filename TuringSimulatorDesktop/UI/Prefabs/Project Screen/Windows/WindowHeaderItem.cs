@@ -75,7 +75,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             CloseButton.OnClickedEvent += Remove;
             CloseButton.IsActive = false;
 
-            Bounds = new Point(52 + Title.Bounds.X, 26);
+            Bounds = new Point(48 + Title.Bounds.X, 26);
         }
 
         public void Select()
@@ -119,7 +119,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             if (View.Title != Title.Text)
             {
                 Title.Text = View.Title;
-                Bounds = new Point(52 + Title.Bounds.X, 26);
+                Bounds = new Point(48 + Title.Bounds.X, 26);
                 OwnerWindow.UpdateHeader();
             }
 

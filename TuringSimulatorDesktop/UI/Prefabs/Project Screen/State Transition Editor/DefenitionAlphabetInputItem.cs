@@ -47,13 +47,21 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         {
             group.ClickableObjects.Add(this);
 
-            Background = new Icon(GlobalInterfaceData.Scheme.InteractableAccent);
+            Background = new Icon(GlobalInterfaceData.Scheme.Background);
 
             FileLabel = new Label();
             FileLabel.FontColor = GlobalInterfaceData.Scheme.FontColor;
             FileLabel.Font = GlobalInterfaceData.StandardRegularFont;
             FileLabel.FontSize = GlobalInterfaceData.Scale(12);
             FileLabel.Text = "No Referenced Alphabet";
+            Bounds = new Point(FileLabel.Bounds.X + 4, 16);
+        }
+
+        public void ChangeAlphabet(FileData AlphabetFile)
+        {
+            ReferenceFileData = AlphabetFile;
+            FileLabel.Text = AlphabetFile.Name;
+            Background.Bounds = new Point(FileLabel.Bounds.X + 4, 16);
         }
 
         public void Clicked()
@@ -75,19 +83,19 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             FileData Data = InputManager.DragData as FileData;
             if (Data != null && Data.Type == TuringCore.CoreFileType.Alphabet)
             {
-                ReferenceFileData = Data;
-                FileLabel.Text = ReferenceFileData.Name;
+                ChangeAlphabet(Data);
             }
         }
        
         void MoveLayout()
         {
             Background.Position = Position;
-            FileLabel.Position = Position + GlobalInterfaceData.Scale(new Vector2(0, bounds.Y / 2f));
+            FileLabel.Position = Position + GlobalInterfaceData.Scale(new Vector2(2, bounds.Y * 0.5f));
         }
 
         void ResizeLayout()
         {
+            //FileLabel.Bounds = bounds;
             Background.Bounds = bounds;
         }
 

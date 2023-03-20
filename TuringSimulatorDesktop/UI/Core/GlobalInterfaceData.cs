@@ -47,10 +47,10 @@ namespace TuringSimulatorDesktop
         public static Texture2D SVGToTexture(string Path)
         {
             SvgDocument svgDoc = SvgDocument.Open<SvgDocument>(Path, null);
-            Bitmap Image = svgDoc.Draw(UIUtils.ConvertFloatToMinInt(svgDoc.Width.Value * (float)UIScale, 1f), UIUtils.ConvertFloatToMinInt(svgDoc.Width.Value * (float)UIScale, 1f));
+            Bitmap Image = svgDoc.Draw(UIUtils.ConvertFloatToMinInt(svgDoc.Width.Value * (float)UIScale, 1f), UIUtils.ConvertFloatToMinInt(svgDoc.Height.Value * (float)UIScale, 1f));
             int bufferSize = Image.Height * Image.Width * 4;
             System.IO.MemoryStream memoryStream = new MemoryStream(bufferSize);
-            Image.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Png);
+            Image.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Bmp);
 
             Texture2D Texture = Texture2D.FromStream(Device, memoryStream);
             return Texture;
@@ -287,8 +287,12 @@ namespace TuringSimulatorDesktop
         SaveIcon,
 
         Header,
+        
+        Arrow,
+        ArrowIcon,
 
         //
+        Run,
         RunIcon,
         AlphabetIcon,
         FolderIcon,

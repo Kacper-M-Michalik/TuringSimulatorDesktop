@@ -141,7 +141,7 @@ namespace TuringSimulatorDesktop.UI
                         }
                         break;
                     default:                        
-                        if ((char.IsNumber(Args.Character) && Modifiers.AllowsNumbers) || (char.IsLetter(Args.Character) && Modifiers.AllowsCharacters) || (char.IsSymbol(Args.Character) && Modifiers.AllowsSymbols)) Builder.Append(Args.Character);
+                        if ((char.IsNumber(Args.Character) && Modifiers.AllowsNumbers) || ((char.IsLetter(Args.Character) || char.IsPunctuation(Args.Character)) && Modifiers.AllowsCharacters) || (char.IsSymbol(Args.Character) && Modifiers.AllowsSymbols)) Builder.Append(Args.Character);
                         break;
                 }
 

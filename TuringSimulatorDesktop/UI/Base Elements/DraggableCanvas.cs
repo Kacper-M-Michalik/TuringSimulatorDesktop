@@ -9,7 +9,10 @@ using TuringSimulatorDesktop.Input;
 
 namespace TuringSimulatorDesktop.UI
 {
-    public class DraggableCanvas : IVisualElement, IPollable
+    public delegate void OnCanvasClick(DraggableCanvas Sender);
+    public delegate void OnCanvasClickAway(DraggableCanvas Sender);
+
+    public class DraggableCanvas : IVisualElement, IPollable, IClickable
     {
         Vector2 position;
         public Vector2 Position
@@ -44,6 +47,7 @@ namespace TuringSimulatorDesktop.UI
                 {
                     Elements[i].IsActive = value;
                 }
+                Group.IsActive = value;
             }        
         }
 
@@ -56,21 +60,27 @@ namespace TuringSimulatorDesktop.UI
         public float DragFactor = 1f;
         public float ZoomFactor = 0.1f;
         public bool DrawBounded = true;
+        public bool ActiveDuringDataDragDrop;
 
         Vector3 Offset;
         float Zoom = 1f;
         public Matrix OffsetMatrix;
         public Matrix ZoomMatrix;
         public Matrix InverseMatrix;
+        public Matrix ResultMatrix;
 
         public Matrix PositionMatrix;
 
         public List<ICanvasInteractable> Elements;
 
+        public event OnCanvasClick OnClickedEvent;
+        public event OnCanvasClickAway OnClickedAwayEvent;
+
         public DraggableCanvas()
         {
             Group = InputManager.CreateActionGroup();
             Group.PollableObjects.Add(this);
+            Group.ClickableObjects.Add(this);
 
 
             Elements = new List<ICanvasInteractable>();
@@ -94,6 +104,8 @@ namespace TuringSimulatorDesktop.UI
         {
             if (IsInActionGroupFrame && Draggable && IsMouseOver())
             {
+                if (!ActiveDuringDataDragDrop && InputManager.DragData != null) return;
+
                 if (InputManager.MouseData.LeftButton == Microsoft.Xna.Framework.Input.ButtonState.Pressed)
                 {
                     Offset.X += (float)InputManager.MouseDeltaX * DragFactor;
@@ -122,7 +134,7 @@ namespace TuringSimulatorDesktop.UI
 
         public void ApplyMatrices()
         {
-            Matrix ResultMatrix = PositionMatrix * OffsetMatrix * ZoomMatrix;
+            ResultMatrix = PositionMatrix * OffsetMatrix * ZoomMatrix;
             InverseMatrix = Matrix.Invert(ResultMatrix);
 
             foreach (ICanvasInteractable InteractableItem in Elements)
@@ -170,7 +182,10 @@ namespace TuringSimulatorDesktop.UI
             Group.IsDirtyPollable = true;
             for (int i = 0; i < Group.ClickableObjects.Count; i++)
             {
-                Group.ClickableObjects[i].IsMarkedForDeletion = true;
+                if (Group.ClickableObjects[i] != this)
+                {
+                    Group.ClickableObjects[i].IsMarkedForDeletion = true;
+                }
             }
             for (int i = 0; i < Group.PollableObjects.Count; i++)
             {
@@ -186,6 +201,16 @@ namespace TuringSimulatorDesktop.UI
         {
             Group.IsMarkedForDeletion = true;
             IsMarkedForDeletion = true;
+        }
+
+        public void Clicked()
+        {
+            OnClickedEvent?.Invoke(this);
+        }
+
+        public void ClickedAway()
+        {
+            OnClickedAwayEvent?.Invoke(this);
         }
     }
 }

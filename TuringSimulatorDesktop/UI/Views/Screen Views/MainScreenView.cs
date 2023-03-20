@@ -56,8 +56,8 @@ namespace TuringSimulatorDesktop.UI
             CreateButton.OnClickedEvent += CreateNewProject;
 
             Icon CreateIcon = new Icon();
-            CreateIcon.Bounds = new Point();
-            CreateIcon.Position = new Vector2();
+            CreateIcon.Bounds = new Point(26, 29);
+            CreateIcon.DrawTexture = GlobalInterfaceData.TextureLookup[UILookupKey.AlphabetIcon];
 
             Label CreateLabel = new Label();
             CreateLabel.DrawCentered = true;
@@ -70,6 +70,7 @@ namespace TuringSimulatorDesktop.UI
             NewProjectButton.AddElement(CreateIcon);
             NewProjectButton.AddElement(CreateLabel);
 
+            NewProjectButton.Offsets[1] = new Vector2(18, 15);
             NewProjectButton.Offsets[2] = new Vector2(0, CreateButton.Bounds.Y * 0.5f);
             NewProjectButton.Position = new Vector2(14, 50);
 
@@ -84,7 +85,8 @@ namespace TuringSimulatorDesktop.UI
             LoadButton.OnClickedEvent += LoadProject;
 
             Icon LoadIcon = new Icon();
-            LoadIcon.Bounds = new Point();
+            LoadIcon.Bounds = new Point(30, 27);
+            LoadIcon.DrawTexture = GlobalInterfaceData.TextureLookup[UILookupKey.LoadIcon];
             LoadIcon.Position = new Vector2();
 
             Label LoadLabel = new Label();
@@ -98,6 +100,7 @@ namespace TuringSimulatorDesktop.UI
             LoadProjectButton.AddElement(LoadIcon);
             LoadProjectButton.AddElement(LoadLabel);
 
+            LoadProjectButton.Offsets[1] = new Vector2(16, 17);
             LoadProjectButton.Offsets[2] = new Vector2(0, LoadButton.Bounds.Y * 0.5f);
             LoadProjectButton.Position = new Vector2(14, 126);
 
@@ -115,7 +118,6 @@ namespace TuringSimulatorDesktop.UI
             Icon JoinIcon = new Icon();
             JoinIcon.DrawTexture = GlobalInterfaceData.TextureLookup[UILookupKey.ConnectIcon];
             JoinIcon.Bounds = new Point(12, 28);
-            JoinIcon.Position = new Vector2(25, 16);
 
             Label JoinLabel = new Label();
             JoinLabel.DrawCentered = true;
@@ -128,6 +130,7 @@ namespace TuringSimulatorDesktop.UI
             JoinProjectButton.AddElement(JoinIcon);
             JoinProjectButton.AddElement(JoinLabel);
 
+            JoinProjectButton.Offsets[1] = new Vector2(25, 16);
             JoinProjectButton.Offsets[2] = new Vector2(0, JoinButton.Bounds.Y * 0.5f);
             JoinProjectButton.Position = new Vector2(14, 202);
 

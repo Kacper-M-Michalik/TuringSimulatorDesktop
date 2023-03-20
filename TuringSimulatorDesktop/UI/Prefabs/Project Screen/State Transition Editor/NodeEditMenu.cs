@@ -57,8 +57,11 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         TextProgrammingView Editor;
 
-        public NodeEditMenu(TextProgrammingView editor)
+        StateTransitionItem CurrentNode;
+
+        public NodeEditMenu(TextProgrammingView editor, StateTransitionItem Node)
         {
+            CurrentNode = Node;
             Editor = editor;
             Group = InputManager.CreateActionGroup();
 
@@ -68,11 +71,13 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             DeleteNodeButton.BaseColor = GlobalInterfaceData.Scheme.InteractableAccent;
             DeleteNodeButton.HighlightColor = GlobalInterfaceData.Scheme.DarkInteractableAccent;
             DeleteNodeButton.HighlightOnMouseOver = true;
+            DeleteNodeButton.OnClickedEvent += Delete;
 
             CloneNodeButton = new ColorButton(Group);
             CloneNodeButton.BaseColor = GlobalInterfaceData.Scheme.InteractableAccent;
             CloneNodeButton.HighlightColor = GlobalInterfaceData.Scheme.DarkInteractableAccent;
             CloneNodeButton.HighlightOnMouseOver = true;
+            CloneNodeButton.OnClickedEvent += Clone;
 
             DeleteNodeLabel = new Label();
             DeleteNodeLabel.FontSize = 12;
@@ -98,10 +103,20 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             CreateTransitionLabel.Text = "Create Transition";
 
 
-            bounds = GlobalInterfaceData.Scale(new Point(225, 181));
+            bounds = GlobalInterfaceData.Scale(new Point(225, 83));
             ResizeLayout();
             Position = Vector2.Zero;
         }
+
+        public void Delete(Button Sender)
+        {
+            Editor.DeleteTransition(CurrentNode);
+        }
+        public void Clone(Button Sender)
+        {
+            Editor.CloneTransition(CurrentNode);
+        }
+
 
         void MoveLayout()
         {
@@ -110,15 +125,15 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             Background.Position = Position;
 
-            DeleteNodeButton.Position = Position + GlobalInterfaceData.Scale(new Vector2(0, 29));
+            DeleteNodeButton.Position = Position + GlobalInterfaceData.Scale(new Vector2(0, 5));
             DeleteNodeLabel.Position = Position + new Vector2(30, 16);
-            CloneNodeButton.Position = Position + GlobalInterfaceData.Scale(new Vector2(0, 5));
+            CloneNodeButton.Position = Position + GlobalInterfaceData.Scale(new Vector2(0, 29));
             CloneNodeLabel.Position = Position + new Vector2(30, 40);
 
             Divider1.Position = Position + GlobalInterfaceData.Scale(new Vector2(0, 54));
 
             CreateTransitionButton.Position = Position + GlobalInterfaceData.Scale(new Vector2(0, 55));
-            CreateTransitionLabel.Position = Position + GlobalInterfaceData.Scale(new Vector2(30, 91));
+            CreateTransitionLabel.Position = Position + GlobalInterfaceData.Scale(new Vector2(30, 66));
         }
 
         void ResizeLayout()
@@ -132,6 +147,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             CloneNodeButton.Bounds = GlobalInterfaceData.Scale(new Point(225, 24));
             DeleteNodeButton.Bounds = GlobalInterfaceData.Scale(new Point(225, 24));
+            CreateTransitionButton.Bounds = GlobalInterfaceData.Scale(new Point(225, 24));
 
             float FontSize = GlobalInterfaceData.Scale(12);
             DeleteNodeLabel.FontSize = FontSize;
