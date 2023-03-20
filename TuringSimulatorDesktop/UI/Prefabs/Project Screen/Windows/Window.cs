@@ -18,13 +18,13 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 Background.Position = position;
                 Header.Position = position;
                 ButtonLayout.Position = position;
-                if (CurrentView != null) CurrentView.Position = new Vector2(position.X, position.Y + 24);
+                if (CurrentView != null) CurrentView.Position = new Vector2(position.X, position.Y + 26);
                 
                 int X = UIUtils.ConvertFloatToInt(position.X);
                 int Y = UIUtils.ConvertFloatToInt(position.Y);
 
                 MainPort.X = X;
-                MainPort.Y = Y + 24;
+                MainPort.Y = Y + 26;
 
             }
         }
@@ -37,12 +37,12 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             {
                 bounds = value;
                 Background.Bounds = bounds;
-                Header.Bounds = new Point(bounds.X, 24);
-                ButtonLayout.Bounds = new Point(bounds.X , 24);
-                if (CurrentView != null) CurrentView.Bounds = new Point(bounds.X, bounds.Y - 24);
+                Header.Bounds = new Point(bounds.X, 26);
+                ButtonLayout.Bounds = new Point(bounds.X , 26);
+                if (CurrentView != null) CurrentView.Bounds = new Point(bounds.X, bounds.Y - 26);
 
                 MainPort.Width = bounds.X;
-                MainPort.Height = bounds.Y - 24;
+                MainPort.Height = bounds.Y - 26;
             }
         }
 
@@ -71,8 +71,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Background = new Icon(GlobalInterfaceData.Scheme.Background);
             Header = new Icon(GlobalInterfaceData.Scheme.Header);
             ButtonLayout = new HorizontalLayoutBox();
-            ButtonLayout.Spacing = 2;
-            ButtonLayout.ViewOffset = new Vector2(2, 0);
+            ButtonLayout.Spacing = 0;
+            ButtonLayout.ViewOffset = new Vector2(0, 0);
             ButtonLayout.Centering = HorizontalCentering.Bottom;
 
             Position = position;
@@ -119,8 +119,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             if (CurrentView != null) CurrentView.IsActive = false;
             CurrentView = ViewButton.View;
             CurrentView.IsActive = true;
-            CurrentView.Bounds = new Point(bounds.X, bounds.Y - 24);
-            CurrentView.Position = new Vector2(position.X, position.Y + 24);
+            CurrentView.Bounds = new Point(bounds.X, bounds.Y - 26);
+            CurrentView.Position = new Vector2(position.X, position.Y + 26);
         }
 
         public void RemoveView(WindowHeaderItem ViewButton)

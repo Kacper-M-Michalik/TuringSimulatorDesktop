@@ -9,7 +9,7 @@ using TuringSimulatorDesktop.Input;
 
 namespace TuringSimulatorDesktop.UI
 {
-    public class ColorButton : Button, IVisualElement, IClickable, IPollable
+    public class ColorButton : Button, IVisualElement, IClickable, IPollable, ICanvasInteractable
     {
         Vector2 position;
         public Vector2 Position
@@ -32,6 +32,17 @@ namespace TuringSimulatorDesktop.UI
                 Background.Bounds = bounds;
             }
         }
+
+        public void SetProjectionMatrix(Matrix projectionMatrix, Matrix inverseProjectionMatrix)
+        {
+            ProjectionMatrix = projectionMatrix;
+            InverseProjectionMatrix = inverseProjectionMatrix;
+            Background.SetProjectionMatrix(projectionMatrix, InverseProjectionMatrix);
+        }
+
+        Matrix ProjectionMatrix = Matrix.Identity;
+        Matrix InverseProjectionMatrix = Matrix.Identity;
+        Matrix WorldSpaceMatrix = Matrix.Identity;
 
         public bool IsActive { get; set; } = true;
 
@@ -94,7 +105,8 @@ namespace TuringSimulatorDesktop.UI
 
         public bool IsMouseOver()
         {
-            return (IsActive && InputManager.MouseData.X >= Position.X && InputManager.MouseData.X <= Position.X + bounds.X && InputManager.MouseData.Y >= Position.Y && InputManager.MouseData.Y <= Position.Y + bounds.Y);
+            Vector3 MousePosition = (InputManager.MousePositionMatrix * InverseProjectionMatrix).Translation;
+            return (IsActive && MousePosition.X >= Position.X && MousePosition.X <= Position.X + bounds.X && MousePosition.Y >= Position.Y && MousePosition.Y <= Position.Y + bounds.Y);
         }
 
         public void PollInput(bool IsInActionGroupFrame)

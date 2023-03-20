@@ -37,7 +37,7 @@ namespace TuringSimulatorDesktop.UI
 
         public bool IsActive { get; set; } = true;
 
-        RichTextLayout RichText = new RichTextLayout() { };// Text = " " };
+        public RichTextLayout RichText = new RichTextLayout() { };// Text = " " };
         RenderTarget2D RenderTexture;
         public FontSystem Font = GlobalInterfaceData.StandardRegularFont;
         public Color FontColor = GlobalInterfaceData.Scheme.FontColor;

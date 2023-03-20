@@ -75,6 +75,8 @@ namespace TuringSimulatorDesktop.Input
                         {
                             if (ActionGroups[i].ClickableObjects[j].IsMouseOver())
                             {
+                                CustomLogging.Log(ActionGroups[i].ClickableObjects[j].ToString()+" was clicked");
+
                                 if (LeftMousePressed || RightMousePressed)
                                 {
                                     if (PreviouslyClickedObject != null && ActionGroups[i].ClickableObjects[j] != PreviouslyClickedObject) PreviouslyClickedObject.ClickedAway();

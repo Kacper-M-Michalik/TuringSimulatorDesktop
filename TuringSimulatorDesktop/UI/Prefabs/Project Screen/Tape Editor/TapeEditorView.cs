@@ -70,6 +70,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         TapeTemplate OpenedFile;
         Tape ActivelyEditedTape;
 
+        Icon Background;
         DraggableCanvas Canvas;
         TapeVisualItem VisualTape;
 
@@ -80,6 +81,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         public TapeEditorView(Guid FileToDisplay)
         {
+            Background = new Icon(GlobalInterfaceData.Scheme.CanvasBackground);
+
             Canvas = new DraggableCanvas();
 
             VisualTape = new TapeVisualItem(Canvas.Group);
@@ -152,11 +155,13 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         void MoveLayout()
         {
+            Background.Position = position;
             Canvas.Position = position;
         }
 
         void ResizeLayout()
-        {            
+        {
+            Background.Bounds = bounds;
             Canvas.Bounds = bounds;
         }
 
@@ -164,6 +169,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         {
             if (IsActive)
             {
+                Background.Draw(BoundPort);
+
                 VisualTape.CameraMin = (Matrix.CreateTranslation(Canvas.Position.X, 0, 0) * Canvas.InverseMatrix).Translation.X;
                 VisualTape.CameraMax = (Matrix.CreateTranslation(Canvas.Position.X + Canvas.Bounds.X, 0, 0) * Canvas.InverseMatrix).Translation.X;
                 VisualTape.UpdateLayout();

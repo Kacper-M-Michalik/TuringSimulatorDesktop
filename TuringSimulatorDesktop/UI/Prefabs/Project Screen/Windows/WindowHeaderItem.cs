@@ -20,9 +20,9 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             {
                 position = value;
                 Background.Position = position;
-                SelectionStrip.Position = new Vector2(position.X, position.Y - 2);
-                Title.Position = new Vector2(position.X + 4, position.Y);
-                CloseButton.Position = new Vector2(position.X + Title.Bounds.X + 8, position.Y);
+                SelectionStrip.Position = new Vector2(position.X, position.Y + 24);
+                Title.Position = new Vector2(position.X + 16, position.Y + 13);
+                CloseButton.Position = new Vector2(position.X + bounds.X - 20, position.Y + 4);
             }
         }
 
@@ -35,7 +35,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 bounds = value;
                 Background.Bounds = bounds;
                 SelectionStrip.Bounds = new Point(bounds.X, 2);
-                CloseButton.Position = new Vector2(position.X + Title.Bounds.X + 4, position.Y);
+                CloseButton.Position = new Vector2(position.X + bounds.X - 20, position.Y + 4);
             }
         }
 
@@ -60,19 +60,22 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             group.PollableObjects.Add(this);
             Group = group;
 
-            Background = new Icon(GlobalInterfaceData.Scheme.SubHeader);
+            Background = new Icon(GlobalInterfaceData.Scheme.Header);
             SelectionStrip = new Icon(GlobalInterfaceData.Scheme.BrightAccent);
             SelectionStrip.IsActive = false;
             Title = new Label();
+            Title.FontColor = GlobalInterfaceData.Scheme.FontColorBright;
             Title.Text = view.Title;
 
             CloseButton = new TextureButton(group);
-            CloseButton.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.DebugTexture];
+            CloseButton.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.CloseIcon];
+            CloseButton.HighlightTexture = GlobalInterfaceData.TextureLookup[UILookupKey.CloseIconHighlight];
+            CloseButton.HighlightOnMouseOver = true;
             CloseButton.Bounds = new Point(16, 16);
             CloseButton.OnClickedEvent += Remove;
             CloseButton.IsActive = false;
 
-            Bounds = new Point(25 + Title.Bounds.X, 18);
+            Bounds = new Point(52 + Title.Bounds.X, 26);
         }
 
         public void Select()
@@ -116,7 +119,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             if (View.Title != Title.Text)
             {
                 Title.Text = View.Title;
-                Bounds = new Point(25 + Title.Bounds.X, 18);
+                Bounds = new Point(52 + Title.Bounds.X, 26);
                 OwnerWindow.UpdateHeader();
             }
 

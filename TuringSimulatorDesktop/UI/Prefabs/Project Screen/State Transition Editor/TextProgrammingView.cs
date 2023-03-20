@@ -91,6 +91,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         public TextProgrammingView(Guid FileToDisplay)
         {
+            TransitionCanvas = new DraggableCanvas();
+
             Group = InputManager.CreateActionGroup();
             Group.PollableObjects.Add(this);
             Group.ClickableObjects.Add(this);
@@ -107,7 +109,6 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             HaltStateInputBox = new InputBox(Group);
 
-            TransitionCanvas = new DraggableCanvas();
 
             IsActive = false;
 

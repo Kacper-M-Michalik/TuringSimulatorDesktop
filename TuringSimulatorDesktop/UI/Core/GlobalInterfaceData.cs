@@ -281,6 +281,8 @@ namespace TuringSimulatorDesktop
 
         UndoIcon,
         RedoIcon,
+        CloseIcon,
+        CloseIconHighlight,
 
         SaveIcon,
 

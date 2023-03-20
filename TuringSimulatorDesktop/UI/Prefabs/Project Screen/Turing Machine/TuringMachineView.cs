@@ -588,9 +588,9 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             CurrentTapeLabel.Position = Position + new Vector2(22, 105);
 
             StartStateTitle.Position = Position + new Vector2(22, 133);
-            StartStateInputBox.Position = Position + new Vector2(22, 158);
+            StartStateInputBox.Position = Position + new Vector2(22, 145);
             StartIndexTitle.Position = Position + new Vector2(22, 186);
-            StartIndexInputBox.Position = Position + new Vector2(22, 211);
+            StartIndexInputBox.Position = Position + new Vector2(22, 198);
 
             ControlBox1.Position = Position + new Vector2(520, 20);
             ControlBox1.UpdateLayout();
@@ -607,7 +607,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             Background.Bounds = bounds;
 
-            StartIndexInputBox.Bounds = new Point();
+            StartIndexInputBox.Bounds = new Point(180, 26);
+            StartStateInputBox.Bounds = new Point(180, 26);
 
             ExecuteButton.Bounds = new Point(65, 65);
             RestartButton.Bounds = new Point(65, 65);

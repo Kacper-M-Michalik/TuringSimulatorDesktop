@@ -154,6 +154,8 @@ namespace TuringSimulatorDesktop.UI
 
         public void LoadProject(Button Sender)
         {
+            if (ProjectLocationInputBox.Text.Length < 6) return;
+
             if (IsHosting)
             {
                 MainScreen.SelectedProject(ProjectLocationInputBox.Text, int.Parse(ClientsInputBox.Text));
