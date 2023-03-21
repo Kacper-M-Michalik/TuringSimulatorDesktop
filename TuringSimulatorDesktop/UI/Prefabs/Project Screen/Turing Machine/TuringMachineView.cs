@@ -89,8 +89,11 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         Icon ReadHead;
         Label CurrentStateLabel;
+
         VerticalLayoutBox CurrentInstructionCollectionLayout;
         Icon CurrentInstructionPointer;
+        Icon CurrentInstructionBackground;
+
         TapeVisualItem VisualTape;
 
 
@@ -155,6 +158,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             StartStateInputBox.OutputLabel.FontSize = 20;
             StartStateInputBox.OutputLabel.FontColor = GlobalInterfaceData.Scheme.FontColor;
             StartStateInputBox.Text = "";
+            StartStateInputBox.EditEvent += ResizeInputBox;
+            StartStateInputBox.BackgroundColor = GlobalInterfaceData.Scheme.InteractableAccent;
 
             StartIndexTitle = new Label();
             StartIndexTitle.FontSize = 11;
@@ -165,6 +170,11 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             StartIndexInputBox.OutputLabel.FontSize = 20;
             StartIndexInputBox.OutputLabel.FontColor = GlobalInterfaceData.Scheme.FontColor;
             StartIndexInputBox.Text = "0";
+            StartIndexInputBox.EditEvent += ResizeInputBox;
+            StartIndexInputBox.BackgroundColor = GlobalInterfaceData.Scheme.InteractableAccent;
+
+            StartIndexInputBox.Bounds = new Point(200, 26);
+            StartStateInputBox.Bounds = new Point(200, 26);
 
             NotificationLabel = new Label();
 
@@ -233,7 +243,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             CurrentStateLabel = new Label();
             CurrentStateLabel.FontSize = 48;
             CurrentStateLabel.FontColor = GlobalInterfaceData.Scheme.FontColor;
-            CurrentStateLabel.Text = "TEST";
+            CurrentStateLabel.Text = "-";
 
 
             ReadHead = new Icon();
@@ -336,8 +346,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             UIEventManager.Subscribe(CurrentlyOpenedAlphabetID, ReceivedAlphabetData);
             Client.SendTCPData(ClientSendPacketFunctions.RequestFile(CurrentlyOpenedAlphabetID, true));
         }
-
-        
+                
         public void ReceivedAlphabetData(object Data)
         {
             FileDataMessage Message = (FileDataMessage)Data;
@@ -373,8 +382,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             CompileSourceFile();
         }
-        
-
+                
         public void CompileSourceFile()
         {            
             TempStateTable = TempFile.Compile(TempAlphabet);
@@ -460,6 +468,13 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 }
                 UpdateUI();
             }
+        }
+
+        void ResizeInputBox(InputBox Sender)
+        {
+            if (Sender.OutputLabel.RichText.Size.X > Sender.Bounds.X - 4) Sender.Bounds = new Point(Sender.OutputLabel.RichText.Size.X + 4, 26);
+
+            if (Sender.Bounds.X > 200 && Sender.OutputLabel.RichText.Size.X + 4 < Sender.Bounds.X) Sender.Bounds = new Point(200, 26);
         }
 
         public int StartMachine()
@@ -560,7 +575,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         public void UpdateUI()
         {
-            CurrentStateLabel.Text = Machine.CurrentState;
+            if (Machine.CurrentState != "Null") CurrentStateLabel.Text = Machine.CurrentState;
+            else CurrentStateLabel.Text = "-";
             Vector2 NewHeadPos = VisualTape.GetIndexWorldPosition(Machine.HeadPosition);
             CurrentStateLabel.Position = NewHeadPos + new Vector2(-CurrentStateLabel.Bounds.X * 0.5f, 115);
             ReadHead.Position = VisualTape.GetIndexWorldPosition(Machine.HeadPosition) - new Vector2(ReadHead.Bounds.X * 0.5f, 100.5f);
@@ -622,10 +638,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Group.Width = bounds.X;
             Group.Height = bounds.Y;
 
-            Background.Bounds = bounds;
-
-            StartIndexInputBox.Bounds = new Point(180, 26);
-            StartStateInputBox.Bounds = new Point(180, 26);
+            Background.Bounds = bounds;           
 
             ExecuteButton.Bounds = new Point(65, 65);
             RestartButton.Bounds = new Point(65, 65);

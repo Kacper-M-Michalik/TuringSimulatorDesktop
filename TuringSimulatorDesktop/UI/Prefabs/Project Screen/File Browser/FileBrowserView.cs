@@ -246,16 +246,27 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Client.SendTCPData(ClientSendPacketFunctions.CreateFolder(CurrentlyOpenedFolderID, "Empty Folder"));
             //add auto select of fodler to rename here
         }
-        public void DeleteFolder( )
+        public void Delete(FileData Data)
         {
-            OpenMenu?.Close();
-
-
+            if (Data.IsFolder)
+            {
+                Client.SendTCPData(ClientSendPacketFunctions.DeleteFolder(Data.ID));
+            }
+            else
+            {
+                Client.SendTCPData(ClientSendPacketFunctions.DeleteFile(Data.GUID));
+            }
         }
-        public void DeleteFile(Button Sender)
+        public void Rename(FileData Data, string NewName)
         {
-            OpenMenu?.Close();
-
+            if (Data.IsFolder)
+            {
+                Client.SendTCPData(ClientSendPacketFunctions.RenameFolder(Data.ID, NewName));
+            }
+            else
+            {
+                Client.SendTCPData(ClientSendPacketFunctions.RenameFile(Data.GUID, NewName));
+            }
         }
         public void CreateTransitionFile(Button Sender)
         {

@@ -583,7 +583,7 @@ namespace TuringServer
             try
             {
                 //Replace with async here later?
-                File.WriteAllBytes(NewMetafileLocation + ".tmeta", JsonSerializer.SerializeToUtf8Bytes(new ObjectMetadataFile() { FileName = NewFileName, FileGUID = FileGUID, FileType = FileData.FileType }));
+                File.WriteAllBytes(NewMetafileLocation, JsonSerializer.SerializeToUtf8Bytes(new ObjectMetadataFile() { FileName = NewFileName, FileGUID = FileGUID, FileType = FileData.FileType }));
                 File.WriteAllBytes(NewFileLocation, Server.LoadedProject.CacheDataLookup[FileID].FileData);               
             }
             catch (Exception E)

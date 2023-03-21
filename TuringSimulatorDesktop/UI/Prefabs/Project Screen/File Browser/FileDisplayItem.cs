@@ -38,6 +38,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         Icon Background;
         Icon FileIcon;
         Label FileLabel;
+        InputBox RenameBox;
 
         public const int ReferenceHeight = 32;
 
@@ -51,6 +52,12 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Browser = browser;
             group.ClickableObjects.Add(this);
             group.PollableObjects.Add(this);
+
+            RenameBox = new InputBox(group);
+            RenameBox.Modifiers.AllowsNewLine = false;
+            RenameBox.IsActive = false;
+            RenameBox.ClickAwayEvent += EndRenameEvent;
+            RenameBox.BackgroundColor = GlobalInterfaceData.Scheme.DarkInteractableAccent;
 
             Background = new Icon(GlobalInterfaceData.Scheme.Background);
 
@@ -96,9 +103,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             if (InputManager.RightMousePressed)
             {
                 Browser.OpenMenu?.Close();
-                FileEditMenu Menu = new FileEditMenu(Browser, this);
-                Menu.DeleteFileButton.OnClickedEvent += Delete;
-                Browser.OpenMenu = Menu;
+                Browser.OpenMenu = new FileEditMenu(Browser, this);
                 Browser.OpenMenu.Position = new Vector2(InputManager.MouseData.X, InputManager.MouseData.Y);
                 return;
             }
@@ -122,23 +127,30 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             ClickedOnce = true;              
         }
 
-        public void Delete(Button Sender)
-        {
-            if (Data.IsFolder)
-            {
-                Client.SendTCPData(ClientSendPacketFunctions.DeleteFolder(Data.ID));
-            }
-            else
-            {
-                Client.SendTCPData(ClientSendPacketFunctions.DeleteFile(Data.GUID));
-            }
-        }
-
         public void ClickedAway()
         {
             Browser.OpenMenu?.Close();
             ClickedOnce = false;
             Background.DrawColor = GlobalInterfaceData.Scheme.Background;
+        }
+
+        public void RenameFile()
+        {
+            RenameBox.IsActive = true;
+            InputManager.ManuallyClickElement(RenameBox);
+            RenameBox.Text = "";
+            //RenameBox.Text = Data.Name;
+        }
+
+        void EndRenameEvent(InputBox Sender)
+        {
+            EndRename();
+        }
+
+        public void EndRename()
+        {
+            RenameBox.IsActive = false;
+            Browser.Rename(Data, RenameBox.Text);
         }
 
         public bool IsMouseOver()
@@ -153,6 +165,11 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 InputManager.StartDragging(Data);
                 ClickedOnce = false;
             }
+
+            if (RenameBox.IsActive && Keyboard.GetState().IsKeyDown(Keys.Enter))
+            {
+                EndRename();
+            }
         }
 
         void MoveLayout()
@@ -160,12 +177,14 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Background.Position = Position;
             FileIcon.Position = Position + GlobalInterfaceData.Scale(new Vector2(18, bounds.Y/2f - FileIcon.Bounds.Y/2f));
             FileLabel.Position = Position + GlobalInterfaceData.Scale(new Vector2(68, bounds.Y/2f));
+            RenameBox.Position = Position + new Vector2(68, 3);
         }
 
         void ResizeLayout()
         {
             Background.Bounds = bounds;
             FileIcon.Bounds = GlobalInterfaceData.Scale(new Point(30, 30));
+            RenameBox.Bounds = new Point(bounds.X - 74, ReferenceHeight - 6);
         }
 
         public void Draw(Viewport? BoundPort = null)
@@ -175,6 +194,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 Background.Draw(BoundPort);
                 FileIcon.Draw(BoundPort);
                 FileLabel.Draw(BoundPort);
+
+                if (RenameBox.IsActive) RenameBox.Draw();
             }
         }
     }

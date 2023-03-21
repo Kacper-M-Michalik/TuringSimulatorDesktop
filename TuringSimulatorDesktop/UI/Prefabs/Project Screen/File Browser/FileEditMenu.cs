@@ -67,8 +67,13 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         Label CreateTapeFileLabel;
         Label CreateAlphabetFileLabel;
 
+        FileBrowserView Browser;
+        FileDisplayItem Item;
+
         public FileEditMenu(FileBrowserView browser, FileDisplayItem item)
         {
+            Browser = browser;
+            Item = item;
             Group = InputManager.CreateActionGroup();
 
             Background = new Icon(GlobalInterfaceData.Scheme.InteractableAccent);
@@ -83,11 +88,13 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             RenameFileButton.BaseColor = GlobalInterfaceData.Scheme.InteractableAccent;
             RenameFileButton.HighlightColor = GlobalInterfaceData.Scheme.DarkInteractableAccent;
             RenameFileButton.HighlightOnMouseOver = true;
+            RenameFileButton.OnClickedEvent += Rename;
 
             DeleteFileButton = new ColorButton(Group);
             DeleteFileButton.BaseColor = GlobalInterfaceData.Scheme.InteractableAccent;
             DeleteFileButton.HighlightColor = GlobalInterfaceData.Scheme.DarkInteractableAccent;
             DeleteFileButton.HighlightOnMouseOver = true;
+            DeleteFileButton.OnClickedEvent += Delete;
 
             Divider1 = new Icon(GlobalInterfaceData.Scheme.NonInteractableAccent);
             Divider2 = new Icon(GlobalInterfaceData.Scheme.NonInteractableAccent);
@@ -207,6 +214,18 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             CreateSlateFileLabel.FontSize = FontSize;
             CreateTapeFileLabel.FontSize = FontSize;
             CreateAlphabetFileLabel.FontSize = FontSize;
+        }
+
+        public void Rename(Button Sender)
+        {
+            Item.RenameFile();
+            Close();
+        }
+
+        public void Delete(Button Sender)
+        {
+            Browser.Delete(Item.Data);
+            Close();
         }
 
         public void Draw(Viewport? BoundPort = null)
