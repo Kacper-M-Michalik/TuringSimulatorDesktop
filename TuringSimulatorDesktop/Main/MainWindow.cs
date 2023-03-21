@@ -29,7 +29,6 @@ namespace TuringSimulatorDesktop
     {
         public GraphicsDeviceManager GraphicsManager;
         public ScreenView CurrentView;
-        SpriteBatch ScreenBatch;
         int BoundTop;
 
         [DllImport("SDL2.dll", CallingConvention = CallingConvention.Cdecl)]
@@ -78,15 +77,10 @@ namespace TuringSimulatorDesktop
 
         protected override void LoadContent()
         {
-            //SDL_SetWindowFullscreen(Window.Handle, 0);
-            //SDL_SetWindowBordered(Window.Handle, (byte)1U);
-            // SDL_MaximizeWindow(Window.Handle);
-            //MaximiseWindow();
             GraphicsManager.PreferredBackBufferWidth = GlobalInterfaceData.MainMenuWidth;
             GraphicsManager.PreferredBackBufferHeight = GlobalInterfaceData.MainMenuHeight;
             GraphicsManager.ApplyChanges();
 
-            ScreenBatch = new SpriteBatch(GraphicsDevice);
             GraphicsDevice.BlendState = BlendState.AlphaBlend;
 
             GlobalInterfaceData.OSWindow = Window;
@@ -178,32 +172,26 @@ namespace TuringSimulatorDesktop
             CurrentView.Draw();       
 
             GraphicsDevice.Viewport = GlobalInterfaceData.FullscreenViewport;
-            //ScreenBatch.Begin();
             if (InputManager.DragData != null)
             {
                 MouseIcon.Bounds = new Point(13, 22);
                 MouseIcon.Position = new Vector2(InputManager.MouseData.X, InputManager.MouseData.Y);
                 MouseIcon.DrawTexture = GlobalInterfaceData.TextureLookup[UILookupKey.MouseDragIcon];
-                //ScreenBatch.Draw((GlobalInterfaceData.TextureLookup[UILookupKey.MouseDragIcon], new Vector2(InputManager.MouseData.X, InputManager.MouseData.Y), Color.White);
             }
             else if (InputManager.IsMouseOverTypingArea)
             {
                 MouseIcon.Bounds = new Point(10, 19);
                 MouseIcon.Position = new Vector2(InputManager.MouseData.X - MouseIcon.Bounds.X * 0.5f, InputManager.MouseData.Y - MouseIcon.Bounds.Y * 0.5f);
                 MouseIcon.DrawTexture = GlobalInterfaceData.TextureLookup[UILookupKey.TypingIcon];
-                //Texture2D Texture = GlobalInterfaceData.TextureLookup[UILookupKey.TypingIcon];
-                //ScreenBatch.Draw(Texture, new Vector2(InputManager.MouseData.X - Texture.Width * 0.5f, InputManager.MouseData.Y - Texture.Height * 0.5f), Color.White);
             }
             else
             {
                 MouseIcon.Bounds = new Point(13, 22);
                 MouseIcon.Position = new Vector2(InputManager.MouseData.X, InputManager.MouseData.Y);
                 MouseIcon.DrawTexture = GlobalInterfaceData.TextureLookup[UILookupKey.MouseIcon];
-                //ScreenBatch.Draw(GlobalInterfaceData.TextureLookup[UILookupKey.MouseIcon], new Vector2(InputManager.MouseData.X, InputManager.MouseData.Y), Color.White);
             }
             MouseIcon.Draw();
             InputManager.IsMouseOverTypingArea = false;
-            //ScreenBatch.End();
 
             //InputManager.DrawActionGroups();         
 

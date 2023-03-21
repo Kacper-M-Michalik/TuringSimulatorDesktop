@@ -97,7 +97,7 @@ namespace TuringSimulatorDesktop.UI
             if (IsInActionGroupFrame && Scrollable && IsMouseOver() && InputManager.ScrollWheelDelta != 0)
             {
                 ViewOffset.Y += (float)InputManager.ScrollWheelDelta * ScrollFactor;
-                ViewOffset.Y = Math.Clamp(ViewOffset.Y, Math.Clamp(-LayoutEndBound.Y + bounds.Y, float.MinValue, ViewOffsetBoundsMin.Y), ViewOffsetBoundsMin.Y);
+                ViewOffset.Y = Math.Clamp(ViewOffset.Y, Math.Clamp(-LayoutEndBound.Y + bounds.Y - Spacing, float.MinValue, ViewOffsetBoundsMin.Y), ViewOffsetBoundsMin.Y);
                 UpdateLayout();
             }
         }

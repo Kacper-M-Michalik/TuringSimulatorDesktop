@@ -58,7 +58,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             LayoutBox.Spacing = 10;
             LayoutBox.Scrollable = true;
             LayoutBox.ScrollFactor = 0.2f;
-            LayoutBox.ViewOffsetBoundsMin = new Vector2(15f, 5f);
+            LayoutBox.ViewOffsetBoundsMin = new Vector2(15f, 5f);            
             LayoutBox.ViewOffset = new Vector2(15f, 5f);
             
             //Bounds = new Point(width, height);
@@ -157,7 +157,16 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             FileLastAccessed = new Label();
 
             FileName.Text = FileInfo.FileName;
-            FileLocation.Text = FileInfo.FullPath;
+
+            if (FileInfo.FullPath.Length > 65)
+            {
+                FileLocation.Text = FileInfo.FullPath.Substring(0, 65)+"...";
+            }
+            else
+            {
+                FileLocation.Text = FileInfo.FullPath;
+            }
+
             FileLastAccessed.Text = FileInfo.LastAccessed.ToString("g");
 
             bounds = new Point(ReferenceWidth, ReferenceHeight);

@@ -73,8 +73,6 @@ namespace TuringSimulatorDesktop.UI
             Title.FontColor = GlobalInterfaceData.Scheme.FontColorBright;
             Title.Text = "Load Project";
 
-
-
             ProjectLocationTitle = new Label();
             ProjectLocationTitle.AutoSizeMesh = true;
             ProjectLocationTitle.FontSize = 20f;
@@ -148,7 +146,6 @@ namespace TuringSimulatorDesktop.UI
             if (Dialog.ShowDialog() == DialogResult.OK)
             {
                 ProjectLocationInputBox.Text = Dialog.FileName;
-                //MainScreen.SelectedProject(Dialog.FileName, 1);
             }
         }
 
@@ -219,7 +216,6 @@ namespace TuringSimulatorDesktop.UI
             Background.Bounds = bounds;
             Header.Bounds = new Point(bounds.X, 28);
 
-            //ProjectLocationTitle.Bounds = new Point(300, 42);
             ProjectLocationInputBox.Bounds = new Point(376, 42);
             ProjectLocationSelectionButton.Bounds = new Point(42, 42);
 

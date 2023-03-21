@@ -66,7 +66,6 @@ namespace TuringSimulatorDesktop
     {
         public string ProjectName;
         public Dictionary<string, int> AlphabetToFileLookup;
-        //public Dictionary<string, Alphabet> CachedAlphabets;
 
         public ConnectedProjectData(string projectName)
         {
