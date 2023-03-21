@@ -1,0 +1,11 @@
+{
+  "Characters": [
+    "1",
+    "0",
+    "_",
+    "",
+    "*"
+  ],
+  "EmptyCharacter": "_",
+  "WildcardCharacter": "*"
+}

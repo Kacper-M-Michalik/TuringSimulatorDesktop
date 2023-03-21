@@ -64,6 +64,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             SelectionStrip = new Icon(GlobalInterfaceData.Scheme.BrightAccent);
             SelectionStrip.IsActive = false;
             Title = new Label();
+            Title.Font = GlobalInterfaceData.StandardRegularFont;
             Title.FontColor = GlobalInterfaceData.Scheme.FontColorBright;
             Title.Text = view.Title;
 
@@ -75,7 +76,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             CloseButton.OnClickedEvent += Remove;
             CloseButton.IsActive = false;
 
-            Bounds = new Point(48 + Title.Bounds.X, 26);
+            Bounds = new Point(42 + Title.Bounds.X, 26);
         }
 
         public void Select()
@@ -119,7 +120,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             if (View.Title != Title.Text)
             {
                 Title.Text = View.Title;
-                Bounds = new Point(48 + Title.Bounds.X, 26);
+                Bounds = new Point(42 + Title.Bounds.X, 26);
                 OwnerWindow.UpdateHeader();
             }
 

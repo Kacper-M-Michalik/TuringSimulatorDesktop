@@ -68,13 +68,13 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                         FileIcon.DrawTexture = GlobalInterfaceData.TextureLookup[UILookupKey.AlphabetIcon];
                         break;
                     case CoreFileType.Tape:
-                        FileIcon.DrawTexture = GlobalInterfaceData.TextureLookup[UILookupKey.AlphabetIcon];
+                        FileIcon.DrawTexture = GlobalInterfaceData.TextureLookup[UILookupKey.TapeIcon];
                         break;
                     case CoreFileType.TransitionFile:
-                        FileIcon.DrawTexture = GlobalInterfaceData.TextureLookup[UILookupKey.AlphabetIcon];
+                        FileIcon.DrawTexture = GlobalInterfaceData.TextureLookup[UILookupKey.TransitionTableIcon];
                         break;
                     case CoreFileType.SlateFile:
-                        FileIcon.DrawTexture = GlobalInterfaceData.TextureLookup[UILookupKey.AlphabetIcon];
+                        FileIcon.DrawTexture = GlobalInterfaceData.TextureLookup[UILookupKey.SlateFileTCIcon];
                         break;
                     case CoreFileType.Other:
                         FileIcon.DrawTexture = GlobalInterfaceData.TextureLookup[UILookupKey.DebugTexture];

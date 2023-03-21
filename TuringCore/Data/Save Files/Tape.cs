@@ -27,6 +27,13 @@ namespace TuringCore
             LowestIndex = 0;
         }
 
+        public TapeTemplate(Tape Source)
+        {
+            Data = new Dictionary<int, string>(Source.Data);
+            HighestIndex = Source.HighestIndex;
+            LowestIndex = Source.LowestIndex;
+        }
+
         public void SetData(string[] Input)
         {
             Data.Clear();

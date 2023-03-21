@@ -1,0 +1,163 @@
+{
+  "HaltStates": [
+    "halt-accept",
+    "halt-reject",
+    ""
+  ],
+  "Transitions": [
+    {
+      "X": 552,
+      "Y": 174,
+      "CurrentState": "0",
+      "TapeValue": "0",
+      "NewState": "1o",
+      "NewTapeValue": "_",
+      "MoveDirection": 1
+    },
+    {
+      "X": 552,
+      "Y": 243,
+      "CurrentState": "0",
+      "TapeValue": "1",
+      "NewState": "1i",
+      "NewTapeValue": "_",
+      "MoveDirection": 1
+    },
+    {
+      "X": 550,
+      "Y": 314,
+      "CurrentState": "0",
+      "TapeValue": "_",
+      "NewState": "halt-accept",
+      "NewTapeValue": "_",
+      "MoveDirection": 1
+    },
+    {
+      "X": 546,
+      "Y": 386,
+      "CurrentState": "1o",
+      "TapeValue": "_",
+      "NewState": "2o",
+      "NewTapeValue": "_",
+      "MoveDirection": 0
+    },
+    {
+      "X": 551,
+      "Y": 463,
+      "CurrentState": "1o",
+      "TapeValue": "*",
+      "NewState": "1o",
+      "NewTapeValue": "*",
+      "MoveDirection": 1
+    },
+    {
+      "X": 550,
+      "Y": 530,
+      "CurrentState": "1i",
+      "TapeValue": "_",
+      "NewState": "2i",
+      "NewTapeValue": "_",
+      "MoveDirection": 0
+    },
+    {
+      "X": 548,
+      "Y": 601,
+      "CurrentState": "1i",
+      "TapeValue": "*",
+      "NewState": "1i",
+      "NewTapeValue": "*",
+      "MoveDirection": 1
+    },
+    {
+      "X": 1001,
+      "Y": 178,
+      "CurrentState": "2o",
+      "TapeValue": "0",
+      "NewState": "3",
+      "NewTapeValue": "_",
+      "MoveDirection": 0
+    },
+    {
+      "X": 1006,
+      "Y": 242,
+      "CurrentState": "2o",
+      "TapeValue": "_",
+      "NewState": "halt-accept",
+      "NewTapeValue": "_",
+      "MoveDirection": 1
+    },
+    {
+      "X": 1014,
+      "Y": 301,
+      "CurrentState": "2o",
+      "TapeValue": "*",
+      "NewState": "halt-reject",
+      "NewTapeValue": "*",
+      "MoveDirection": 1
+    },
+    {
+      "X": 1016,
+      "Y": 380,
+      "CurrentState": "2i",
+      "TapeValue": "1",
+      "NewState": "3",
+      "NewTapeValue": "_",
+      "MoveDirection": 0
+    },
+    {
+      "X": 1028,
+      "Y": 443,
+      "CurrentState": "2i",
+      "TapeValue": "_",
+      "NewState": "halt-accept",
+      "NewTapeValue": "_",
+      "MoveDirection": 1
+    },
+    {
+      "X": 1028,
+      "Y": 506,
+      "CurrentState": "2i",
+      "TapeValue": "*",
+      "NewState": "halt-reject",
+      "NewTapeValue": "*",
+      "MoveDirection": 1
+    },
+    {
+      "X": 1030,
+      "Y": 574,
+      "CurrentState": "3",
+      "TapeValue": "_",
+      "NewState": "halt-accept",
+      "NewTapeValue": "_",
+      "MoveDirection": 1
+    },
+    {
+      "X": 1047,
+      "Y": 640,
+      "CurrentState": "3",
+      "TapeValue": "*",
+      "NewState": "4",
+      "NewTapeValue": "*",
+      "MoveDirection": 0
+    },
+    {
+      "X": 1042,
+      "Y": 704,
+      "CurrentState": "4",
+      "TapeValue": "*",
+      "NewState": "4",
+      "NewTapeValue": "*",
+      "MoveDirection": 0
+    },
+    {
+      "X": 1048,
+      "Y": 771,
+      "CurrentState": "4",
+      "TapeValue": "_",
+      "NewState": "0",
+      "NewTapeValue": "_",
+      "MoveDirection": 1
+    }
+  ],
+  "DefinitionAlphabetFileID": "df61a80c-7b5b-471b-8573-e75bbff2b156"
+}

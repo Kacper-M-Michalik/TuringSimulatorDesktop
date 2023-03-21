@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using TuringSimulatorDesktop.Input;
 using TuringServer;
 using System.Windows.Forms;
+using System.IO;
 
 namespace TuringSimulatorDesktop.UI
 {
@@ -212,18 +213,16 @@ namespace TuringSimulatorDesktop.UI
 
         public void CreateProject(Button Sender)
         {
-            if (IsEmptyProject)
+            FileManager.CreateProject(ProjectTitleInputBox.Text, ProjectLocationInputBox.Text, TuringCore.TuringProjectType.NonClassical);
+         
+            if (!IsEmptyProject)
             {
-                FileManager.CreateProject(ProjectTitleInputBox.Text, ProjectLocationInputBox.Text, TuringCore.TuringProjectType.NonClassical);
-            }
-            else
-            {
-
+               // Directory.CreateDirectory(ProjectTitleInputBox.Text + Path.DirectorySeparatorChar + ProjectTitleInputBox.Text + Path.DirectorySeparatorChar + ProjectTitleInputBox.Text + "Data" + Path.DirectorySeparatorChar + "Templates");
             }
 
             if (IsHosting)
             {
-                MainScreen.SelectedProject(ProjectLocationInputBox.Text, int.Parse(ClientsInputBox.Text));
+                MainScreen.SelectedProject(ProjectLocationInputBox.Text, int.Parse(ClientsInputBox.Text));               
             }
             else
             {

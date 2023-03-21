@@ -41,6 +41,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             {
                 isActive = value;
                 Group.IsActive = isActive;
+                Canvas.IsActive = value;
+                Canvas.Group.IsActive = value;
             }
         }
         public string Title => "Turing Machine";
@@ -103,14 +105,14 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         Alphabet TempAlphabet;
         bool IsStateTableOutdated;
 
-
+        Tape TempTape;
 
         bool IsAutoStepActive;
         double TimeLeftToNextStep;
         const double BaseTimeBetweenSteps = 800;
         double TimeBetweenStepsMS;
 
-
+        Alphabet EmptyAlphabet = new Alphabet() { EmptyCharacter = "" };
 
         public TuringMachineView(Guid FileToDisplay)
         {
@@ -245,7 +247,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Machine = new TuringMachine();
             TimeBetweenStepsMS = BaseTimeBetweenSteps;
 
-
+            Machine.SetActiveTape(new TapeTemplate());
 
             IsActive = false;
 
@@ -366,6 +368,9 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 return;
             }
 
+            TempTape = Machine.OriginalTape.Clone(TempAlphabet);
+            VisualTape.SetSourceTape(TempTape);
+
             CompileSourceFile();
         }
         
@@ -427,6 +432,16 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             Machine.SetActiveTape(Tape);
 
+            if (TempAlphabet != null)
+            {
+                TempTape = Machine.OriginalTape.Clone(TempAlphabet);
+            }
+            else
+            {
+                TempTape = Machine.OriginalTape.Clone(EmptyAlphabet);
+            }
+            VisualTape.SetSourceTape(TempTape);
+
             CurrentTapeLabel.Text = Message.Name;
         }
 
@@ -453,26 +468,19 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 //does start state and idnex exist
                 //alphabet comaptibilty chekcs?
 
-
             if (IsStateTableOutdated)
             {
                 Machine.SetActiveStateTable(TempStateTable, TempAlphabet);
                 IsStateTableOutdated = false;
             }
-
-            if (Machine.OriginalTape == null)
-            {
-                Machine.SetActiveTape(new TapeTemplate());
-            }
-
-
+               
             int Code = Machine.Start(StartStateInputBox.Text, Convert.ToInt32(StartIndexInputBox.Text));
            
             if (Code == 0) VisualTape.SetSourceTape(Machine.ActiveTape); 
             
             if (Code == 1)
             {
-                //set error ui
+                //Outdated error code
             }
             if (Code == 2)
             {
@@ -519,6 +527,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         }
         public void Restart(Button Sender)
         {
+            IsAutoStepActive = false;
             StartMachine();
             UpdateUI();
         }
@@ -663,6 +672,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         public void Close()
         {
+            Canvas.Close();
             Group.IsMarkedForDeletion = true;
         }
 

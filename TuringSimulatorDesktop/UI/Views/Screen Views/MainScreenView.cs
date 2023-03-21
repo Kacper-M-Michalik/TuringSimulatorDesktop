@@ -190,7 +190,6 @@ namespace TuringSimulatorDesktop.UI
         }
 
         string Location;
-
         public void SelectedProject(string location, int MaxClientCount)
         {
             BackendInterface.StartProjectServer(MaxClientCount, 28104);
@@ -206,10 +205,12 @@ namespace TuringSimulatorDesktop.UI
             //add some sort of timeout to this
             UIEventManager.RecievedProjectDataFromServerDelegate = ServerSentProjectData;
             Client.SendTCPData(ClientSendPacketFunctions.LoadProject(Location));
+
         }
         void ServerSentProjectData(object sender, EventArgs e)
         {   
             GlobalProjectAndUserData.UpdateRecentlyOpenedFile(Location);
+
             FullyConnectedToServer(this, null);
         }
 

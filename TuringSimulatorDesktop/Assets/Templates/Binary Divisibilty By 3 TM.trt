@@ -1,0 +1,82 @@
+{
+  "HaltStates": [
+    "halt-accept",
+    "halt-reject",
+    ""
+  ],
+  "Transitions": [
+    {
+      "X": 417,
+      "Y": 189,
+      "CurrentState": "0",
+      "TapeValue": "0",
+      "NewState": "0",
+      "NewTapeValue": "0",
+      "MoveDirection": 1
+    },
+    {
+      "X": 426,
+      "Y": 235,
+      "CurrentState": "0",
+      "TapeValue": "1",
+      "NewState": "q1",
+      "NewTapeValue": "1",
+      "MoveDirection": 1
+    },
+    {
+      "X": 417,
+      "Y": 306,
+      "CurrentState": "q1",
+      "TapeValue": "0",
+      "NewState": "q2",
+      "NewTapeValue": "0",
+      "MoveDirection": 1
+    },
+    {
+      "X": 443,
+      "Y": 369,
+      "CurrentState": "q1",
+      "TapeValue": "1",
+      "NewState": "0",
+      "NewTapeValue": "1",
+      "MoveDirection": 1
+    },
+    {
+      "X": 430,
+      "Y": 424,
+      "CurrentState": "q1",
+      "TapeValue": "_",
+      "NewState": "halt-reject",
+      "NewTapeValue": "*",
+      "MoveDirection": 1
+    },
+    {
+      "X": 443,
+      "Y": 492,
+      "CurrentState": "q2",
+      "TapeValue": "0",
+      "NewState": "q1",
+      "NewTapeValue": "0",
+      "MoveDirection": 1
+    },
+    {
+      "X": 444,
+      "Y": 554,
+      "CurrentState": "q2",
+      "TapeValue": "1",
+      "NewState": "q1",
+      "NewTapeValue": "1",
+      "MoveDirection": 1
+    },
+    {
+      "X": 432,
+      "Y": 632,
+      "CurrentState": "0",
+      "TapeValue": "_",
+      "NewState": "halt-accept",
+      "NewTapeValue": "_",
+      "MoveDirection": 1
+    }
+  ],
+  "DefinitionAlphabetFileID": "df61a80c-7b5b-471b-8573-e75bbff2b156"
+}

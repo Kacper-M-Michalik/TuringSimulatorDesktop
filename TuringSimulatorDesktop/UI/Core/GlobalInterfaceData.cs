@@ -266,6 +266,11 @@ namespace TuringSimulatorDesktop
         LoadIcon,
         LoadFile,
 
+        Save,
+        SaveHighlight,
+        SaveAll,
+        SaveAllHighlight,
+
         EmptyProject,
         EmptyProjectSelected,
         TemplateProject,
@@ -296,6 +301,7 @@ namespace TuringSimulatorDesktop
         RunIcon,
         AlphabetIcon,
         FolderIcon,
+        TapeIcon,
         SlateFileTCIcon,
         SlateFileTICIcon,
         TransitionTableIcon,

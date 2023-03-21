@@ -109,11 +109,14 @@ namespace TuringSimulatorDesktop.UI
             RedoButton.OnClickedEvent += Redo;
 
             SaveButton = new TextureButton(Group);
-            SaveButton.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.SaveIcon];
+            SaveButton.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.Save];
+            SaveButton.HighlightTexture = GlobalInterfaceData.TextureLookup[UILookupKey.SaveHighlight];
             SaveButton.HighlightOnMouseOver = true;
             SaveButton.OnClickedEvent += Save;
 
             SaveAllButton = new TextureButton(Group);
+            SaveAllButton.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.SaveAll];
+            SaveAllButton.HighlightTexture = GlobalInterfaceData.TextureLookup[UILookupKey.SaveAllHighlight];
             SaveAllButton.HighlightOnMouseOver = true;
             SaveAllButton.OnClickedEvent += SaveAll;
 
