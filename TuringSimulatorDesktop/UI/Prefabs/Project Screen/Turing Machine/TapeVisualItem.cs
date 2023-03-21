@@ -39,7 +39,6 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             set
             {
                 isActive = value;
-                CellLayoutBox.IsActive = value;
                 for (int i = 0; i < Cells.Count; i++)
                 {
                     Cells[i].IsActive = value;
@@ -60,9 +59,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         Matrix ProjectionMatrix, InverseProjectionMatrix;
 
         ActionGroup Group;
-
-        HorizontalLayoutBox CellLayoutBox;
-        
+                
         List<TapeCell> Cells;
         public float CameraMin, CameraMax;
         public Tape SourceTape = null;
@@ -70,8 +67,6 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         public TapeVisualItem(ActionGroup group)
         {
             Group = group;
-            CellLayoutBox = new HorizontalLayoutBox();
-            CellLayoutBox.DrawBounded = false;
 
             Cells = new List<TapeCell>();
 
@@ -86,8 +81,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         public void UpdateLayout()
         {
-            float Width = CameraMax - CameraMin;
-            int TargetCellCount = Convert.ToInt32(MathF.Ceiling(Width / TapeCell.ReferenceTotalWidth)) + 1;
+            int TargetCellCount = Convert.ToInt32(MathF.Ceiling((CameraMax - CameraMin) / TapeCell.ReferenceTotalWidth)) + 1;
 
             //redo!!!, zoom out nmegative value bug, need to multiply movement by zoom too
             if (Cells.Count < TargetCellCount)
@@ -98,7 +92,6 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                     NewCell.IsActive = true;
                     NewCell.SetProjectionMatrix(ProjectionMatrix, InverseProjectionMatrix);
                     Cells.Add(NewCell);
-                    CellLayoutBox.AddElement(NewCell);
                 }
             }
             else if (Cells.Count > TargetCellCount)
@@ -106,51 +99,47 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 while (Cells.Count > TargetCellCount)
                 {
                     Cells[Cells.Count - 1].Close();
-                    CellLayoutBox.RemoveElement(Cells[Cells.Count - 1]);
                     Cells.RemoveAt(Cells.Count - 1);
                 }
             }
 
-            float TapeLeftPosition;
+            float Difference = CameraMin - position.X;
+            int StartCellIndex;
 
-            if (Position.X - CameraMin > CameraMax - Position.X)
+            if (Difference > 0)
             {
-                TapeLeftPosition = CameraMin - (TapeCell.ReferenceTotalWidth - ((Position.X - CameraMin) % TapeCell.ReferenceTotalWidth));
+                StartCellIndex = Convert.ToInt32(MathF.Ceiling(Difference / TapeCell.ReferenceTotalWidth)) - 1;
             }
             else
             {
-                TapeLeftPosition = CameraMin - ((CameraMax- Position.X) % TapeCell.ReferenceTotalWidth);
+                StartCellIndex = Convert.ToInt32(MathF.Floor(Difference / TapeCell.ReferenceTotalWidth));
             }
 
-            int BaseCellIndex = Convert.ToInt32((TapeLeftPosition - Position.X) / TapeCell.ReferenceTotalWidth);
-
-            int CellIndex = BaseCellIndex;
             for (int i = 0; i < Cells.Count; i++)
             {
-                Cells[i].Index = CellIndex;
-                Cells[i].IndexLabel.Text = CellIndex.ToString();
-                CellIndex++;
+                Cells[i].Position = new Vector2(position.X + StartCellIndex * TapeCell.ReferenceTotalWidth, position.Y);
+
+                Cells[i].Index = StartCellIndex;
+                Cells[i].IndexLabel.Text = StartCellIndex.ToString();
+
+                StartCellIndex++;
             }
 
-            CellIndex = BaseCellIndex;
             if (SourceTape != null)
             {
                 for (int i = 0; i < Cells.Count; i++)
                 {
-                    if (CellIndex > SourceTape.HighestIndex || CellIndex < SourceTape.LowestIndex)
+                    if (Cells[i].Index > SourceTape.HighestIndex || Cells[i].Index < SourceTape.LowestIndex)
                     {
                         Cells[i].InputOutputLabel.Text = SourceTape.DefinitionAlphabet.EmptyCharacter;
                     }
                     else
                     {
-                        Cells[i].InputOutputLabel.Text = SourceTape[CellIndex];
+                        Cells[i].InputOutputLabel.Text = SourceTape[Cells[i].Index];
                     }
-                    CellIndex++;
                 }
             }
 
-            CellLayoutBox.Position = new Vector2(TapeLeftPosition, position.Y);
-            CellLayoutBox.UpdateLayout();
         }
 
         public void UpdateTapeContents(int Index, InputBox Sender)
@@ -172,14 +161,17 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         void MoveLayout()
         {
-            CellLayoutBox.Position = position;
+            UpdateLayout();
         }
 
         public void Draw(Viewport? BoundPort = null)
         {
             if (IsActive)
             {
-                CellLayoutBox.Draw(BoundPort);
+                for (int i = 0; i < Cells.Count; i++)
+                {
+                    Cells[i].Draw(BoundPort);
+                }
             }
         }
     }

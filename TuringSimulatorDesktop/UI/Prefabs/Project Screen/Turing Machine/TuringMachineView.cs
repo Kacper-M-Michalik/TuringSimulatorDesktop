@@ -451,6 +451,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             VisualTape.SetSourceTape(TempTape);
 
             CurrentTapeLabel.Text = Message.Name;
+
+            Restart(null);
         }
 
         public void PollInput(bool IsInActionGroupFrame)
