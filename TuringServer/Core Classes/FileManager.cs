@@ -252,7 +252,7 @@ namespace TuringServer
             return true;
         }
 
-        public static bool CreateProject(string Name, string ProjectDirectory, TuringProjectType RuleType)
+        public static CreateProjectReturnData CreateProject(string Name, string ProjectDirectory, TuringProjectType RuleType)
         {
             JsonSerializerOptions Options = new JsonSerializerOptions() { WriteIndented = true };
             string BaseFolder = ProjectDirectory + Path.DirectorySeparatorChar + Name;
@@ -267,9 +267,9 @@ namespace TuringServer
             {
                 if (File.Exists(ProjectPath)) DeleteFileByPath(ProjectPath);
                 CustomLogging.Log("File Manager Error: CreateProject - " + E.ToString());
-                return false;
+                return new CreateProjectReturnData(false, "");
             }
-            return true;
+            return new CreateProjectReturnData(true, ProjectPath);
         }
 
         //is there a point of this?
@@ -287,6 +287,18 @@ namespace TuringServer
                 return false;
             }
             return true;
+        }
+    }
+
+    public struct CreateProjectReturnData
+    {
+        public bool Success;
+        public string SolutionPath;
+
+        public CreateProjectReturnData(bool success, string solutionPath)
+        {
+            Success = success;
+            SolutionPath = solutionPath;
         }
     }
 }

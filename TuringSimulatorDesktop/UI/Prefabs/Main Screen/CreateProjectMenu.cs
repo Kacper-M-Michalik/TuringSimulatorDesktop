@@ -213,20 +213,36 @@ namespace TuringSimulatorDesktop.UI
 
         public void CreateProject(Button Sender)
         {
-            FileManager.CreateProject(ProjectTitleInputBox.Text, ProjectLocationInputBox.Text, TuringCore.TuringProjectType.NonClassical);
+            CreateProjectReturnData Result = FileManager.CreateProject(ProjectTitleInputBox.Text, ProjectLocationInputBox.Text, TuringCore.TuringProjectType.NonClassical);
          
+            if (!Result.Success)
+            {
+                throw new Exception("Failed To create new project!");
+            }
+
             if (!IsEmptyProject)
             {
-               // Directory.CreateDirectory(ProjectTitleInputBox.Text + Path.DirectorySeparatorChar + ProjectTitleInputBox.Text + Path.DirectorySeparatorChar + ProjectTitleInputBox.Text + "Data" + Path.DirectorySeparatorChar + "Templates");
+                string Dir = ProjectLocationInputBox.Text + Path.DirectorySeparatorChar + ProjectTitleInputBox.Text + Path.DirectorySeparatorChar + ProjectTitleInputBox.Text + "Data" + Path.DirectorySeparatorChar + "Templates";
+                Directory.CreateDirectory(Dir);
+
+                string[] Templates = Directory.GetFiles(Environment.CurrentDirectory + @"\Assets\Templates\");
+                    
+                foreach (string TemplatePath in Templates)
+                {
+                    string FileName = TemplatePath.Substring(TemplatePath.LastIndexOf("\\"));
+                    FileStream Stream = File.Create(Dir + FileName);
+                    Stream.Write(File.ReadAllBytes(TemplatePath));
+                    Stream.Close();
+                }
             }
 
             if (IsHosting)
             {
-                MainScreen.SelectedProject(ProjectLocationInputBox.Text, int.Parse(ClientsInputBox.Text));               
+                MainScreen.SelectedProject(Result.SolutionPath, int.Parse(ClientsInputBox.Text));               
             }
             else
             {
-                MainScreen.SelectedProject(ProjectLocationInputBox.Text, 1);
+                MainScreen.SelectedProject(Result.SolutionPath, 1);
             }
         }
 

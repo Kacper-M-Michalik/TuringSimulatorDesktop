@@ -263,7 +263,7 @@ namespace TuringServer
             {
                 bool Failed = true;
                 int CopyVersion = 1;
-                while (CopyVersion < 10 && Failed)
+                while (CopyVersion < int.MaxValue-1 && Failed)
                 {
                     FinalFileName = FileName + " (" + CopyVersion.ToString() + ")";
                     NewFileLocation = Server.LoadedProject.BasePath + ParentFolder.LocalPath + FinalFileName + FileManager.FileTypeToExtension(FileType);
@@ -303,6 +303,127 @@ namespace TuringServer
                         DataFileStream.Write(JsonSerializer.SerializeToUtf8Bytes(new SlateFile()));
                         break;
                 }
+                DataFileStream.Close();
+            }
+            catch (Exception E)
+            {
+                CustomLogging.Log("ServerRecieve Error: UserCreatedNewFile - " + E.ToString());
+                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to create file - Server failed to create it."));
+                return;
+            }
+
+            int NewID = FileManager.GetNewFileID();
+
+            Server.LoadedProject.GuidFileLookup.Add(FileGUID, NewID);
+            DirectoryFile NewFileData = new DirectoryFile(NewID, FileGUID, FinalFileName, FileType, Server.LoadedProject.FolderDataLookup[FolderID]);
+            Server.LoadedProject.FileDataLookup.Add(NewID, NewFileData);
+            ParentFolder.SubFiles.Add(NewFileData);
+            FileManager.LoadFileIntoCache(NewID);
+
+            Packet SendPacket = ServerSendPacketFunctions.FolderData(FolderID);
+            foreach (int SubscriberID in Server.LoadedProject.FolderDataLookup[FolderID].SubscriberIDs)
+            {
+                Server.SendTCPData(SubscriberID, SendPacket);
+            }
+        }
+
+        public static void UserCreatedNewFileWithData(int SenderClientID, Packet Data)
+        {
+            CustomLogging.Log("SERVER INSTRUCTION: User created file with inital data.");
+
+            int FolderID;
+            string FileName;
+            CoreFileType FileType;
+            byte[] InitialData;
+
+            try
+            {
+                FolderID = Data.ReadInt();
+                FileName = Data.ReadString();
+                FileType = (CoreFileType)Data.ReadInt();
+                InitialData = Data.ReadByteArray();
+            }
+            catch
+            {
+                CustomLogging.Log("ServerReceive Error: Invalid create file packet recieved from client: " + SenderClientID.ToString());
+                return;
+            }
+
+            if (FileType == CoreFileType.Other)
+            {
+                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to create file - Cannot create file with unknown extension."));
+                return;
+            }
+            if (!FileManager.IsValidFileName(FileName))
+            {
+                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to create file - File name uses invalid characters."));
+                return;
+            }
+            if (!Server.LoadedProject.FolderDataLookup.ContainsKey(FolderID))
+            {
+                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to create file - Folder doesnt exist."));
+                return;
+            }
+
+            DirectoryFolder ParentFolder = Server.LoadedProject.FolderDataLookup[FolderID];
+            string NewFileLocation = Server.LoadedProject.BasePath + ParentFolder.LocalPath + FileName + FileManager.FileTypeToExtension(FileType);
+
+            string FinalFileName = FileName;
+            if (File.Exists(NewFileLocation))
+            {
+                bool Failed = true;
+                int CopyVersion = 1;
+                while (CopyVersion < int.MaxValue - 1 && Failed)
+                {
+                    FinalFileName = FileName + " (" + CopyVersion.ToString() + ")";
+                    NewFileLocation = Server.LoadedProject.BasePath + ParentFolder.LocalPath + FinalFileName + FileManager.FileTypeToExtension(FileType);
+                    Failed = File.Exists(NewFileLocation);
+                    CopyVersion++;
+                }
+
+                if (Failed)
+                {
+                    Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to create file - File already exists/too many default name files currently exist."));
+                    return;
+                }
+            }
+
+            Guid FileGUID = Guid.NewGuid();
+
+            try
+            {
+                FileStream MetadataFilestream = File.Create(Server.LoadedProject.BasePath + ParentFolder.LocalPath + FinalFileName + ".tmeta");
+                MetadataFilestream.Write(JsonSerializer.SerializeToUtf8Bytes(new ObjectMetadataFile() { FileGUID = FileGUID, FileName = FinalFileName, FileType = FileType }));
+                MetadataFilestream.Close();
+
+
+                FileStream DataFileStream = File.Create(NewFileLocation);
+                try
+                {
+                    switch (FileType)
+                    {
+                        case CoreFileType.Alphabet:
+                            Alphabet A = JsonSerializer.Deserialize<Alphabet>(InitialData);
+                            break;
+                        case CoreFileType.Tape:
+                            TapeTemplate T = JsonSerializer.Deserialize<TapeTemplate>(InitialData);
+                            break;
+                        case CoreFileType.TransitionFile:
+                            TransitionFile Ta = JsonSerializer.Deserialize<TransitionFile>(InitialData);
+                            break;
+                        case CoreFileType.SlateFile:
+                            SlateFile S = JsonSerializer.Deserialize<SlateFile>(InitialData);
+                            break;
+                    }
+                    DataFileStream.Write(InitialData);
+                }
+                catch (Exception E)
+                {
+                    CustomLogging.Log("ServerRecieve Error: UserCreatedNewFile - " + E.ToString());
+                    Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to create file - Invalid inital dat sent."));
+                    return;
+                }                    
+               
                 DataFileStream.Close();
             }
             catch (Exception E)
@@ -739,12 +860,28 @@ namespace TuringServer
 
             string NewFolderDirectory = Server.LoadedProject.BasePath + ParentFolderData.LocalPath + NewFolderName + Path.DirectorySeparatorChar;
 
+            string FinalFolderName = NewFolderName;
+
+            string BaseDirectoryName = Server.LoadedProject.BasePath + ParentFolderData.LocalPath;
             if (Directory.Exists(NewFolderDirectory))
             {
-                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to create folder - Folder with this name already exists."));
-                return;     
-            }
+                bool Failed = true;
+                int CopyVersion = 1;
+                while (CopyVersion < int.MaxValue - 1 && Failed)
+                {
+                    FinalFolderName = NewFolderName + " (" + CopyVersion.ToString() + ")";
+                    NewFolderDirectory = BaseDirectoryName +  FinalFolderName + Path.DirectorySeparatorChar;
+                    Failed = Directory.Exists(NewFolderDirectory);
+                    CopyVersion++;
+                }
 
+                if (Failed)
+                {
+                    Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to create folder - Folder already exists/too many default name folders currently exist."));
+                    return;
+                }
+            }
+            
             try
             {
                 Directory.CreateDirectory(NewFolderDirectory);
@@ -757,7 +894,7 @@ namespace TuringServer
             }
 
             int NewID = FileManager.GetNewFileID();
-            DirectoryFolder NewFolderData = new DirectoryFolder(NewID, NewFolderName, ParentFolderData);
+            DirectoryFolder NewFolderData = new DirectoryFolder(NewID, FinalFolderName, ParentFolderData);
             ParentFolderData.SubFolders.Add(NewFolderData);
             Server.LoadedProject.FolderDataLookup.Add(NewID, NewFolderData);
 
