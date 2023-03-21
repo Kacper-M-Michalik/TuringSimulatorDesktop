@@ -195,7 +195,13 @@ namespace TuringServer
                 if (Clients[i].TCP.ConnectionSocket == null)
                 {
                     Clients[i].TCP.ConnectClientToServer(NewClient);
-                    if (LoadedProject != null) AddPacketToProcessOnServerThread(i, ClientSendPacketFunctions.RequestProjectData());
+                    if (LoadedProject != null) 
+                    {
+                        Packet MockPacket = ClientSendPacketFunctions.RequestProjectData();
+                        MockPacket.InsertPacketLength();
+                        MockPacket.SaveTemporaryBufferToPernamentReadBuffer();
+                        AddPacketToProcessOnServerThread(i, MockPacket);
+                    }
                     return;
                 }
             }

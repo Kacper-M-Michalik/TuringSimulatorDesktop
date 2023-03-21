@@ -83,6 +83,11 @@ namespace TuringServer
         {
             return ParentFolder.LocalPath + Name + ".tmeta";
         }
+
+        public ObjectMetadataFile ToMetaDataFile()
+        {
+            return new ObjectMetadataFile() { FileGUID = GUID, FileName = Name, FileType = FileType };
+        }
     }
 
 }

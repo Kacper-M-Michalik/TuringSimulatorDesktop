@@ -619,7 +619,6 @@ namespace TuringServer
             //Server.SendTCPToAllClients(ServerSendPacketFunctions.FileRenamed(FileID));
         }
 
-        //TODO THIS ONE
         public static void UserMovedFile(int SenderClientID, Packet Data)
         {
             CustomLogging.Log("SERVER INSTRUCTION: User moved file.");
@@ -663,18 +662,22 @@ namespace TuringServer
 
             DirectoryFile FileData = Server.LoadedProject.FileDataLookup[FileID];
             DirectoryFolder FolderData = Server.LoadedProject.FolderDataLookup[NewFolderID];
-            string NewFileLocation = Server.LoadedProject.BasePath + FolderData.LocalPath + FileData.Name;
+            string NewFileLocation = Server.LoadedProject.BasePath + FolderData.LocalPath + FileData.Name + FileData.Extension;
+            string NewMetadataLocation = Server.LoadedProject.BasePath + FolderData.LocalPath + FileData.Name + ".tmeta";
 
-            if (File.Exists(NewFileLocation))
+            string OldFileLocation = Server.LoadedProject.BasePath + FileData.GetLocalPath();
+            string OldMetadataFileLocation = Server.LoadedProject.BasePath + FileData.GetMetadataLocalPath();
+
+            if (File.Exists(NewFileLocation) || File.Exists(NewMetadataLocation))
             {
-                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to move file - File with this name already exists."));
+                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to move file - File/metadata file with this name already exists."));
                 return;
             }
 
             try
             {
-                //Replace with async here later?
                 File.WriteAllBytes(NewFileLocation, Server.LoadedProject.CacheDataLookup[FileID].FileData);
+                File.WriteAllBytes(NewMetadataLocation, JsonSerializer.SerializeToUtf8Bytes(FileData.ToMetaDataFile()));
             }
             catch (Exception E)
             {
@@ -683,10 +686,11 @@ namespace TuringServer
                 return;
             }
 
-            if (!FileManager.DeleteFileByPath(Server.LoadedProject.BasePath + FileData.GetLocalPath()))
+            if (!FileManager.DeleteFileByPath(OldFileLocation) || !FileManager.DeleteFileByPath(OldMetadataFileLocation))
             {
-                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to move file - Server failed to clean old file."));
-                FileManager.DeleteFileByPath(NewFileLocation);
+                Server.SendTCPData(SenderClientID, ServerSendPacketFunctions.ErrorNotification("Failed to move file - Server failed to clean old file. Please manually delete old file."));
+               // FileManager.DeleteFileByPath(NewFileLocation);
+               // FileManager.DeleteFileByPath(NewMetadataLocation);
                 return;
             }
 
@@ -694,6 +698,7 @@ namespace TuringServer
 
             FileData.ParentFolder.SubFiles.Remove(FileData);
             FileData.ParentFolder = FolderData;
+            FileData.ParentFolder.SubFiles.Add(FileData);
 
             Packet SendPacket = ServerSendPacketFunctions.FolderData(PreviousFolderID);
             foreach (int SubscriberID in Server.LoadedProject.FolderDataLookup[PreviousFolderID].SubscriberIDs)
@@ -701,11 +706,19 @@ namespace TuringServer
                 Server.SendTCPData(SubscriberID, SendPacket);
             }
 
+            SendPacket = ServerSendPacketFunctions.FolderData(NewFolderID);
+            foreach (int SubscriberID in Server.LoadedProject.FolderDataLookup[NewFolderID].SubscriberIDs)
+            {
+                Server.SendTCPData(SubscriberID, SendPacket);
+            }
+
+            /*
             SendPacket = ServerSendPacketFunctions.FolderData(FileData.ID);
             foreach (int SubscriberID in Server.LoadedProject.FolderDataLookup[FileData.ID].SubscriberIDs)
             {
                 Server.SendTCPData(SubscriberID, SendPacket);
             }
+            */
 
             //Server.SendTCPToAllClients(ServerSendPacketFunctions.FileMoved(FileID));
         }

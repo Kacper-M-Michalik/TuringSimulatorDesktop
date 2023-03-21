@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace TuringSimulatorDesktop.UI.Prefabs
 {
-    public class FileDisplayItem : IVisualElement, IClickable, IPollable
+    public class FileDisplayItem : IVisualElement, IClickable, IPollable, IDragListener
     {
         Vector2 position;
         public Vector2 Position
@@ -169,6 +169,22 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             if (RenameBox.IsActive && Keyboard.GetState().IsKeyDown(Keys.Enter))
             {
                 EndRename();
+            }
+        }
+
+        public void RecieveDragData()
+        {
+            FileData ReceivedData = InputManager.DragData as FileData;
+            if (ReceivedData != null && Data.IsFolder)
+            {
+                if (ReceivedData.IsFolder)
+                {
+                    Client.SendTCPData(ClientSendPacketFunctions.MoveFolder(ReceivedData.ID, Data.ID));
+                }
+                else
+                {
+                    Client.SendTCPData(ClientSendPacketFunctions.MoveFile(ReceivedData.GUID, Data.ID));
+                }
             }
         }
 

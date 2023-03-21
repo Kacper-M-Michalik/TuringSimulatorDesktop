@@ -47,7 +47,7 @@ namespace TuringSimulatorDesktop
         public static Texture2D SVGToTexture(string Path)
         {
             SvgDocument svgDoc = SvgDocument.Open<SvgDocument>(Path, null);
-            Bitmap Image = svgDoc.Draw(UIUtils.ConvertFloatToMinInt(svgDoc.Width.Value * (float)UIScale, 1f), UIUtils.ConvertFloatToMinInt(svgDoc.Height.Value * (float)UIScale, 1f));
+            Bitmap Image = svgDoc.Draw(Convert.ToInt32(MathF.Ceiling(svgDoc.Width.Value)) * 2, Convert.ToInt32(MathF.Ceiling(svgDoc.Height.Value)) * 2);//svgDoc.Draw(UIUtils.ConvertFloatToMinInt(svgDoc.Width.Value * (float)UIScale, 1f), UIUtils.ConvertFloatToMinInt(svgDoc.Height.Value * (float)UIScale, 1f));
             int bufferSize = Image.Height * Image.Width * 4;
             System.IO.MemoryStream memoryStream = new MemoryStream(bufferSize);
             Image.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Bmp);
@@ -251,6 +251,7 @@ namespace TuringSimulatorDesktop
     public enum UILookupKey
     {
         MouseIcon,
+        MouseDragIcon,
         TypingIcon,
 
         MinimiseIcon,

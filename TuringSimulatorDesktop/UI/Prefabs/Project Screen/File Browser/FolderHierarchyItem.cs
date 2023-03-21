@@ -4,11 +4,12 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using TuringCore;
 using TuringSimulatorDesktop.Input;
 
 namespace TuringSimulatorDesktop.UI.Prefabs
 {
-    public class FolderHierarchyItem : IVisualElement
+    public class FolderHierarchyItem : IVisualElement, IClickable, IPollable, IDragListener
     {
         Vector2 position;
         public Vector2 Position
@@ -41,9 +42,11 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             }
         }
 
+        public bool IsMarkedForDeletion { get; set; }
+
         ActionGroup Group;
 
-        ColorButton SelectFolderButton;
+        Icon SelectFolderButton;
         Label FolderLabel;
 
         FileBrowserView Browser;
@@ -56,11 +59,10 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Browser = browser;
             Data = data;
 
-            SelectFolderButton = new ColorButton(Group);
-            SelectFolderButton.BaseColor = GlobalInterfaceData.Scheme.Background;
-            SelectFolderButton.HighlightColor = GlobalInterfaceData.Scheme.DarkInteractableAccent;
-            SelectFolderButton.HighlightOnMouseOver = true;
-            SelectFolderButton.OnClickedEvent += LoadFolder;
+            Group.ClickableObjects.Add(this);
+            Group.PollableObjects.Add(this);
+
+            SelectFolderButton = new Icon(GlobalInterfaceData.Scheme.Background);
 
             FolderLabel = new Label();
             FolderLabel.Font = GlobalInterfaceData.StandardBoldFont;
@@ -73,10 +75,6 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Position = new Vector2(0, 0);
         }
 
-        public void LoadFolder(Button Sender)
-        {
-            Browser.SwitchOpenedFolder(Data.ID);
-        }
 
         void MoveLayout()
         {
@@ -92,6 +90,49 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             FolderLabel.FontSize = FontSize;
         }
 
+        public void RecieveDragData()
+        {
+            FileData ReceivedData = InputManager.DragData as FileData;
+            if (ReceivedData != null)
+            {
+                if (ReceivedData.IsFolder)
+                {
+                    Client.SendTCPData(ClientSendPacketFunctions.MoveFolder(ReceivedData.ID, Data.ID));
+                }
+                else
+                {
+                    Client.SendTCPData(ClientSendPacketFunctions.MoveFile(ReceivedData.GUID, Data.ID));
+                }
+            }
+        }
+
+        public void Clicked()
+        {
+            Browser.SwitchOpenedFolder(Data.ID);
+        }
+
+        public void ClickedAway()
+        {
+
+        }
+
+        public void PollInput(bool IsInActionGroupFrame)
+        {
+            if (IsInActionGroupFrame && IsMouseOver())
+            {
+                SelectFolderButton.DrawColor = GlobalInterfaceData.Scheme.DarkInteractableAccent;
+            }
+            else
+            {
+                SelectFolderButton.DrawColor = GlobalInterfaceData.Scheme.Background;
+            }
+        }
+
+        public bool IsMouseOver()
+        {
+            return (IsActive && InputManager.MouseData.X >= Position.X && InputManager.MouseData.X <= Position.X + bounds.X && InputManager.MouseData.Y >= Position.Y && InputManager.MouseData.Y <= Position.Y + bounds.Y);
+        }
+
         public void Draw(Viewport? BoundPort = null)
         {
             if (IsActive)
@@ -104,7 +145,9 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         public void Close()
         {
             IsActive = false;
-            SelectFolderButton.IsMarkedForDeletion = true;
+            Group.IsDirtyClickable = true;
+            Group.IsDirtyPollable = true;
+            IsMarkedForDeletion = true;
         }
     }
 }
