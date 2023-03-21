@@ -269,7 +269,7 @@ namespace TuringSimulatorDesktop.UI
 
             ProjectLocationTitle.Position = Position + new Vector2(17, 150);
             ProjectLocationInputBox.Position = Position + new Vector2(16, 176);
-            ProjectLocationSelectionButton.Position = Position + new Vector2(316, 176);
+            ProjectLocationSelectionButton.Position = Position + new Vector2(392, 176);
 
             ProjectSettingsTitle.Position = position + new Vector2(17, 246);
 
@@ -298,7 +298,7 @@ namespace TuringSimulatorDesktop.UI
             ProjectTitleInputBox.Bounds = new Point(300, 42);
 
             //ProjectLocationTitle.Bounds = new Point(300, 42);
-            ProjectLocationInputBox.Bounds = new Point(300, 42);
+            ProjectLocationInputBox.Bounds = new Point(376, 42);
             ProjectLocationSelectionButton.Bounds = new Point(42, 42);
 
             EmptyOption.Bounds = new Point(200, 105);
