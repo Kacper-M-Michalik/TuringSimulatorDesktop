@@ -173,6 +173,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 Builder.Append(Character);
                 Builder.Append("/n");
             }
+            Builder.Remove(Builder.Length - 2, 2);
             CharacterInputItem.Text = Builder.ToString();
             FullyLoadedFile = true;
         }

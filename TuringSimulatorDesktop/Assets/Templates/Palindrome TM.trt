@@ -1,8 +1,7 @@
 {
   "HaltStates": [
     "halt-accept",
-    "halt-reject",
-    ""
+    "halt-reject"
   ],
   "Transitions": [
     {

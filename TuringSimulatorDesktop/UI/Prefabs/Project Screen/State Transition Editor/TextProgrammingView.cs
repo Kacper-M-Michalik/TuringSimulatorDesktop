@@ -225,6 +225,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 Builder.Append(HaltState);
                 Builder.Append("/n");
             }
+            Builder.Remove(Builder.Length - 2, 2);
             HaltStateInputBox.Text = Builder.ToString();
 
             TransitionCanvas.ApplyMatrices();

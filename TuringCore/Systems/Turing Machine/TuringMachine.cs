@@ -36,26 +36,34 @@ namespace TuringCore
 
             ActiveTape = OriginalTape.Clone(ActiveAlphabet);
 
-            if (ActiveStateTable.ContainsInstructionForState(CurrentState))
+            if (ActiveStateTable.IsHaltState(CurrentState))
             {
-                NextInstruction = ActiveStateTable[CurrentState][ActiveTape[HeadPosition]];
+                NextInstruction = null;
+            }
+            else if (ActiveStateTable.ContainsInstructionForState(CurrentState))
+            {
+                if (ActiveStateTable[CurrentState].ContainsVariant(ActiveTape[HeadPosition]))
+                {
+                    NextInstruction = ActiveStateTable[CurrentState][ActiveTape[HeadPosition]];
+                }
+                else if (ActiveStateTable[CurrentState].ContainsVariant(ActiveAlphabet.WildcardCharacter))
+                {
+                    NextInstruction = ActiveStateTable[CurrentState][ActiveAlphabet.WildcardCharacter];
+                }
+                else
+                {
+                    IsActive = false;
+                    ReachedHaltState = true;
+                    CurrentState = HaltError;
+                }
             }
             else
             {
+                IsActive = false;
+                ReachedHaltState = true;
                 CurrentState = HaltError;
-                NextInstruction = null;
             }
-            /*
-            if (ActiveStateTable.DefinitionAlphabetID != OriginalTape.DefinitionAlphabetID)
-            {
-                CurrentState = HaltError;
-                NextInstruction = null;
-            }
-            else
-            {
-                NextInstruction = ActiveStateTable[CurrentState][ActiveTape[HeadPosition]];
-            }
-            */
+
             return 0;
         }
 

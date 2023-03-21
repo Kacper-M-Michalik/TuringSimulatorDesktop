@@ -14,7 +14,7 @@ using System.Net;
 
 namespace TuringSimulatorDesktop.UI
 {
-    public class MainScreenView : ScreenView
+    public class MainScreenView : ScreenView, IPollable
     {        
         int Width, Height;
         ActionGroup Group;
@@ -32,10 +32,14 @@ namespace TuringSimulatorDesktop.UI
 
         IClosable OpenMenu;
 
+        bool IsDragging;
+        Point GlobalStartPosition;
+        Point Offset;
+
         public MainScreenView()
         {          
             Group = InputManager.CreateActionGroup();
-
+            Group.PollableObjects.Add(this);
 
             CloseButton = new TextureButton(45, 32, new Vector2(705, 0), Group);
             CloseButton.OnClickedEvent += Close;
@@ -190,6 +194,9 @@ namespace TuringSimulatorDesktop.UI
         }
 
         string Location;
+
+        public bool IsMarkedForDeletion { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
         public void SelectedProject(string location, int MaxClientCount)
         {
             BackendInterface.StartProjectServer(MaxClientCount, 28104);
@@ -256,6 +263,33 @@ namespace TuringSimulatorDesktop.UI
             GlobalInterfaceData.MainWindow.Exit();
         }
 
+        public bool IsMouseOver()
+        {
+            return (InputManager.MouseData.X >= 0 && InputManager.MouseData.X <= Width && InputManager.MouseData.Y >= 0 && InputManager.MouseData.Y <= Header.Bounds.Y);
+        }
+
+        public void PollInput(bool IsInActionGroupFrame)
+        {
+            if (IsDragging)
+            {
+                Point Difference = new Point(GlobalInterfaceData.OSWindow.Position.X + InputManager.MouseData.Position.X, GlobalInterfaceData.OSWindow.Position.Y + InputManager.MouseData.Position.Y) - GlobalStartPosition;
+                GlobalInterfaceData.OSWindow.Position = new Point(GlobalStartPosition.X + Difference.X - Offset.X, GlobalStartPosition.Y + Difference.Y - Offset.Y);
+            }
+
+            if (InputManager.LeftMouseReleased)
+            {
+                IsDragging = false;
+            }
+
+            if (InputManager.LeftMousePressed && IsMouseOver())
+            {
+                IsDragging = true;
+                Offset = new Point(InputManager.MouseData.X, InputManager.MouseData.Y);
+                GlobalStartPosition = GlobalInterfaceData.OSWindow.Position + Offset;
+            }
+        }
+
+
         public override void Draw()
         {
             Background.Draw();
@@ -274,8 +308,8 @@ namespace TuringSimulatorDesktop.UI
 
         public override void ScreenResize()
         {
-            int Width = GlobalInterfaceData.Device.PresentationParameters.BackBufferWidth;
-            int Height = GlobalInterfaceData.Device.PresentationParameters.BackBufferHeight;
+            Width = GlobalInterfaceData.Device.PresentationParameters.BackBufferWidth;
+            Height = GlobalInterfaceData.Device.PresentationParameters.BackBufferHeight;
 
             Group.Width = Width;
             Group.Height = Height;
@@ -283,6 +317,5 @@ namespace TuringSimulatorDesktop.UI
             Background = new Icon(Width, Height, Vector2.Zero, GlobalInterfaceData.Scheme.Background);
             Header = new Icon(Width, 32, Vector2.Zero, GlobalInterfaceData.Scheme.Header);
         }
-
     }
 }
