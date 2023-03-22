@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TuringCore.VisualProgramming;
 
-namespace TuringCore.Systems.VisualProgramming
+namespace TuringCore
 {
-    public class VisualProgrammingProject
+    public class VisualProgrammingFile : CompilableFile
     {
         public Alphabet ProjectAlphabet;
         public List<Node> StoredNodes = new List<Node>();
@@ -17,9 +18,9 @@ namespace TuringCore.Systems.VisualProgramming
             StoredNodes.Add(Node);
         }
 
-        public StateTable Compile()
+        public override StateTable Compile(Alphabet DefinitionAlphabet)
         {
-            return null;
+            throw new NotImplementedException();
         }
     }
 }

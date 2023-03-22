@@ -300,7 +300,7 @@ namespace TuringServer
                         DataFileStream.Write(JsonSerializer.SerializeToUtf8Bytes(new TransitionFile()));
                         break;
                     case CoreFileType.SlateFile:
-                        DataFileStream.Write(JsonSerializer.SerializeToUtf8Bytes(new SlateFile()));
+                        DataFileStream.Write(JsonSerializer.SerializeToUtf8Bytes(new VisualProgrammingFile()));
                         break;
                 }
                 DataFileStream.Close();
@@ -412,7 +412,7 @@ namespace TuringServer
                             TransitionFile Ta = JsonSerializer.Deserialize<TransitionFile>(InitialData);
                             break;
                         case CoreFileType.SlateFile:
-                            SlateFile S = JsonSerializer.Deserialize<SlateFile>(InitialData);
+                            VisualProgrammingFile S = JsonSerializer.Deserialize<VisualProgrammingFile>(InitialData);
                             break;
                     }
                     DataFileStream.Write(InitialData);

@@ -330,7 +330,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 }
                 else
                 {
-                    TempFile = JsonSerializer.Deserialize<SlateFile>(Message.Data);
+                    TempFile = JsonSerializer.Deserialize<VisualProgrammingFile>(Message.Data);
                 }
             }
             catch

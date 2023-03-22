@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TuringCore.Systems.VisualProgramming
+namespace TuringCore.VisualProgramming
 {
     public class StateNode : Node
     {

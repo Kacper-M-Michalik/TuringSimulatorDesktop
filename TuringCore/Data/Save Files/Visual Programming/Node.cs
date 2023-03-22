@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using TuringCore.Actions;
 
-namespace TuringCore.Systems.VisualProgramming
+namespace TuringCore.VisualProgramming
 {
-    public class Node
+    public abstract class Node
     {
         public float X;
         public float Y;

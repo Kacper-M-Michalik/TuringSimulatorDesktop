@@ -7,8 +7,6 @@ namespace TuringCore
     [Serializable]
     public class Alphabet
     {
-        //[JsonInclude]
-        //public string ID;
         [JsonInclude]
         public HashSet<string> Characters;
         [JsonInclude]
@@ -18,7 +16,6 @@ namespace TuringCore
 
         public Alphabet()
         {
-            //ID = "";
             Characters = new HashSet<string>();
             EmptyCharacter = "";
             WildcardCharacter = "*";

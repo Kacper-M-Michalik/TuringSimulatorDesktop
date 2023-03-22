@@ -10,6 +10,7 @@ using TuringSimulatorDesktop.UI.Prefabs;
 using TuringCore;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using TuringCore.TextProgramming;
 
 namespace TuringSimulatorDesktop.UI.Prefabs
 {    
@@ -225,7 +226,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 Builder.Append(HaltState);
                 Builder.Append("/n");
             }
-            Builder.Remove(Builder.Length - 2, 2);
+            if (Builder.Length > 0) Builder.Remove(Builder.Length - 2, 2);
             HaltStateInputBox.Text = Builder.ToString();
 
             TransitionCanvas.ApplyMatrices();
