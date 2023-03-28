@@ -69,12 +69,4 @@ namespace TuringCore
             return Table;
         }
     }
-
-    [Serializable]
-    public enum MoveHeadDirection
-    {
-        Left,
-        Right,
-        Empty
-    }
 }
