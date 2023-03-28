@@ -1,0 +1,236 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="TuringCore.ErrorNotificationMessage" Collapsed="true">
+    <Position X="35.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Data\Networking\ServerToClient\ErrorNotificationMessage.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TuringCore.FileDataMessage" Collapsed="true">
+    <Position X="37.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IABAAgAAAAAAAAAAAAAAAAQAAAAAABAAAAAAAAAAAAA=</HashCode>
+      <FileName>Data\Networking\ServerToClient\FileDataMessage.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TuringCore.FolderDataMessage" Collapsed="true">
+    <Position X="40" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAAAAAAAgAAAAAAAAAQAAAAAAAAAAAAAAAIAAIA=</HashCode>
+      <FileName>Data\Networking\ServerToClient\FolderDataMessage.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TuringCore.LogDataMessage" Collapsed="true">
+    <Position X="42.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAA=</HashCode>
+      <FileName>Data\Networking\ServerToClient\LogDataMessage.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TuringCore.ProjectDataMessage" Collapsed="true">
+    <Position X="44.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAACAAAAAAEAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Data\Networking\ServerToClient\ProjectDataMessage.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TuringCore.RequestHeader">
+    <Position X="40" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAA=</HashCode>
+      <FileName>Data\Networking\RequestHeader.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TuringCore.TransitionFile" Collapsed="true">
+    <Position X="40.25" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAACAAAAEA=</HashCode>
+      <FileName>Data\Save Files\Text Programming\TransitionFile.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TuringCore.VisualProgrammingFile">
+    <Position X="42.5" Y="9.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAACAAAAAAAgAAAAAAAAAEA=</HashCode>
+      <FileName>Data\Save Files\Visual Programming\VisualProgrammingFile.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TuringCore.Alphabet" Collapsed="true">
+    <Position X="47" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYAAAAAAACA=</HashCode>
+      <FileName>Data\Save Files\Alphabet.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TuringCore.CompilableFile" Collapsed="true">
+    <Position X="41.5" Y="8.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAEA=</HashCode>
+      <FileName>Data\Save Files\CompilableFile.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TuringCore.Tape" Collapsed="true">
+    <Position X="47" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAABAAAAQIAACAAAAAQAAAAAABAAAAAgAAAAAAA=</HashCode>
+      <FileName>Data\Save Files\Tape.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TuringCore.TapeTemplate" Collapsed="true">
+    <Position X="48.75" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAABAAAAQAAAAAAAAAQAAAAAABAAAAAgAAAAABA=</HashCode>
+      <FileName>Data\Save Files\TapeTemplate.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TuringCore.ClientSendPacketFunctions" Collapsed="true">
+    <Position X="48.75" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEFECAAAAAAAAIgAWACAAAAAAAAAAAAAEgAABCBAA=</HashCode>
+      <FileName>Networking\Client Side\ClientSendPacketFunctions.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TuringCore.Packet" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="48.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIgCAQAACAABAIAQAAQAABAAIAAC8AAIAAAAQEAAAA=</HashCode>
+      <FileName>Networking\Packet.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="TuringCore.TuringAction" Collapsed="true">
+    <Position X="37.75" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Systems\Turing Machine\Instructions\Actions\Action.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TuringCore.InstructionCollection" Collapsed="true">
+    <Position X="50.5" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAQAAAABACAAAAAAAAAAAAAAAAAAQAAAAAAA=</HashCode>
+      <FileName>Systems\Turing Machine\Instructions\InstructionCollection.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TuringCore.InstructionVariant" Collapsed="true">
+    <Position X="52.25" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Systems\Turing Machine\Instructions\InstructionVariant.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TuringCore.IntVector" Collapsed="true">
+    <Position X="47" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAASAAAAAAAAAAAABAAAAAAAAAAAAA=</HashCode>
+      <FileName>Systems\Turing Machine\IntVector.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TuringCore.StateTable" Collapsed="true">
+    <Position X="52.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAADAABQAAAACAAAAAAAAAAIAAAAAAAAAAAAAIA=</HashCode>
+      <FileName>Systems\Turing Machine\StateTable.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TuringCore.TuringMachine" Collapsed="true">
+    <Position X="52.25" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAgAiACAIAAEgCAACAAAAAgAAYAKABAAAAAAAA=</HashCode>
+      <FileName>Systems\Turing Machine\TuringMachine.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TuringCore.TextProgramming.Transition" Collapsed="true">
+    <Position X="50.5" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAAAAAAAAAAAAAACEAAIAAgAAAAAAAAAAAYAA=</HashCode>
+      <FileName>Data\Save Files\Text Programming\Transition.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TuringCore.VisualProgramming.ActionNode" Collapsed="true">
+    <Position X="35.25" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQ=</HashCode>
+      <FileName>Data\Save Files\Visual Programming\ActionNode.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TuringCore.VisualProgramming.Node" Collapsed="true">
+    <Position X="36.5" Y="8.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYAA=</HashCode>
+      <FileName>Data\Save Files\Visual Programming\Node.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TuringCore.VisualProgramming.StateNode">
+    <Position X="37.5" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Data\Save Files\Visual Programming\StateNode.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TuringCore.SaveFiles.ProjectSaveFile" Collapsed="true">
+    <Position X="50.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAQAAAAACAAAAAAIAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Data\Save Files\ProjectSaveFile.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TuringCore.Actions.ChangeStateAction" Collapsed="true">
+    <Position X="35.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQAAAAAAAAAAIAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Systems\Turing Machine\Instructions\Actions\ChangeStateAction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TuringCore.Actions.MoveHeadAction" Collapsed="true">
+    <Position X="37.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Systems\Turing Machine\Instructions\Actions\MoveHeadAction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TuringCore.Actions.WriteAction" Collapsed="true">
+    <Position X="40" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAQAAAAA=</HashCode>
+      <FileName>Systems\Turing Machine\Instructions\Actions\WriteAction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Enum Name="TuringCore.CoreFileType">
+    <Position X="48.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAAAAAACAAAAAAAAAAAAAAACAAAAAEAAACAAAA=</HashCode>
+      <FileName>Data\CoreFileType.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="TuringCore.TuringProjectType">
+    <Position X="46.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAA=</HashCode>
+      <FileName>Data\Rules.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="TuringCore.ClientSendPackets">
+    <Position X="49" Y="6.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEFEAAAAAAAAAIhAWAAAAABAACAAAAAAEgAABCAAA=</HashCode>
+      <FileName>Networking\Packet.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="TuringCore.ServerSendPackets">
+    <Position X="51.5" Y="5.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAABAACACAABAEACQAACAgABAAAAAAAAAAAAIAAA=</HashCode>
+      <FileName>Networking\Packet.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="TuringCore.MoveHeadDirection">
+    <Position X="46.5" Y="7" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAACACAAAAAAAA=</HashCode>
+      <FileName>Data\Save Files\Text Programming\MoveHeadDirection.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
