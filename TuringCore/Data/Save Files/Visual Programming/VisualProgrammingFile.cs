@@ -9,7 +9,6 @@ namespace TuringCore
 {
     public class VisualProgrammingFile : CompilableFile
     {
-        public Alphabet ProjectAlphabet;
         public List<Node> StoredNodes = new List<Node>();
 
         public void InsertStateNode(string State)

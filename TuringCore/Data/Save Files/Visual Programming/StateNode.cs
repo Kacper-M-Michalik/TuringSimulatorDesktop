@@ -8,11 +8,11 @@ namespace TuringCore.VisualProgramming
 {
     public class StateNode : Node
     {
-        public string NewState;
+        public string CurrentState;
 
-        public StateNode(string SetNewState)
+        public StateNode(string SetCurrentState)
         {
-            NewState = SetNewState;
+            CurrentState = SetCurrentState;
         }
     }
 }

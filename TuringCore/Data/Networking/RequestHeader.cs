@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace TuringCore
 {
     [Serializable]
-    public class RequestHeader
+    public abstract class RequestHeader
     {
         [JsonInclude]
         public int RequestType;
