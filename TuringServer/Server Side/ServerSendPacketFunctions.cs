@@ -47,6 +47,7 @@ namespace TuringServer
             ProjectDataMessage Payload = new ProjectDataMessage();
             Payload.RequestType = (int)ServerSendPackets.SentProjectData;
             Payload.ProjectName = Server.LoadedProject.ProjectName;
+            Payload.ProjectType = Server.LoadedProject.TuringTypeRule;
 
             Data.Write((int)ServerSendPackets.SentProjectData);
             Data.Write(JsonSerializer.SerializeToUtf8Bytes(Payload));

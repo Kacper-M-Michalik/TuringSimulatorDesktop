@@ -12,5 +12,7 @@ namespace TuringCore
     {
         [JsonInclude]
         public string ProjectName;
+        [JsonInclude]
+        public TuringProjectType ProjectType;
     }
 }
