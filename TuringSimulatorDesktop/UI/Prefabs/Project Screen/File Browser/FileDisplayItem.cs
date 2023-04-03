@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using TuringCore;
+using TuringCore.Networking;
 using TuringSimulatorDesktop.Input;
 using Microsoft.Xna.Framework.Input;
 

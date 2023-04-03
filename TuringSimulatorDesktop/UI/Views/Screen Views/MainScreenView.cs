@@ -11,6 +11,7 @@ using Microsoft.Xna.Framework.Content;
 using TuringSimulatorDesktop.UI.Prefabs;
 using System.Windows.Forms;
 using System.Net;
+using TuringCore.Networking;
 
 namespace TuringSimulatorDesktop.UI
 {
