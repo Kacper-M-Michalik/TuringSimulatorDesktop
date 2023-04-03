@@ -11,8 +11,6 @@ namespace TuringCore
         public int HighestIndex;
         public int LowestIndex;
 
-        public Tape() { }
-
         public string this[int Position]
         {
             get

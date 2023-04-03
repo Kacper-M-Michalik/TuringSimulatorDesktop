@@ -254,7 +254,6 @@ namespace TuringServer
 
         public static CreateProjectReturnData CreateProject(string Name, string ProjectDirectory, TuringProjectType RuleType)
         {
-            JsonSerializerOptions Options = new JsonSerializerOptions() { WriteIndented = true };
             string BaseFolder = ProjectDirectory + Path.DirectorySeparatorChar + Name;
             string ProjectPath = BaseFolder + Path.DirectorySeparatorChar + Name + ".tproj";
             try
@@ -287,18 +286,6 @@ namespace TuringServer
                 return false;
             }
             return true;
-        }
-    }
-
-    public struct CreateProjectReturnData
-    {
-        public bool Success;
-        public string SolutionPath;
-
-        public CreateProjectReturnData(bool success, string solutionPath)
-        {
-            Success = success;
-            SolutionPath = solutionPath;
         }
     }
 }

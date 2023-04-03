@@ -10,8 +10,6 @@ namespace TuringServer
     {
         public static bool PortInUse(int Port)
         {
-            bool InUse = false;
-
             IPGlobalProperties IpProperties = IPGlobalProperties.GetIPGlobalProperties();
             IPEndPoint[] IpEndPoints = IpProperties.GetActiveTcpListeners();
 
@@ -19,12 +17,11 @@ namespace TuringServer
             {
                 if (EndPoint.Port == Port)
                 {
-                    InUse = true;
-                    break;
+                    return true;
                 }
             }
 
-            return InUse;
+            return false;
         }
     }
 }

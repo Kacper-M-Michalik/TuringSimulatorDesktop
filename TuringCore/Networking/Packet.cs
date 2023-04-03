@@ -220,20 +220,20 @@ namespace TuringCore
 
         #region Disposing
 
-        private bool disposed = false;
+        private bool Disposed = false;
 
-        protected virtual void Dispose(bool _disposing)
+        protected virtual void Dispose(bool Disposing)
         {
-            if (!disposed)
+            if (!Disposed)
             {
-                if (_disposing)
+                if (Disposing)
                 {
                     ReadBuffer = null;
                     TemporaryWriteBuffer = null;
                     ReadPointerPosition = 0;
                 }
 
-                disposed = true;
+                Disposed = true;
             }
         }
 
