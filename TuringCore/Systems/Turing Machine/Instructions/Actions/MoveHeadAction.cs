@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TuringCore.Actions
+namespace TuringCore.Systems
 {
     public class MoveHeadAction : TuringAction
     {

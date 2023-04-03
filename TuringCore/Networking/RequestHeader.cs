@@ -5,14 +5,12 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace TuringCore
+namespace TuringCore.Networking
 {
     [Serializable]
-    public class ProjectDataMessage : RequestHeader
+    public abstract class RequestHeader
     {
         [JsonInclude]
-        public string ProjectName;
-        [JsonInclude]
-        public TuringProjectType ProjectType;
+        public int RequestType;
     }
 }

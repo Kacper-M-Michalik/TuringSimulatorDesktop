@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TuringCore;
 
-namespace TuringCore
+namespace TuringCore.Networking
 {
     public static class ClientSendPacketFunctions
     {

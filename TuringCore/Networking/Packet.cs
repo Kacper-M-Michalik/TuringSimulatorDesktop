@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace TuringCore
+namespace TuringCore.Networking
 {
     public enum ClientSendPackets
     {

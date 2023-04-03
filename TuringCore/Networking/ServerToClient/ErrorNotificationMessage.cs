@@ -5,12 +5,12 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace TuringCore
+namespace TuringCore.Networking
 {
     [Serializable]
-    public abstract class RequestHeader
+    public class ErrorNotificationMessage : RequestHeader
     {
         [JsonInclude]
-        public int RequestType;
+        public string ErrorMessgae;
     }
 }

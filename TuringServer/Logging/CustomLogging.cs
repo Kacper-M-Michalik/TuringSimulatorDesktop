@@ -7,10 +7,11 @@ using TuringServer;
 
 namespace TuringServer.Logging
 {
+    public delegate void LogMethod(string Message);
+
     public static class CustomLogging
     {
         public static int LogClientID = -1;
-        public delegate void LogMethod(string Message);
         public static LogMethod LogPointer;
         public static LogMethod WritePointer;
 

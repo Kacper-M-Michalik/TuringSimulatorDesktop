@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace TuringCore
+namespace TuringCore.Systems
 {
     public class StateTable
     {

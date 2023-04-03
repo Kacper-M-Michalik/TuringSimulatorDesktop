@@ -11,6 +11,8 @@ using TuringCore;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using TuringCore.TextProgramming;
+using TuringCore.Files;
+using TuringCore.Networking;
 
 namespace TuringSimulatorDesktop.UI.Prefabs
 {    

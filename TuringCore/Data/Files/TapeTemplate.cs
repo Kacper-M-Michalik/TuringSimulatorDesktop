@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
-namespace TuringCore
+namespace TuringCore.Files
 {
     [Serializable]
     public class TapeTemplate
@@ -17,15 +14,15 @@ namespace TuringCore
         [JsonInclude]
         public int LowestIndex;
 
+        //Construct a new TapeTemplate
         public TapeTemplate()
         {
-            //ID = "";
-            // DefinitionAlphabetID = Guid.Empty;
             Data = new Dictionary<int, string>();
             HighestIndex = 0;
             LowestIndex = 0;
         }
-
+        
+        //Construct a new TapeTemplate using data from an existing Tape
         public TapeTemplate(Tape Source)
         {
             Data = new Dictionary<int, string>(Source.Data);
@@ -33,6 +30,7 @@ namespace TuringCore
             LowestIndex = Source.LowestIndex;
         }
 
+        //Set data on the TapeTempalte in bulk
         public void SetData(string[] Input)
         {
             Data.Clear();
@@ -44,11 +42,13 @@ namespace TuringCore
             HighestIndex = Input.Length - 1;
         }
 
+        //Get the length of the Tape
         public int Count()
         {
             return Data.Count;
         }
 
+        //Create a new Tape using the TapeTemplates data
         public Tape Clone(Alphabet Alphabet)
         {
             Tape CloneTape = new Tape();

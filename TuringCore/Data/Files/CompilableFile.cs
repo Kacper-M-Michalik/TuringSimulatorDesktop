@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using TuringCore.Systems;
 
-namespace TuringCore
+namespace TuringCore.Files
 {
     [Serializable]
     public abstract class CompilableFile

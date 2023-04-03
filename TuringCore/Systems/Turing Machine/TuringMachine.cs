@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using TuringCore.Files;
 
-namespace TuringCore
+namespace TuringCore.Systems
 {
     public class TuringMachine
     {

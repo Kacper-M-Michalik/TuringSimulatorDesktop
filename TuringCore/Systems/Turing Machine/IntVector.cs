@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TuringCore
+namespace TuringCore.Systems
 {
     //Not in use, to be added, will allow for tape of any dimensions.
     class IntVector

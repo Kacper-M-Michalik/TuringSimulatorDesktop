@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace TuringCore
+namespace TuringCore.Networking
 {
     [Serializable]
     public class FileDataMessage : RequestHeader

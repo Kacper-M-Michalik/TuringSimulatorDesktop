@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace TuringCore
+namespace TuringCore.Files
 {
     public class Tape
     {

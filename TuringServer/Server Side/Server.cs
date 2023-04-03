@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using TuringCore;
+using TuringCore.Networking;
 using TuringServer.Logging;
 
 namespace TuringServer

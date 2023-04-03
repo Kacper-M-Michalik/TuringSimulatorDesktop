@@ -1,8 +1,8 @@
-﻿using System.Text.Json;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
-namespace TuringCore.SaveFiles
+namespace TuringCore.Files
 {
+    //Class + JSON Template
     public class ProjectSaveFile
     {
         [JsonInclude]
@@ -12,6 +12,7 @@ namespace TuringCore.SaveFiles
         [JsonInclude]
         public TuringProjectType TuringTypeRule;
 
+        //Marks that the JSON serializer should use this contructor
         [JsonConstructor]
         public ProjectSaveFile(string ProjectName, string BaseFolder, TuringProjectType TuringTypeRule)
         {

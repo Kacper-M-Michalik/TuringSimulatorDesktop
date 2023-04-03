@@ -7,6 +7,8 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using TuringCore;
+using TuringCore.Files;
+using TuringCore.Networking;
 
 namespace TuringSimulatorDesktop.UI.Prefabs
 {

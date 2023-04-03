@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TuringCore.Actions;
 using System.Text.Json.Serialization;
+using TuringCore.Systems;
 using TuringCore.TextProgramming;
 
-namespace TuringCore
+namespace TuringCore.Files
 {
     [Serializable]
     public class TransitionFile : CompilableFile

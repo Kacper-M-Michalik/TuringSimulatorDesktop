@@ -7,6 +7,7 @@ using TuringCore;
 using TuringServer;
 using TuringSimulatorDesktop.UI;
 using System.Text.Json;
+using TuringCore.Networking;
 
 namespace TuringSimulatorDesktop
 {

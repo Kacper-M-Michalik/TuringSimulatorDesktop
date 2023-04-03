@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TuringCore.Systems;
 using TuringCore.VisualProgramming;
 
-namespace TuringCore
+namespace TuringCore.Files
 {
     public class VisualProgrammingFile : CompilableFile
     {

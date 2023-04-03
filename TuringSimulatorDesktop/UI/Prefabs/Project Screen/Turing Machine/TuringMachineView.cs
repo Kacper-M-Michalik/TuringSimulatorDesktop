@@ -5,6 +5,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
 using TuringCore;
+using TuringCore.Files;
+using TuringCore.Networking;
+using TuringCore.Systems;
 using TuringSimulatorDesktop.Input;
 
 namespace TuringSimulatorDesktop.UI.Prefabs

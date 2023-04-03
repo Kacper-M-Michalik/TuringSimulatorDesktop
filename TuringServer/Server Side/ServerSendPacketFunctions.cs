@@ -4,6 +4,7 @@ using TuringCore;
 using TuringServer.Logging;
 using System.Text.Json.Serialization;
 using System.Text.Json;
+using TuringCore.Networking;
 
 namespace TuringServer
 {

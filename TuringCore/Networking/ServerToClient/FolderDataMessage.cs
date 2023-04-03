@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace TuringCore
+namespace TuringCore.Networking
 {
     [Serializable]
     public class FolderDataMessage : RequestHeader
