@@ -4,6 +4,7 @@ using System.Text;
 
 namespace TuringCore.Networking
 {
+    //Request types the client can send
     public enum ClientSendPackets
     {
         LoadProject,
@@ -29,6 +30,7 @@ namespace TuringCore.Networking
         DeleteFolder
     }
 
+    //Response types the server can send
     public enum ServerSendPackets
     {
         LogData,
@@ -38,12 +40,7 @@ namespace TuringCore.Networking
         SentFolderData,
         SentOrUpdatedFile,
         SentFileMetadata,
-
-        //Unecessary?
-
-        //CreatedFile,
-        //RenamedFile,
-        //MovedFile,
+        
         DeletedFile,
 
         CreatedFolder,
@@ -52,7 +49,7 @@ namespace TuringCore.Networking
         DeletedFolder
     }
 
-    public class Packet : IDisposable
+    public class Packet //: IDisposable
     {
         byte[] ReadBuffer;
         public List<byte> TemporaryWriteBuffer;
@@ -64,6 +61,7 @@ namespace TuringCore.Networking
             ReadPointerPosition = 0;
         }
 
+        //Create Packet with existing binary data
         public Packet(byte[] Data)
         {
             TemporaryWriteBuffer = new List<byte>(0);
@@ -74,6 +72,9 @@ namespace TuringCore.Networking
 
         #region Writes
 
+        //Each write function writes to the temporary write buffer, this is as to allow dynamically increasign the size of the packet as mroe data is writetn to it
+
+        //AddLength controls whether the length of the byte[] is inserted before the byte[], it might not always be required if the size is known prehand and saves us memory
         public void Write(byte[] Data, bool AddLength = true)
         {
             if (AddLength) Write(Data.Length);
@@ -107,7 +108,6 @@ namespace TuringCore.Networking
 
         public void Write(string Data)
         {
-            //Reading string will be reading an int to get length, then looping through length.
             Write(Data.Length);
             TemporaryWriteBuffer.AddRange(Encoding.ASCII.GetBytes(Data));
         }
@@ -116,6 +116,9 @@ namespace TuringCore.Networking
 
         #region Reads
 
+        //We read from the final ReadBuffer
+
+        //MovePointer indicates whether we want the pointer to have moved the amount of data we have read after the read is complete
         public byte[] ReadBytes(int Length, bool MovePointer = true)
         {
             if (ReadPointerPosition + Length > ReadBuffer.Length) throw new Exception("ReadBytes Length out of bounds!");
@@ -185,16 +188,19 @@ namespace TuringCore.Networking
             return ReadBuffer.Length;
         }
 
+        //Unread number of bytes of the packet
         public int UnreadLength()
         {
             return ReadBuffer.Length - ReadPointerPosition;
         }
 
+        //Inserts the size of the packet in bytes in the front of the TemporaryWriteBuffer
         public void InsertPacketLength()
         {
             TemporaryWriteBuffer.InsertRange(0, BitConverter.GetBytes(TemporaryWriteBuffer.Count + 4));
         }
 
+        //This is used by the server to overwrite the length of the packet (which will be no longer necessary when the packet is fully received) with the ID of the client who sent the packet to the server, which is important for further processing, this method of simply overwriting the beginning of the packet means we don't need to pass around multiple parameter in the server functions other than this packet and makes it quick to insert the sender ID
         public void InsertPacketSenderIDUnsafe(int SenderID)
         {
             byte[] IDToBytes = BitConverter.GetBytes(SenderID);
@@ -204,12 +210,14 @@ namespace TuringCore.Networking
             ReadBuffer[3] = IDToBytes[3];
         }
 
+        //Saves the write buffer to the final read buffer (which is used for sending/reading packet)
         public byte[] SaveTemporaryBufferToPernamentReadBuffer()
         {
             ReadBuffer = TemporaryWriteBuffer.ToArray();
             return ReadBuffer;
         }
 
+        //Clear the packet to be empty
         public void Reset()
         {
             ReadBuffer = null;
@@ -220,8 +228,10 @@ namespace TuringCore.Networking
 
         #region Disposing
 
+        /*
         private bool Disposed = false;
 
+        //Disposes of the packet, clearing its data
         protected virtual void Dispose(bool Disposing)
         {
             if (!Disposed)
@@ -244,6 +254,8 @@ namespace TuringCore.Networking
         }
 
         #endregion
+        */
     }
 
 }
+# endregion

@@ -87,7 +87,7 @@ namespace TuringServer
         {
             Data.InsertPacketLength();
             Clients[ClientID].TCP.SendDataToClient(Data.SaveTemporaryBufferToPernamentReadBuffer());
-            Data.Dispose();
+            //Data.Dispose();
         }
         /*
         public static void SendTCPData(int ClientID, byte[] Data)
@@ -107,7 +107,7 @@ namespace TuringServer
                     Clients[i].TCP.SendDataToClient(FinalData);
                 }
             }
-            Data.Dispose();
+            //Data.Dispose();
         }
         #endregion
 
@@ -143,7 +143,7 @@ namespace TuringServer
                         {
                             CustomLogging.Log("SERVER: Invalid Packet recieved");
                         }
-                        Data.Dispose();
+                        //Data.Dispose();
                     }
                 }
 

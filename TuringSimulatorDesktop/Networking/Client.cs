@@ -208,7 +208,7 @@ namespace TuringSimulatorDesktop
                     //Execute function
                     if (ClientReceiveFunctions.PacketToFunction.ContainsKey(PacketType))
                         ClientReceiveFunctions.PacketToFunction[PacketType](Data);
-                    Data.Dispose();
+                    //Data.Dispose();
                 }
 
             }            
@@ -226,7 +226,7 @@ namespace TuringSimulatorDesktop
         public static void SendTCPData(Packet Data)
         {
             TCP.SendDataToServer(Data);
-            Data.Dispose();
+            //Data.Dispose();
         }
 
         public static void Disconnect()

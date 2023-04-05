@@ -3,8 +3,10 @@ using System.Text;
 
 namespace TuringCore.Networking
 {
+    //This class simplifies the process of creating a request packet for clients by having them have to simply call a function with the appropriate parameters, and the request packet is generated automatically.
     public static class ClientSendPacketFunctions
     {
+        //Generates Load Project Request Packet
         public static Packet LoadProject(string Location)
         {
             Packet Data = new Packet();
@@ -15,6 +17,7 @@ namespace TuringCore.Networking
             return Data;
         }
 
+        //Generates Request Packet that asks for data about the currently loaded project
         public static Packet RequestProjectData()
         {
             Packet Data = new Packet();
@@ -24,6 +27,7 @@ namespace TuringCore.Networking
             return Data;
         }
 
+        //Generates Request Packet for this client to become the debug client that receives all copies of debugs logs made by the server
         public static Packet RequestLogReceiverStatus()
         {
             Packet Data = new Packet();
@@ -33,6 +37,7 @@ namespace TuringCore.Networking
             return Data;
         }
 
+        //Generates Request Packet that asks for a file
         public static Packet RequestFile(Guid FileID, bool RecieveUpdates)
         {
             Packet Data = new Packet();
@@ -44,6 +49,7 @@ namespace TuringCore.Networking
             return Data;
         }
 
+        //Generates Request Packet that asks for a files metadata
         public static Packet RequestFileMetadata(Guid FileID)
         {
             Packet Data = new Packet();
@@ -54,6 +60,7 @@ namespace TuringCore.Networking
             return Data;
         }
 
+        //Generates Request Packet that asks for a folder and its related data
         public static Packet RequestFolderData(int FolderID, bool RecieveUpdates)
         {
             Packet Data = new Packet();
@@ -65,6 +72,7 @@ namespace TuringCore.Networking
             return Data;
         }
 
+        //Generates Request Packet that asks to create a new file
         public static Packet CreateFile(int Folder, string NewName, CoreFileType FileType)
         {
             Packet Data = new Packet();
@@ -77,6 +85,7 @@ namespace TuringCore.Networking
             return Data;
         }
 
+        //Generates Request Packet that asks edit an existing files contents
         public static Packet UpdateFile(Guid FileID, int Version, string NewContents)
         {
             Packet Data = new Packet();
@@ -89,6 +98,7 @@ namespace TuringCore.Networking
             return Data;
         }
 
+        //Generates Request Packet that asks edit an existing files contents
         public static Packet UpdateFile(Guid FileID, int Version, byte[] NewContents)
         {
             Packet Data = new Packet();
@@ -114,6 +124,7 @@ namespace TuringCore.Networking
         }
         */
 
+        //Generates Request Packet that asks rename an existing file
         public static Packet RenameFile(Guid FileID, string NewFileName)
         {
             Packet Data = new Packet();
@@ -125,6 +136,7 @@ namespace TuringCore.Networking
             return Data;
         }
 
+        //Generates Request Packet that asks file to be moved to a new folder
         public static Packet MoveFile(Guid FileID, int NewFolderID)
         {
             Packet Data = new Packet();
@@ -136,6 +148,7 @@ namespace TuringCore.Networking
             return Data;
         }
 
+        //Generates Request Packet that asks for a file to be deleted
         public static Packet DeleteFile(Guid FileID)
         {
             Packet Data = new Packet();
@@ -146,6 +159,7 @@ namespace TuringCore.Networking
             return Data;
         }
 
+        //Generates Request Packet that asks the server to stop sending updates about this file to the client
         public static Packet UnsubscribeFromFileUpdates(Guid FileID)
         {
             Packet Data = new Packet();
@@ -156,6 +170,7 @@ namespace TuringCore.Networking
             return Data;
         }
 
+        //Generates Request Packet that asks the server to stop sending updates about this folder to the client
         public static Packet UnsubscribeFromFolderUpdates(int FileID)
         {
             Packet Data = new Packet();
@@ -167,6 +182,7 @@ namespace TuringCore.Networking
         }
 
 
+        //Generates Request Packet that asks to create a new folder
         public static Packet CreateFolder(int BaseFolder, string NewName)
         {
             Packet Data = new Packet();
@@ -178,6 +194,7 @@ namespace TuringCore.Networking
             return Data;
         }
 
+        //Generates Request Packet that asks rename an existing folder
         public static Packet RenameFolder(int Folder, string NewName)
         {
             Packet Data = new Packet();
@@ -189,6 +206,7 @@ namespace TuringCore.Networking
             return Data;
         }
 
+        //Generates Request Packet that asks folder to be moved to a new folder
         public static Packet MoveFolder(int Folder, int TargetFolder)
         {
             Packet Data = new Packet();
@@ -200,6 +218,7 @@ namespace TuringCore.Networking
             return Data;
         }
 
+        //Generates Request Packet that asks for a folder to be deleted
         public static Packet DeleteFolder(int Folder)
         {
             Packet Data = new Packet();
