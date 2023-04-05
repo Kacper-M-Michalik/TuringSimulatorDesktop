@@ -17,7 +17,7 @@ namespace TuringServer
 
             LogDataMessage Payload = new LogDataMessage();
             Payload.RequestType = (int)ServerSendPackets.LogData;
-            Payload.LogMessgae = LogData;
+            Payload.LogMessage = LogData;
 
             Data.Write((int)ServerSendPackets.LogData);
             Data.Write(JsonSerializer.SerializeToUtf8Bytes(Payload));
@@ -33,7 +33,7 @@ namespace TuringServer
 
             ErrorNotificationMessage Payload = new ErrorNotificationMessage();
             Payload.RequestType = (int)ServerSendPackets.ErrorNotification;
-            Payload.ErrorMessgae = ErrorString;
+            Payload.ErrorMessage = ErrorString;
 
             Data.Write((int)ServerSendPackets.ErrorNotification);
             Data.Write(JsonSerializer.SerializeToUtf8Bytes(Payload));

@@ -36,14 +36,14 @@ namespace TuringSimulatorDesktop
         {
             ErrorNotificationMessage Message = JsonSerializer.Deserialize<ErrorNotificationMessage>(Data.ReadByteArray());
 
-            CustomLogging.Log("CLIENT: Received Error Notif: " + Message.ErrorMessgae);
+            CustomLogging.Log("CLIENT: Received Error Notif: " + Message.ErrorMessage);
         }
 
         public static void ReceiveLogData(Packet Data)
         {
             LogDataMessage Message = JsonSerializer.Deserialize<LogDataMessage>(Data.ReadByteArray());
 
-            CustomLogging.Log("CLIENT: LOG DATA FROM SERVER: " + Message.LogMessgae);
+            CustomLogging.Log("CLIENT: LOG DATA FROM SERVER: " + Message.LogMessage);
         }
 
         public static void ReceivedFileFromServer(Packet Data)

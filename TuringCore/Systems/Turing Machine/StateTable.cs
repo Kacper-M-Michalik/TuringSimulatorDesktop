@@ -5,14 +5,15 @@ namespace TuringCore.Systems
 {
     public class StateTable
     {
-        //public string ID;
         Dictionary<string, InstructionCollection> Instructions = new Dictionary<string, InstructionCollection>();
         HashSet<string> HaltStates = new HashSet<string>();
 
+        //Allows the statetable to be accessed like an array -> Neater Code
         public InstructionCollection this[string State]
         {
             get
             {
+                //Check if we have a valid collection of instructions for this state
                 if (Instructions.TryGetValue(State, out InstructionCollection InstructionToReturn))
                 {
                     return InstructionToReturn;

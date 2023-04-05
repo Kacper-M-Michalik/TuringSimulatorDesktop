@@ -20,6 +20,7 @@ namespace TuringServer.Logging
 
         static CustomLogging()
         {
+            //Bug where if error happens and log is doen again, infinite log loop!
             LogPointer = delegate (string Message) { if (LogClientID != -1) { Server.SendTCPData(LogClientID, ServerSendPacketFunctions.LogData(Message)); } Debug.WriteLine(Message); };
             WritePointer = delegate (string Message) { if (LogClientID != -1) { Server.SendTCPData(LogClientID, ServerSendPacketFunctions.LogData(Message)); } Debug.Write(Message); };
 

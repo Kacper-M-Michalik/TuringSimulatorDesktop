@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TuringCore.Systems
 {
@@ -10,10 +7,12 @@ namespace TuringCore.Systems
     {
         Dictionary<string, InstructionVariant> InstructionVariants = new Dictionary<string, InstructionVariant>();
 
+        //Allows the InstructionCollection to be accessed like an array -> Neater Code
         public InstructionVariant this[string ReadAlphabetCharacter]
         {
             get
             {
+                //Check if we have valid instructions for this read tape value
                 if (InstructionVariants.TryGetValue(ReadAlphabetCharacter, out InstructionVariant Variant))
                 {
                     return Variant;

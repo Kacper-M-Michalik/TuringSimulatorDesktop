@@ -77,5 +77,6 @@
       "MoveDirection": 1
     }
   ],
-  "DefinitionAlphabetFileID": "df61a80c-7b5b-471b-8573-e75bbff2b156"
+  "DefinitionAlphabetFileID": "df61a80c-7b5b-471b-8573-e75bbff2b156",
+  "IsClassical": false
 }
