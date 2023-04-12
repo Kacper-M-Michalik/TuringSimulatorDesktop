@@ -81,7 +81,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                     case CoreFileType.TransitionFile:
                         FileIcon.DrawTexture = GlobalInterfaceData.TextureLookup[UILookupKey.TransitionTableIcon];
                         break;
-                    case CoreFileType.SlateFile:
+                    case CoreFileType.CustomGraphFile:
                         FileIcon.DrawTexture = GlobalInterfaceData.TextureLookup[UILookupKey.SlateFileTCIcon];
                         break;
                     case CoreFileType.Other:

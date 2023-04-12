@@ -301,7 +301,7 @@ namespace TuringServer
                     case CoreFileType.TransitionFile:
                         DataFileStream.Write(JsonSerializer.SerializeToUtf8Bytes(new TransitionFile()));
                         break;
-                    case CoreFileType.SlateFile:
+                    case CoreFileType.CustomGraphFile:
                         DataFileStream.Write(JsonSerializer.SerializeToUtf8Bytes(new VisualProgrammingFile()));
                         break;
                 }
@@ -413,7 +413,7 @@ namespace TuringServer
                         case CoreFileType.TransitionFile:
                             TransitionFile Ta = JsonSerializer.Deserialize<TransitionFile>(InitialData);
                             break;
-                        case CoreFileType.SlateFile:
+                        case CoreFileType.CustomGraphFile:
                             VisualProgrammingFile S = JsonSerializer.Deserialize<VisualProgrammingFile>(InitialData);
                             break;
                     }

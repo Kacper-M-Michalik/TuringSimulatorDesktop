@@ -11,7 +11,7 @@ namespace TuringCore
         Alphabet,
         Tape,
         TransitionFile,
-        SlateFile,
+        CustomGraphFile,
         Other
     }
 }

@@ -54,8 +54,8 @@ namespace TuringServer
                     return CoreFileType.Tape;
                 case ".trt":
                     return CoreFileType.TransitionFile;
-                case ".slt":
-                    return CoreFileType.SlateFile;
+                case ".cgr":
+                    return CoreFileType.CustomGraphFile;
                 default:
                     return CoreFileType.Other;
             }
@@ -71,8 +71,8 @@ namespace TuringServer
                     return ".tape";
                 case CoreFileType.TransitionFile:
                     return ".trt";
-                case CoreFileType.SlateFile:
-                    return ".slt";
+                case CoreFileType.CustomGraphFile:
+                    return ".cgr";
                 default:
                     return "";
             }

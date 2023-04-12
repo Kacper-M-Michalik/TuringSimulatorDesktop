@@ -317,7 +317,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             }
 
             //unnecessary check?
-            if (Message.FileType != CoreFileType.TransitionFile && Message.FileType != CoreFileType.SlateFile)
+            if (Message.FileType != CoreFileType.TransitionFile && Message.FileType != CoreFileType.CustomGraphFile)
             {
                 //diosplay error to UI HERE
                 CustomLogging.Log("Client: Turing Machine Window Fatal Error, received an unexpected non table source data!");

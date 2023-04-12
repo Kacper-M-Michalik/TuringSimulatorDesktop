@@ -277,7 +277,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         public void CreateSlateFile(Button Sender)
         {
             OpenMenu?.Close();
-            Client.SendTCPData(ClientSendPacketFunctions.CreateFile(CurrentlyOpenedFolderID, "Empty Slate File", CoreFileType.SlateFile));
+            Client.SendTCPData(ClientSendPacketFunctions.CreateFile(CurrentlyOpenedFolderID, "Empty Slate File", CoreFileType.CustomGraphFile));
         }
         public void CreateTapeFile(Button Sender)
         {
@@ -305,7 +305,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                     ViewToAdd = new TextProgrammingView(Data.GUID);
                     OwnerWindow.OwnerScreen.SetActiveEditorWindow((IRunnable)ViewToAdd);
                     break;
-                case CoreFileType.SlateFile:
+                case CoreFileType.CustomGraphFile:
                     ViewToAdd = new VisualProgrammingView(Data.GUID);
                     //OwnerWindow.OwnerScreen.SetActiveEditorWindow((IRunnable)ViewToAdd);
                     break;
