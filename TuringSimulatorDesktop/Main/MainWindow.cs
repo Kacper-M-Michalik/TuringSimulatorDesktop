@@ -136,11 +136,6 @@ namespace TuringSimulatorDesktop
             CurrentView = new MainScreenView();
         }
 
-        protected override void Update(GameTime gameTime)
-        {      
-            base.Update(gameTime);
-        }
-
         protected override void Draw(GameTime gameTime)
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
