@@ -9,7 +9,9 @@ using System.Threading.Tasks;
 using TuringCore;
 using TuringCore.Files;
 using TuringCore.Networking;
+using TuringSimulatorDesktop.Debugging;
 using TuringSimulatorDesktop.Input;
+using TuringSimulatorDesktop.Networking;
 
 namespace TuringSimulatorDesktop.UI.Prefabs
 {
@@ -63,6 +65,9 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         Icon Background;
 
+        TextureButton HelpMenuButton;
+        List<Texture2D> HelpMenus;
+
         Label EmptyCharacterTitle;
         Label WildcardCharacterTitle;
         Label AllowedCharactersTitle;
@@ -90,6 +95,9 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Group = InputManager.CreateActionGroup();
 
             Background = new Icon(GlobalInterfaceData.Scheme.Background);
+
+            HelpMenuButton = new TextureButton(Group);
+            HelpMenuButton.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.HelpButton];
 
             EmptyCharacterTitle = new Label();
             EmptyCharacterTitle.FontSize = GlobalInterfaceData.Scale(12);
@@ -213,6 +221,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             Background.Position = position;
 
+            HelpMenuButton.Position = Position + new Vector2(bounds.X - 37, 7);
+
             EmptyCharacterTitle.Position = position + GlobalInterfaceData.Scale(new Vector2(22, 18));
             EmptyCharacterInputBox.Position = position + GlobalInterfaceData.Scale(new Vector2(20, 30));
 
@@ -230,6 +240,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Group.Height = bounds.Y;
 
             Background.Bounds = bounds;
+
+            HelpMenuButton.Bounds = new Point(30, 30);
 
             EmptyCharacterInputBox.Bounds = GlobalInterfaceData.Scale(new Point(120, 30));
             WildcardCharacterInputBox.Bounds = GlobalInterfaceData.Scale(new Point(120, 30));
@@ -250,6 +262,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
                 AllowedCharactersTitle.Draw(BoundPort);
                 CharacterInputItem.Draw(BoundPort);
+
+                HelpMenuButton.Draw(BoundPort);
             }
         }
 

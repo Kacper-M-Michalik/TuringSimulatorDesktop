@@ -9,7 +9,7 @@ using TuringSimulatorDesktop.Input;
 using TuringServer;
 using System.Windows.Forms;
 
-namespace TuringSimulatorDesktop.UI
+namespace TuringSimulatorDesktop.UI.Prefabs
 {
     public class LoadProjectMenu : IVisualElement, IClosable
     {

@@ -8,7 +8,9 @@ using TuringCore;
 using TuringCore.Files;
 using TuringCore.Networking;
 using TuringCore.Systems;
+using TuringSimulatorDesktop.Debugging;
 using TuringSimulatorDesktop.Input;
+using TuringSimulatorDesktop.Networking;
 
 namespace TuringSimulatorDesktop.UI.Prefabs
 {    
@@ -64,6 +66,9 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         Icon Background;
 
+        TextureButton HelpMenuButton;
+        List<Texture2D> HelpMenus;
+
         Label CurrentStateTableTitle;
         Label CurrentStateTableLabel;
         Label CurrentTapeTitle;
@@ -118,7 +123,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         const double BaseTimeBetweenSteps = 800;
         double TimeBetweenStepsMS;
 
-        Alphabet EmptyAlphabet = new Alphabet() { EmptyCharacter = "" };
+        Alphabet EmptyAlphabet = new Alphabet() { EmptyCharacter = "" };        
 
         public TuringMachineView(Guid FileToDisplay)
         {
@@ -130,6 +135,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Group = InputManager.CreateActionGroup();
             Group.ClickableObjects.Add(this);
             Group.PollableObjects.Add(this);
+
+            HelpMenus = new List<Texture2D>() { GlobalInterfaceData.TextureLookup[UILookupKey.HelpMenuTuringExecution1], GlobalInterfaceData.TextureLookup[UILookupKey.HelpMenuTuringExecution2] };
 
             CurrentStateTableTitle = new Label();
             CurrentStateTableTitle.FontSize = 11;
@@ -184,6 +191,10 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             ControlBox1 = new HorizontalLayoutBox();
             ControlBox1.DrawBounded = false;
             ControlBox1.Scrollable = false;
+
+            HelpMenuButton = new TextureButton(Group);
+            HelpMenuButton.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.HelpButton];
+            HelpMenuButton.OnClickedEvent += OpenHelpMenu;
 
             AutoStepButton = new TextureButton(Group);
             AutoStepButton.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.AutoStep];
@@ -392,7 +403,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             if (TempStateTable == null)
             {
                 NotificationLabel.Text = "Failed to compile state table: Check it programmed correctly!";
-                CustomLogging.Log("Cllient: Failed to compile file, invalid transition/slate file!");
+                CustomLogging.Log("Client: Failed to compile file, invalid transition/slate file!");
                 return;
             }
             IsStateTableOutdated = true;            
@@ -587,6 +598,12 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             ReadHead.Position = VisualTape.GetIndexWorldPosition(Machine.HeadPosition) - new Vector2(ReadHead.Bounds.X * 0.5f, 100.5f);
         }
 
+        public void OpenHelpMenu(Button Sender)
+        {
+            Window Win = OwnerWindow.OwnerScreen.CreateWindow(InputManager.MouseData.X - HelpMenus[0].Width, InputManager.MouseData.Y, HelpMenus[0].Width, HelpMenus[0].Height);
+            Win.AddView(new HelpMenu(HelpMenus));
+        }
+
         public void RecieveDragData()
         {
             FileData Data = InputManager.DragData as FileData;
@@ -618,6 +635,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             Background.Position = Position;
 
+            HelpMenuButton.Position = Position + new Vector2(bounds.X - 37, 7); 
+
             Canvas.Position = Position;
 
             CurrentStateTableTitle.Position = Position + new Vector2(22, 27);
@@ -643,7 +662,9 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Group.Width = bounds.X;
             Group.Height = bounds.Y;
 
-            Background.Bounds = bounds;           
+            Background.Bounds = bounds;
+
+            HelpMenuButton.Bounds = new Point(30, 30);
 
             ExecuteButton.Bounds = new Point(65, 65);
             RestartButton.Bounds = new Point(65, 65);
@@ -685,6 +706,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
                 ControlBox1.Draw(BoundPort);
                 ControlBox2.Draw(BoundPort);
+
+                HelpMenuButton.Draw(BoundPort);
             }
         }
 

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TuringSimulatorDesktop.Input;
 
-namespace TuringSimulatorDesktop.UI
+namespace TuringSimulatorDesktop.Input
 {
     public interface IPollable
     {

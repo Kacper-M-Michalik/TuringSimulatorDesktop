@@ -4,6 +4,7 @@ using System.Text;
 using System.Diagnostics;
 using System.IO;
 using TuringServer;
+using TuringServer.ServerSide;
 
 namespace TuringServer.Logging
 {
@@ -21,22 +22,18 @@ namespace TuringServer.Logging
         static CustomLogging()
         {
             //Bug where if error happens and log is doen again, infinite log loop!
+
+            //We use function pointers for our logging as to allow thje front end that implements this backend to be able to override the logging with its own version
             LogPointer = delegate (string Message) { if (LogClientID != -1) { Server.SendTCPData(LogClientID, ServerSendPacketFunctions.LogData(Message)); } Debug.WriteLine(Message); };
             WritePointer = delegate (string Message) { if (LogClientID != -1) { Server.SendTCPData(LogClientID, ServerSendPacketFunctions.LogData(Message)); } Debug.Write(Message); };
-
-            /*
-            #if DEBUG
-                LogPointer = delegate (string Message) { Debug.WriteLine(Message); };
-                WritePointer = delegate (string Message) { Debug.Write(Message); };
-            #endif
-            */
-
-            //Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + Path.DirectorySeparatorChar + "Turing Machine - Desktop");
-            //LogFilePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + Path.DirectorySeparatorChar + "Turing Machine - Desktop" + Path.DirectorySeparatorChar + "Log--" + DateTime.Now.ToString("yyyy-MM-dd--HH-mm") + ".txt";
+            
+            //Create local logging file with current date and time
+            Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + Path.DirectorySeparatorChar + "Turing Machine - Desktop");
+            LogFilePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + Path.DirectorySeparatorChar + "Turing Machine - Desktop" + Path.DirectorySeparatorChar + "Log--" + DateTime.Now.ToString("yyyy-MM-dd--HH-mm") + ".txt";
 
             try
             {
-               // LogStream = File.Create(LogFilePath);
+                LogStream = File.Create(LogFilePath);
             }
             catch (Exception E)
             {
@@ -44,14 +41,18 @@ namespace TuringServer.Logging
             }
         }
 
+        //Write to a new line
         public static void Log(string Message)
         {
+            //Check if we have a function pointer
             if (LogPointer != null) LogPointer(Message);
             byte[] Data = Encoding.ASCII.GetBytes(Message + "\n");
+            //WRite copy of log to log/debug file
             LogStream?.Write(Data, 0, Data.Length);
             LogStream?.Flush();
         }
 
+        //Appends to a line
         public static void Write(string Message)
         {
             if (WritePointer != null) WritePointer(Message);

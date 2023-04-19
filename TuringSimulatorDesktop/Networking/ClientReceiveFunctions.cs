@@ -8,8 +8,9 @@ using TuringServer;
 using TuringSimulatorDesktop.UI;
 using System.Text.Json;
 using TuringCore.Networking;
+using TuringSimulatorDesktop.Debugging;
 
-namespace TuringSimulatorDesktop
+namespace TuringSimulatorDesktop.Networking
 {
     static class ClientReceiveFunctions
     {

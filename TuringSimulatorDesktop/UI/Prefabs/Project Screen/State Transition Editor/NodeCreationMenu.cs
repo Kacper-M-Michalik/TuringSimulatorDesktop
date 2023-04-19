@@ -55,11 +55,11 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Editor = editor;
             Group = InputManager.CreateActionGroup();
 
-            Background = new Icon(GlobalInterfaceData.Scheme.InteractableAccent);
+            Background = new Icon(GlobalInterfaceData.Scheme.CanvasContextMenu);
 
             CreateTransitionButton = new ColorButton(Group);
-            CreateTransitionButton.BaseColor = GlobalInterfaceData.Scheme.InteractableAccent;
-            CreateTransitionButton.HighlightColor = GlobalInterfaceData.Scheme.DarkInteractableAccent;
+            CreateTransitionButton.BaseColor = GlobalInterfaceData.Scheme.CanvasContextMenu;
+            CreateTransitionButton.HighlightColor = GlobalInterfaceData.Scheme.CanvasContextMenuSelected;
             CreateTransitionButton.HighlightOnMouseOver = true;
             CreateTransitionButton.OnClickedEvent += Editor.AddNewTransition;
 

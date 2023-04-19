@@ -65,17 +65,17 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Editor = editor;
             Group = InputManager.CreateActionGroup();
 
-            Background = new Icon(GlobalInterfaceData.Scheme.InteractableAccent);
+            Background = new Icon(GlobalInterfaceData.Scheme.CanvasContextMenu);
 
             DeleteNodeButton = new ColorButton(Group);
-            DeleteNodeButton.BaseColor = GlobalInterfaceData.Scheme.InteractableAccent;
-            DeleteNodeButton.HighlightColor = GlobalInterfaceData.Scheme.DarkInteractableAccent;
+            DeleteNodeButton.BaseColor = GlobalInterfaceData.Scheme.CanvasContextMenu;
+            DeleteNodeButton.HighlightColor = GlobalInterfaceData.Scheme.CanvasContextMenuSelected;
             DeleteNodeButton.HighlightOnMouseOver = true;
             DeleteNodeButton.OnClickedEvent += Delete;
 
             CloneNodeButton = new ColorButton(Group);
-            CloneNodeButton.BaseColor = GlobalInterfaceData.Scheme.InteractableAccent;
-            CloneNodeButton.HighlightColor = GlobalInterfaceData.Scheme.DarkInteractableAccent;
+            CloneNodeButton.BaseColor = GlobalInterfaceData.Scheme.CanvasContextMenu;
+            CloneNodeButton.HighlightColor = GlobalInterfaceData.Scheme.CanvasContextMenuSelected;
             CloneNodeButton.HighlightOnMouseOver = true;
             CloneNodeButton.OnClickedEvent += Clone;
 
@@ -92,8 +92,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Divider1 = new Icon(GlobalInterfaceData.Scheme.NonInteractableAccent);
 
             CreateTransitionButton = new ColorButton(Group);
-            CreateTransitionButton.BaseColor = GlobalInterfaceData.Scheme.InteractableAccent;
-            CreateTransitionButton.HighlightColor = GlobalInterfaceData.Scheme.DarkInteractableAccent;
+            CreateTransitionButton.BaseColor = GlobalInterfaceData.Scheme.CanvasContextMenu;
+            CreateTransitionButton.HighlightColor = GlobalInterfaceData.Scheme.CanvasContextMenuSelected;
             CreateTransitionButton.HighlightOnMouseOver = true;
             CreateTransitionButton.OnClickedEvent += Editor.AddNewTransition;
 

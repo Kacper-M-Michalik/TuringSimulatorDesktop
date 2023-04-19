@@ -8,8 +8,10 @@ using TuringServer;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using TuringCore.Networking;
+using TuringSimulatorDesktop.Debugging;
+using TuringSimulatorDesktop.UI;
 
-namespace TuringSimulatorDesktop
+namespace TuringSimulatorDesktop.Networking
 {
     public static class Client
     {

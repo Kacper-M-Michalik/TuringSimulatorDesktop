@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 using TuringCore;
 
-namespace TuringServer
+namespace TuringServer.Data
 {
-    [Serializable]
+    //Class + JSON Template
     public class ObjectMetadataFile
     {
         [JsonInclude]

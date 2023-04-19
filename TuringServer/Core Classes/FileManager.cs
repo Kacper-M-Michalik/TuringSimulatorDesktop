@@ -6,6 +6,8 @@ using System.Text.Json;
 using TuringCore.Files;
 using TuringCore;
 using TuringServer.Logging;
+using TuringServer.Data;
+using TuringServer.ServerSide;
 
 namespace TuringServer
 {
@@ -20,9 +22,8 @@ namespace TuringServer
                 if (!char.IsAscii(FileName[i])) return false;
             }
 
-            //Maybe rewrite using regex?
             //https://docs.microsoft.com/en-gb/windows/win32/fileio/naming-a-file?redirectedfrom=MSDN for seeing banned characters
-            if (FileName.Contains("<") || FileName.Contains(">") || FileName.Contains(":") || FileName.Contains("\"") || FileName.Contains("/") || FileName.Contains("\\") || FileName.Contains("|") || FileName.Contains("?") || FileName.Contains("*"))
+            if (FileName.Contains("<") || FileName.Contains(">") || FileName.Contains(":") || FileName.Contains("\"") || FileName.Contains("/") || FileName.Contains("\\") || FileName.Contains("|") || FileName.Contains("?") || FileName.Contains("*") || FileName.Length > 255)
             {                
                 return false;
             }
@@ -79,6 +80,7 @@ namespace TuringServer
         }
 
         //ID 0 reserved for BaseFolder
+        //These ID's are different than GUIS used for files, they are reallocated each boot up of a project, and used to assignID's to folders, they are also given to files for backwards compatibility, as during prototyping files used int ID's
         static int NextID = 1;
         public static int GetNewFileID()
         {
@@ -110,6 +112,7 @@ namespace TuringServer
 
             ProjectSaveFile SaveFile;
 
+            //Try to read Project Data File
             try
             {
                 SaveFile = JsonSerializer.Deserialize<ProjectSaveFile>(File.ReadAllBytes(CorrectPath));
@@ -120,8 +123,10 @@ namespace TuringServer
                 return null;
             }
 
+            //Get the parent path of the entire project
             string ProjectBasePath = Directory.GetParent(CorrectPath).ToString() + Path.DirectorySeparatorChar;
 
+            //Generate our lookups
             Dictionary<int, CacheFileData> NewCacheDataLookup = new Dictionary<int, CacheFileData>();
             Dictionary<int, DirectoryFile> NewFileDataLookup = new Dictionary<int, DirectoryFile>();
             DirectoryFolder BaseFolder = new DirectoryFolder(0, SaveFile.BaseFolder, null);
@@ -131,6 +136,7 @@ namespace TuringServer
             Queue<(string, DirectoryFolder)> FolderQueue = new Queue<(string, DirectoryFolder)>();
             FolderQueue.Enqueue((ProjectBasePath + SaveFile.BaseFolder, null));
             
+            //Generate file/folder hierarchy from files/folders on disk
             while (FolderQueue.Count != 0)
             {
                 (string, DirectoryFolder) FolderInfo = FolderQueue.Dequeue();
@@ -152,6 +158,7 @@ namespace TuringServer
                 {
                     ObjectMetadataFile MetadataFile = null;
 
+                    //Check if a file is a metadata file
                     if (Files[i].EndsWith("tmeta"))
                     {
                         bool Failed;
@@ -161,6 +168,7 @@ namespace TuringServer
                         {
                             MetadataFile = JsonSerializer.Deserialize<ObjectMetadataFile>(Data);
 
+                            //Check if equivalent object file exists, if it doesn't there is an error, and so we fai lto laod it in
                             Failed = !File.Exists(FolderInfo.Item1 + Path.DirectorySeparatorChar + MetadataFile.FileName + FileManager.FileTypeToExtension(MetadataFile.FileType));
                         }
                         catch
@@ -179,7 +187,7 @@ namespace TuringServer
                         }
                         else
                         {
-                            //write error here
+                            CustomLogging.Log("Failed to load in file: " + Files[i]);
                         }
                     }
                 }
@@ -192,6 +200,7 @@ namespace TuringServer
                 
             }
 
+            //Return ProjectData Object
             return new ProjectData()
             {
                 ProjectName = SaveFile.ProjectName,
@@ -211,8 +220,10 @@ namespace TuringServer
 
         public static bool LoadFileIntoCache(int FileID)
         {
+            //Check file exists
             if (Server.LoadedProject.FileDataLookup.ContainsKey(FileID))
             {
+                //Check if file isn't already cached
                 if (Server.LoadedProject.CacheDataLookup.ContainsKey(FileID))
                 {
                     Server.LoadedProject.CacheDataLookup[FileID].ResetExpiryTimer();
@@ -220,6 +231,7 @@ namespace TuringServer
                 }
                 else
                 {
+                    //Load file and add to cache
                     try
                     {
                         Server.LoadedProject.CacheDataLookup.Add(FileID, new CacheFileData(
@@ -237,6 +249,7 @@ namespace TuringServer
             return false;
         }
         
+        //Wrapper functions that handles errors when delteign a file
         public static bool DeleteFileByPath(string FilePath)
         {
             try
@@ -252,6 +265,7 @@ namespace TuringServer
             return true;
         }
 
+        //Create appropriate folder structure and generates Project Data File in specified location
         public static CreateProjectReturnData CreateProject(string Name, string ProjectDirectory, TuringProjectType RuleType)
         {
             string BaseFolder = ProjectDirectory + Path.DirectorySeparatorChar + Name;
@@ -271,11 +285,9 @@ namespace TuringServer
             return new CreateProjectReturnData(true, ProjectPath);
         }
 
-        //is there a point of this?
+        //Saves changes made to a Project Data File
         public static bool SaveProject()
         {
-            //string SaveJson = JsonSerializer.Serialize(new ProjectSaveFile(Server.LoadedProject.ProjectName, Server.LoadedProject.BaseDirectoryFolder.Name, Server.LoadedProject.TuringTypeRule), Options);
-
             try
             {
                 File.WriteAllBytes(Server.LoadedProject.ProjectFilePath, JsonSerializer.SerializeToUtf8Bytes(new ProjectSaveFile(Server.LoadedProject.ProjectName, Server.LoadedProject.BaseDirectoryFolder.Name, Server.LoadedProject.TuringTypeRule), Options));

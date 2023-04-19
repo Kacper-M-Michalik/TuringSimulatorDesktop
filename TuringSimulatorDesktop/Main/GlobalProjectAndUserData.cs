@@ -7,6 +7,8 @@ using System.Text.Json;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using TuringCore;
+using TuringSimulatorDesktop.Debugging;
+using TuringSimulatorDesktop.Files;
 
 namespace TuringSimulatorDesktop
 {

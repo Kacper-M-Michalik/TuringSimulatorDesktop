@@ -12,6 +12,7 @@ using TuringSimulatorDesktop.UI.Prefabs;
 using System.Windows.Forms;
 using System.Net;
 using TuringCore.Networking;
+using TuringSimulatorDesktop.Networking;
 
 namespace TuringSimulatorDesktop.UI
 {

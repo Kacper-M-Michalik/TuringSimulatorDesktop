@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace TuringSimulatorDesktop.UI
 {
-    public interface IDraggable
+    public interface IUndoRedoable
     {
+        public void Undo();
+
+        public void Redo();
     }
+
 }

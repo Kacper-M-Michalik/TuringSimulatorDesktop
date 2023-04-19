@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using TuringCore;
+using TuringServer.ServerSide;
 
-namespace TuringServer
+namespace TuringServer.Data
 {
     public class DirectoryFolder
     {
@@ -30,6 +31,7 @@ namespace TuringServer
             SubFiles = new List<DirectoryFile>();
         }
 
+        //Path on disk of this folder, having a cached version of it saves on computation time of having to regenerate the string each time we want to access something in this folder on disk
         public void UpdatePath()
         {
             LocalPath = ParentFolder == null ? Name + Path.DirectorySeparatorChar : ParentFolder.LocalPath + Name + Path.DirectorySeparatorChar;
@@ -48,6 +50,7 @@ namespace TuringServer
         public CoreFileType FileType;
         public DirectoryFolder ParentFolder;
 
+        //Constructors
         public DirectoryFile(int SetID, Guid SetGUID, string SetName, string SetExtension, DirectoryFolder SetParentFolder)
         {
             ID = SetID;
@@ -74,16 +77,19 @@ namespace TuringServer
             SubscriberIDs = new HashSet<int>();
         }
 
+        //Gets path on disk to object file
         public string GetLocalPath()
         {
             return ParentFolder.LocalPath + Name + Extension;
         }
 
+        //Gets path on disk to metadata file
         public string GetMetadataLocalPath()
         {
             return ParentFolder.LocalPath + Name + ".tmeta";
         }
 
+        //Returns a metadata object based on this file
         public ObjectMetadataFile ToMetaDataFile()
         {
             return new ObjectMetadataFile() { FileGUID = GUID, FileName = Name, FileType = FileType };

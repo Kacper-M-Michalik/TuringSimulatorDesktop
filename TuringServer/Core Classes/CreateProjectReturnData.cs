@@ -11,6 +11,7 @@ namespace TuringServer
         public bool Success;
         public string SolutionPath;
 
+        //Constructor
         public CreateProjectReturnData(bool success, string solutionPath)
         {
             Success = success;

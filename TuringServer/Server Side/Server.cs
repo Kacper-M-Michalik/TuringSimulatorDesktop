@@ -5,14 +5,15 @@ using System.Net.Sockets;
 using System.Threading;
 using TuringCore;
 using TuringCore.Networking;
+using TuringServer.Data;
 using TuringServer.Logging;
 
-namespace TuringServer
+namespace TuringServer.ServerSide
 {
     public static class Server
     {
         //possible bug -> when user joins as they are added onto clients on new thread, having simualtenous SendTCPDataToAllClients may have problems
-        //may have to add packet "User joined server" -> other thread creates, adds onto queue, server send this new client the project data, aka jsut folder structure for now
+        //may have to add packet "User joined server" -> other thread creates, adds onto queue, server send this new client the project data, aka just folder structure for now
 
         public static bool IsServerOn;
 
@@ -31,28 +32,32 @@ namespace TuringServer
 
         public static ProjectData LoadedProject;
 
+        //Sets up server
         public static void StartServer(int SetMaxPlayers, int SetPort)
         {
             MaxClients = SetMaxPlayers;
             Port = SetPort;
 
-            CustomLogging.Log("THREAD NOTIF SERVER: SERVER INIT ON THREAD " + Thread.CurrentThread.ManagedThreadId.ToString());
+            CustomLogging.Log("THREAD NOTIF SERVER: SERVER INITIATED ON THREAD " + Thread.CurrentThread.ManagedThreadId.ToString());
 
             IsServerOn = true;
             MarkForClosing = false;
             LastTick = DateTime.UtcNow.Ticks;
 
+            //Create slot for every possible client
             Clients = new Dictionary<int, ServerClientSlot>();
             for (int i = 0; i < MaxClients; i++)
             {
                 Clients.Add(i, new ServerClientSlot(i));
             }
 
+            //Start listening for any incoming TCP connections
             ServerTcpListener = new TcpListener(IPAddress.Any, Port);
             ServerTcpListener.Start();
 
             CustomLogging.Log("SERVER: Server Started on port: " + Port.ToString());
 
+            //When a TCP connection is found, call this function
             ServerTcpListener.BeginAcceptTcpClient(new AsyncCallback(NewTCPClientConnectedCallback), null);
             
             RunServer();
@@ -83,6 +88,8 @@ namespace TuringServer
         }
 
         #region Helper Functions
+
+        //Sends a packet to specific client
         public static void SendTCPData(int ClientID, Packet Data)
         {
             Data.InsertPacketLength();
@@ -96,6 +103,7 @@ namespace TuringServer
         }
         */
 
+        //Sends a packet to all connected clients
         public static void SendTCPToAllClients(Packet Data)
         {
             Data.InsertPacketLength();
@@ -111,8 +119,10 @@ namespace TuringServer
         }
         #endregion
 
+        //Server main loop as described by the Backend Design Section
         static void RunServer()
         {    
+            //Continue while not told to close
             while (!MarkForClosing)
             {
                 if (PacketProcessingQueue.Count > 0)
@@ -129,26 +139,31 @@ namespace TuringServer
                     {
                         Packet Data = PacketsBeingProcessed.Dequeue();
 
-                        //Packet Length has been replaced with sender ID
-                        int SenderID = Data.ReadInt();
-                        //Get Type
-                        int PacketType = Data.ReadInt();
-                        //Execute function
+                        //Check packet has valid header
+                        if (Data.Length() >= 8)
+                        {
+                            //Packet Length has been replaced with sender ID
+                            int SenderID = Data.ReadInt();
+                            //Get Packet Type
+                            int PacketType = Data.ReadInt();
 
-                        if (Enum.IsDefined(typeof(ClientSendPackets), PacketType))
-                        {
-                            ServerReceiveFunctions.PacketToFunction[PacketType](SenderID, Data);
+                            //Check if Packet Type Valid + Process Packet
+                            if (Enum.IsDefined(typeof(ClientSendPackets), PacketType))
+                            {
+                                ServerReceiveFunctions.PacketToFunction[PacketType](SenderID, Data);
+                            }
+                            else
+                            {
+                                CustomLogging.Log("SERVER: Invalid Packet recieved");
+                            }
+                            //Data.Dispose();
                         }
-                        else
-                        {
-                            CustomLogging.Log("SERVER: Invalid Packet recieved");
-                        }
-                        //Data.Dispose();
                     }
                 }
 
                 long CurrentTime = DateTime.UtcNow.Ticks;
 
+                //Here we add the time passed to each cached file, when the time alive is larger than the maximum time alive, the cached file is unloaded
                 if (LoadedProject != null)
                 {
                     foreach (KeyValuePair<int, CacheFileData> CachedFile in LoadedProject.CacheDataLookup)
@@ -164,6 +179,7 @@ namespace TuringServer
                 LastTick = CurrentTime;              
             }
 
+            //Once the server has finished processing packets and was told turn off, we shut it down
             ShutDown();
         }
 
@@ -172,8 +188,10 @@ namespace TuringServer
             MarkForClosing = true;
         }
 
+        //Allows another thread to add a packet to the processing queue for the main server thread
         public static void AddPacketToProcessOnServerThread(int SenderID, Packet PacketToAdd)
         {
+            //Locking the queue means that the main server loop has to wait until the queue is unlocked to use it, guaranteeing that the server thread doesn't copy the processing queue while more packets are being added to it
             lock (PacketProcessingQueue)
             {
                 PacketToAdd.InsertPacketSenderIDUnsafe(SenderID);
@@ -181,16 +199,20 @@ namespace TuringServer
             }
         }
 
+        //This gets called when a new TCP connection is incoming
         static void NewTCPClientConnectedCallback(IAsyncResult Result)
         {
             if (!IsServerOn) return;
 
             CustomLogging.Log("SERVER: Server dealing with new connection on thread " + Thread.CurrentThread.ManagedThreadId.ToString());
 
+            //Accept the connection
             TcpClient NewClient = ServerTcpListener.EndAcceptTcpClient(Result);
 
+            //Listen for any more incoming connections
             ServerTcpListener.BeginAcceptTcpClient(new AsyncCallback(NewTCPClientConnectedCallback), null);
 
+            //Find next available slot for client to connect to, if none found, we reach the NewClient.Close() function at the end, closing the connection
             for (int i = 0; i < MaxClients; i++)
             {
                 if (Clients[i].TCP.ConnectionSocket == null)
@@ -198,6 +220,7 @@ namespace TuringServer
                     Clients[i].TCP.ConnectClientToServer(NewClient);
                     if (LoadedProject != null) 
                     {
+                        //When a new client join successfully, we send a fake request to the server, making it automatically send the user data about the currently loaded project
                         Packet MockPacket = ClientSendPacketFunctions.RequestProjectData();
                         MockPacket.InsertPacketLength();
                         MockPacket.SaveTemporaryBufferToPernamentReadBuffer();
@@ -212,6 +235,7 @@ namespace TuringServer
             NewClient.Close();
         }
 
+        //Shuts down all TCP connections and cleans up server
         static void ShutDown()
         {
             IsServerOn = false;
@@ -234,6 +258,7 @@ namespace TuringServer
 
         public static int DefaultDataBufferSize = 4096;
 
+        //Constructor
         public ServerClientSlot(int SetClientID)
         {
             ClientId = SetClientID;
@@ -256,6 +281,7 @@ namespace TuringServer
                 ID = SetID;
             }
 
+            //Setups up socket information and data stream once a connection is completed
             public void ConnectClientToServer(TcpClient SetConnectionSocket)
             {
                 ConnectionSocket = SetConnectionSocket;
@@ -271,6 +297,7 @@ namespace TuringServer
                 CustomLogging.Log("SERVER: Client at " + ConnectionSocket.Client.RemoteEndPoint.ToString() + " has been connected to server!");
             }
 
+            //Writes data to the data stream, sending it to the client
             public void SendDataToClient(byte[] Data)
             {
                 if (ConnectionSocket == null) return;
@@ -285,57 +312,65 @@ namespace TuringServer
                 }
             }
 
+            // Packet rebuilding algorithm as detailed in the Backend Networking Section
             private void OnReceiveDataFromClient(IAsyncResult Result)
             {
                // try
               //  {
                     //if (ConnectionSocket == null) return;
 
-                    CustomLogging.Log("SERVER: Server dealing with incoming data on thread " + Thread.CurrentThread.ManagedThreadId.ToString()+ ". From client: " + ID.ToString());
+                CustomLogging.Log("SERVER: Server dealing with incoming data on thread " + Thread.CurrentThread.ManagedThreadId.ToString()+ ". From client: " + ID.ToString());
 
-                    //warning -> if ther are packets that are intended for this client after disconnect, shit will hit the fan, possible bug with customconsole, as changing logclientid on seperate thread than variable is used on
-                    if (!ConnectionSocket.Connected)
+                //warning -> if there are packets that are intended for this client after disconnect, shit will hit the fan, possible bug with customconsole, as changing logclientid on seperate thread than variable is used on
+
+                //Check if the socket is still active (this function may get called on a disconnect according to Microsoft Docs)
+                if (!ConnectionSocket.Connected)
+                {
+                    TCPInternalDisconnect();
+                    CustomLogging.Log("SERVER: Client " + ID.ToString() + " has disconnected!");
+
+                    if (CustomLogging.LogClientID == ID) CustomLogging.LogClientID = -1;
+
+                    return;
+                }            
+
+                //Read incoming data
+                int IncomingDataLength = DataStream.EndRead(Result);
+
+                //Copy into temp buffer
+                byte[] UsefuldataBuffer = new byte[IncomingDataLength];
+                Array.Copy(ReceiveDataBuffer, UsefuldataBuffer, IncomingDataLength);
+
+                //Copy into Packet
+                PacketCurrentlyBeingRebuilt.Write(UsefuldataBuffer, false);
+                PacketCurrentlyBeingRebuilt.SaveTemporaryBufferToPernamentReadBuffer();
+
+                //Check if a full packet has been received, if so, add to packet processing queue
+                if (PacketCurrentlyBeingRebuilt.UnreadLength() >= 4)
+                {
+                    int PacketLength = PacketCurrentlyBeingRebuilt.ReadInt(false);
+
+                    while (PacketCurrentlyBeingRebuilt.UnreadLength() >= PacketLength && PacketCurrentlyBeingRebuilt.UnreadLength() >= 4)
                     {
-                        TCPInternalDisconnect();
-                        CustomLogging.Log("SERVER: Client " + ID.ToString() + " has disconnected!");
+                        Packet ProcessedPacket = new Packet(PacketCurrentlyBeingRebuilt.ReadBytes(PacketLength));
+                        Server.AddPacketToProcessOnServerThread(ID, ProcessedPacket);
 
-                        if (CustomLogging.LogClientID == ID) CustomLogging.LogClientID = -1;
-
-                        return;
-                    }            
-
-                    int IncomingDataLength = DataStream.EndRead(Result);
-
-                    byte[] UsefuldataBuffer = new byte[IncomingDataLength];
-                    Array.Copy(ReceiveDataBuffer, UsefuldataBuffer, IncomingDataLength);
-
-                    PacketCurrentlyBeingRebuilt.Write(UsefuldataBuffer, false);
-                    PacketCurrentlyBeingRebuilt.SaveTemporaryBufferToPernamentReadBuffer();
-
-                    if (PacketCurrentlyBeingRebuilt.UnreadLength() >= 4)
-                    {
-                        int PacketLength = PacketCurrentlyBeingRebuilt.ReadInt(false);
-
-                        while (PacketCurrentlyBeingRebuilt.UnreadLength() >= PacketLength && PacketCurrentlyBeingRebuilt.UnreadLength() >= 4)
+                        if (PacketCurrentlyBeingRebuilt.UnreadLength() >= 4)
                         {
-                            Packet ProcessedPacket = new Packet(PacketCurrentlyBeingRebuilt.ReadBytes(PacketLength));
-                            Server.AddPacketToProcessOnServerThread(ID, ProcessedPacket);
-
-                            if (PacketCurrentlyBeingRebuilt.UnreadLength() >= 4)
-                            {
-                                PacketLength = PacketCurrentlyBeingRebuilt.ReadInt(false);
-                            }
-
-                        }
-
-                        if (PacketCurrentlyBeingRebuilt.UnreadLength() == 0)
-                        {
-                            PacketCurrentlyBeingRebuilt.Reset();
+                            PacketLength = PacketCurrentlyBeingRebuilt.ReadInt(false);
                         }
 
                     }
 
-                    if (ConnectionSocket != null) DataStream.BeginRead(ReceiveDataBuffer, 0, DataBufferSize, OnReceiveDataFromClient, null);
+                    if (PacketCurrentlyBeingRebuilt.UnreadLength() == 0)
+                    {
+                        PacketCurrentlyBeingRebuilt.Reset();
+                    }
+
+                }
+
+                //Start reading the incoming data again
+                if (ConnectionSocket != null) DataStream.BeginRead(ReceiveDataBuffer, 0, DataBufferSize, OnReceiveDataFromClient, null);
               //   }
              //   catch (Exception E)
              //   {
@@ -343,6 +378,7 @@ namespace TuringServer
              //   }
             }
 
+            //Disconnect and clean up the TCP socket and data stream
             public void TCPInternalDisconnect()
             {
                 ConnectionSocket?.Close();
@@ -354,6 +390,7 @@ namespace TuringServer
 
         }
 
+        //Shuts downb TCP conenction with this client
         public void DisconnectClientFromServer()
         {
             CustomLogging.Log("SERVER: " + TCP.ConnectionSocket.Client.RemoteEndPoint.ToString() + " aka. Client N:" + ClientId.ToString() + " has been disconnected from the server!");
