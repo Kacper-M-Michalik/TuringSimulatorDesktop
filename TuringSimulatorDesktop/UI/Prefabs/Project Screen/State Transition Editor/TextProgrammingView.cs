@@ -82,7 +82,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         List<Texture2D> HelpMenus;
 
         Label DefenitionAlphabetTitle;
-        DefenitionAlphabetInputItem DefenitionAlphabetBox;
+        DefinitionAlphabetInputItem DefenitionAlphabetBox;
 
         Label HaltStatesTitle;
         InputBox HaltStateInputBox;
@@ -117,7 +117,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             DefenitionAlphabetTitle = new Label();
             DefenitionAlphabetTitle.Text = "Definition Alphabet ID:";
 
-            DefenitionAlphabetBox = new DefenitionAlphabetInputItem(Group);
+            DefenitionAlphabetBox = new DefinitionAlphabetInputItem(Group);
             
             HaltStatesTitle = new Label();
             HaltStatesTitle.Text = "Halt States:";

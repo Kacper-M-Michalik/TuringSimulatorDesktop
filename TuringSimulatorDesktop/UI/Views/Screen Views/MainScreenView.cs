@@ -40,17 +40,17 @@ namespace TuringSimulatorDesktop.UI
 
         public MainScreenView()
         {          
+            //Create acyion group
             Group = InputManager.CreateActionGroup();
             Group.PollableObjects.Add(this);
 
+            //Place 
             CloseButton = new TextureButton(45, 32, new Vector2(705, 0), Group);
             CloseButton.OnClickedEvent += Close;
             CloseButton.HighlightOnMouseOver = true;
             CloseButton.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.CloseApplicationIcon];
             CloseButton.HighlightTexture = GlobalInterfaceData.TextureLookup[UILookupKey.CloseApplicationHighlightIcon];
-
-
-
+            
             NewProjectButton = new ElementCollection(); 
 
             ColorButton CreateButton = new ColorButton(Group);

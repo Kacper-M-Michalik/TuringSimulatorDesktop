@@ -145,14 +145,16 @@ namespace TuringSimulatorDesktop.UI
 
         public void UpdateLayout()
         {
+            //Calculate start placement position
             Vector2 PlacementPosition = Position + ViewOffset;
 
             if (!UniformAreas)
             {
+                //Each element placed with equal width away from eachother, no matter their width 
                 for (int i = 0; i < Elements.Count; i++)
                 {
                     if (Elements[i].IsActive)
-                    {
+                    {                        
                         float Y = PlacementPosition.Y;
                         if (Centering == HorizontalCentering.Middle)
                         {
@@ -177,6 +179,7 @@ namespace TuringSimulatorDesktop.UI
             }
             else
             {
+                //Widest element found, each element is given the space of this largest width plus padding, as such no matter size elements will be centered in set positions
                 if (UniformAreaAutoSize)
                 {
                     float UniformAreaSize = 0;
@@ -189,6 +192,7 @@ namespace TuringSimulatorDesktop.UI
                     }
                 }
 
+                //Same as above but with manual width for each element area
                 for (int i = 0; i < Elements.Count; i++)
                 {
                     if (Elements[i].IsActive)
@@ -220,6 +224,8 @@ namespace TuringSimulatorDesktop.UI
             LayoutEndBound = PlacementPosition - ViewOffset - Position - ViewOffsetBoundsMin - new Vector2(Spacing, 0);
         }
 
+
+        //Draw all elements
         public void Draw(Viewport? BoundPort = null)
         {
             if (IsActive)

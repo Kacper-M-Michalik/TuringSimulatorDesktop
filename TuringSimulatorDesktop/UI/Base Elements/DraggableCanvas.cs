@@ -14,6 +14,7 @@ namespace TuringSimulatorDesktop.UI
 
     public class DraggableCanvas : IVisualElement, IPollable, IClickable
     {
+        //Update elements/properties on reposition/resize
         Vector2 position;
         public Vector2 Position
         {
@@ -76,6 +77,7 @@ namespace TuringSimulatorDesktop.UI
         public event OnCanvasClick OnClickedEvent;
         public event OnCanvasClickAway OnClickedAwayEvent;
 
+        //Constructors
         public DraggableCanvas()
         {
             Group = InputManager.CreateActionGroup();
@@ -100,6 +102,7 @@ namespace TuringSimulatorDesktop.UI
             return (IsActive && InputManager.MouseData.X >= Position.X && InputManager.MouseData.X <= Position.X + bounds.X && InputManager.MouseData.Y >= Position.Y && InputManager.MouseData.Y <= Position.Y + bounds.Y);
         }
 
+        //When the user drags across the canvas, calculate and apply the new offsets to all UI elements on canvas
         public void PollInput(bool IsInActionGroupFrame)
         {
             if (IsInActionGroupFrame && Draggable && IsMouseOver())
@@ -120,6 +123,27 @@ namespace TuringSimulatorDesktop.UI
             }
         }
 
+        public void ApplyMatrices()
+        {
+            ResultMatrix = PositionMatrix * OffsetMatrix * ZoomMatrix;
+            InverseMatrix = Matrix.Invert(ResultMatrix);
+
+            foreach (ICanvasInteractable InteractableItem in Elements)
+            {
+                InteractableItem.SetProjectionMatrix(ResultMatrix, InverseMatrix);
+            }
+        }
+
+        public void Clicked()
+        {
+            OnClickedEvent?.Invoke(this);
+        }
+
+        public void ClickedAway()
+        {
+            OnClickedAwayEvent?.Invoke(this);
+        }
+
         public void MoveLayout()
         {
             Group.X = UIUtils.ConvertFloatToInt(position.X);
@@ -132,17 +156,6 @@ namespace TuringSimulatorDesktop.UI
             ApplyMatrices();
         }
 
-        public void ApplyMatrices()
-        {
-            ResultMatrix = PositionMatrix * OffsetMatrix * ZoomMatrix;
-            InverseMatrix = Matrix.Invert(ResultMatrix);
-
-            foreach (ICanvasInteractable InteractableItem in Elements)
-            {
-                InteractableItem.SetProjectionMatrix(ResultMatrix, InverseMatrix);
-            }
-        }
-
         public void ResizeLayout()
         {
             Group.Width = bounds.X;
@@ -151,6 +164,7 @@ namespace TuringSimulatorDesktop.UI
             Port.Height = bounds.Y;
         }
 
+        //Draw all elements in canvas
         public void Draw(Viewport? BoundPort = null)
         {
             if (IsActive)
@@ -176,6 +190,7 @@ namespace TuringSimulatorDesktop.UI
             }
         }
 
+        //Sets action group to be evaluated by inputManager, marks all items on canvas for deletion
         public void Clear()
         {
             Group.IsDirtyClickable = true;
@@ -197,20 +212,11 @@ namespace TuringSimulatorDesktop.UI
             Elements.Clear();
         }
 
+        //Sets action group to be evaluated by inputManager, marks itself for deletion
         public void Close()
         {
             Group.IsMarkedForDeletion = true;
             IsMarkedForDeletion = true;
-        }
-
-        public void Clicked()
-        {
-            OnClickedEvent?.Invoke(this);
-        }
-
-        public void ClickedAway()
-        {
-            OnClickedAwayEvent?.Invoke(this);
         }
     }
 }

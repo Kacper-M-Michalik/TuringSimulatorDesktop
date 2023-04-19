@@ -10,8 +10,9 @@ using System.Threading.Tasks;
 namespace TuringSimulatorDesktop.UI
 {
     public class Mesh
-    {
+    {        
         public VertexPositionTexture[] Vertices;
+        //Indices represent triangle faces made of vertices
         public int[] Indices;
 
         public Mesh()
@@ -24,9 +25,11 @@ namespace TuringSimulatorDesktop.UI
             Indices = indices;
         }
 
+        //Mark to compiler to inline thsi function
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Mesh CreateRectangle(Vector2 Offset, float Width, float Height)
         {
+            //Returns a rectangular mesh
             return new Mesh
             (
                 new VertexPositionTexture[]

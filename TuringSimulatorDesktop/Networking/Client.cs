@@ -27,6 +27,7 @@ namespace TuringSimulatorDesktop.Networking
         static TCPInterface TCP = new TCPInterface();
         static int DataBufferSize = 4096;
 
+        //TCP Helper Class
         class TCPInterface
         {
             public TcpClient ConnectionSocket;
@@ -34,6 +35,7 @@ namespace TuringSimulatorDesktop.Networking
             private byte[] ReceiveDataBuffer;
             private Packet PacketCurrentlyBeingRebuilt;
 
+            //Timeout based connection system
             public void Connect(IPAddress TargetIP, int Port, int Timeout)
             {
                 try
@@ -65,11 +67,12 @@ namespace TuringSimulatorDesktop.Networking
                 }
             }
 
+            //If successfully connected, this is called
             public void OnConnectCallBack(IAsyncResult Result)            
             {
                 try
                 {
-                    //whats point of this?
+                    //Check connection is successful, if TCP socket is shut down while waiting for callback, this function gets called despite no connection according to Microsoft Docs
                     if (ConnectionSocket == null) return;
 
                     CustomLogging.Log("CLIENT: Connect callback called.");
@@ -80,6 +83,7 @@ namespace TuringSimulatorDesktop.Networking
 
                     UIEventManager.ClientSuccessConnecting = true;
 
+                    //Start reading incoming data from server
                     DataStream.BeginRead(ReceiveDataBuffer, 0, DataBufferSize, OnReceiveDataFromServer, null);
                 }
                 catch (Exception E)
@@ -89,6 +93,7 @@ namespace TuringSimulatorDesktop.Networking
                 }
             }
 
+            //Processes and sends packet to server
             public void SendDataToServer(Packet Data)
             {
                 try
@@ -103,10 +108,12 @@ namespace TuringSimulatorDesktop.Networking
                 }
             }
 
+            //Packet reconstruction algorithm as detailed in Front End Networking
             private void OnReceiveDataFromServer(IAsyncResult Result)
             {
                 try
                 {
+                    //Check connection si still valid, when a TCP connection is terminated and we were waiting to read data, this function gets called according to Microsoft Docs
                     if (ConnectionSocket == null || !ConnectionSocket.Connected)
                     {
                         CustomLogging.Log("CLIENT: Server disconnected me!");
@@ -116,15 +123,6 @@ namespace TuringSimulatorDesktop.Networking
                     }
 
                     int IncomingDataLength = DataStream.EndRead(Result);
-
-                    /*
-                    if (IncomingDataLength == 0)
-                    {
-                        CustomLogging.Log("CLIENT: SERVER DISCONNECTED ME");
-                        TCPInternalDisconnect();
-                        return;
-                    }
-                    */
 
                     //ReceiveBuffer is always 4096 or whatever , we need to only pack data that is useful into our rebuilt packet -> as such we only copy IncomingDataLength of recievebuffer.
                     byte[] UsefuldataBuffer = new byte[IncomingDataLength];
@@ -139,6 +137,7 @@ namespace TuringSimulatorDesktop.Networking
 
                         while (PacketCurrentlyBeingRebuilt.UnreadLength() >= PacketLength && PacketCurrentlyBeingRebuilt.UnreadLength() >= 4)
                         {
+                            //Packet successfully reconstructed, add to queue to process on main UI thread
                             Packet ProcessedPacket = new Packet(PacketCurrentlyBeingRebuilt.ReadBytes(PacketLength));
                             AddPacketToProcessOnMainThread(ProcessedPacket);
 
@@ -164,6 +163,7 @@ namespace TuringSimulatorDesktop.Networking
                 }
             }
             
+            //Closes and cleans up TCP connection/socket
             public void TCPInternalDisconnect()
             {                
                 ConnectionSocket?.Close();
@@ -185,10 +185,12 @@ namespace TuringSimulatorDesktop.Networking
             }
         }
 
+        //Process Responses
         public static void ProcessPackets()
         {     
             if (PacketProcessingQueue.Count > 0)
             {
+                //Copy reconstructed packets
                 lock (PacketProcessingQueue)
                 {
                     PacketsBeingProcessed = new Queue<Packet>(PacketProcessingQueue);
@@ -200,22 +202,23 @@ namespace TuringSimulatorDesktop.Networking
                 {
                     Packet Data = PacketsBeingProcessed.Dequeue();
 
-                    //Get rid of packet size
-                    Data.ReadInt();
+                    if (Data.Length() >= 8)
+                    {
+                        //Get rid of packet size
+                        Data.ReadInt();
 
-                    int PacketType = Data.ReadInt();
+                        int PacketType = Data.ReadInt();
 
-                    //RequestHeader Header = JsonSerializer.Deserialize<RequestHeader>(Data.ReadByteArray(false));
-
-                    //Execute function
-                    if (ClientReceiveFunctions.PacketToFunction.ContainsKey(PacketType))
-                        ClientReceiveFunctions.PacketToFunction[PacketType](Data);
-                    //Data.Dispose();
+                        //Execute function
+                        if (ClientReceiveFunctions.PacketToFunction.ContainsKey(PacketType))
+                            ClientReceiveFunctions.PacketToFunction[PacketType](Data);
+                    }
                 }
 
             }            
         }
 
+        //Starts the join server thread
         public static void ConnectToServer(IPAddress IP, int Port)
         {
             if (IsConnecting || IsConnected) return;
@@ -225,12 +228,13 @@ namespace TuringSimulatorDesktop.Networking
             ConnectThread.Start();
         }
 
+        //Writes data to server
         public static void SendTCPData(Packet Data)
         {
             TCP.SendDataToServer(Data);
-            //Data.Dispose();
         }
 
+        //Disconnects the TCP connection
         public static void Disconnect()
         {
             CustomLogging.Log("CLIENT: DISCONNECTING FROM SERVER!");

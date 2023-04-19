@@ -38,12 +38,14 @@ namespace TuringSimulatorDesktop.Input
         public static object DragData;
         public static bool IsDragging;
 
+        //Processes User Inputs
         public static void Update()
         {
             MouseData = Mouse.GetState();
 
             MousePositionMatrix = Matrix.CreateTranslation(MouseData.X, MouseData.Y, 0);
 
+            //Update values
             LeftMousePressed = false;
             LeftMouseReleased = false;
             if (MouseData.LeftButton == ButtonState.Pressed && PreviousLeftClickState == ButtonState.Released) LeftMousePressed = true;
@@ -63,14 +65,17 @@ namespace TuringSimulatorDesktop.Input
             ScrollWheelDelta = MouseData.ScrollWheelValue - PreviousScrollWheel;
             PreviousScrollWheel = MouseData.ScrollWheelValue;
 
+            //Checks if application window is focused and whether mouse inptu exists
             if (GlobalInterfaceData.MainWindow.IsActive && (LeftMousePressed || RightMousePressed || LeftMouseReleased))
             {
                 int i = ActionGroups.Count-1;
                 bool RecepientFound = false;
                 while (i > -1 && !RecepientFound)
                 {
+                    //Only process this action group if it is active and the mouse is within it
                     if (ActionGroups[i].IsActive && ActionGroups[i].IsMouseInBounds())
                     {
+                        //Go throug hevery clickable item and check if the mouse is over the item
                         int j = ActionGroups[i].ClickableObjects.Count - 1;
                         while (j > -1 && !RecepientFound)                            
                         {
@@ -78,6 +83,7 @@ namespace TuringSimulatorDesktop.Input
                             {
                                 CustomLogging.Log(ActionGroups[i].ClickableObjects[j].ToString()+" was clicked");
 
+                                //If left or right click occured, fire off the elements clicked event and notify the previously clicked item it has been clicked away by firing its ClickedAway event
                                 if (LeftMousePressed || RightMousePressed)
                                 {
                                     if (PreviouslyClickedObject != null && ActionGroups[i].ClickableObjects[j] != PreviouslyClickedObject) PreviouslyClickedObject.ClickedAway();
@@ -86,6 +92,8 @@ namespace TuringSimulatorDesktop.Input
                                 }                  
                                 else
                                 {
+                                    //If the mouse buttons weren't pressed, the left mouse button must have been released
+                                    //Check if the reiceveing item is actually lsitening for drag data and if so, make it process the data
                                     IDragListener Listener = ActionGroups[i].ClickableObjects[j] as IDragListener;
                                     if (Listener != null)
                                     {
@@ -107,12 +115,14 @@ namespace TuringSimulatorDesktop.Input
                 if (PreviouslyClickedObject != null && RecepientFound == false) PreviouslyClickedObject.ClickedAway();
             }
 
+            //End dragging on mouse release
             if (LeftMouseReleased)
             {
                 IsDragging = false;
                 DragData = null;
             }
 
+            //Poll all IPollable objects, arguement indicates if the mouse is within the elements action group
             for (int i = 0; i < ActionGroups.Count; i++)
             {
                 if (ActionGroups[i].IsActive)
@@ -134,6 +144,7 @@ namespace TuringSimulatorDesktop.Input
                 }    
             }
 
+            //Clean up any elements that have been marked to be deleted
             for (int i = ActionGroups.Count - 1; i > -1; i--)
             {
                 if (ActionGroups[i].IsMarkedForDeletion && !ActionGroups[i].IsPersistant) ActionGroups.RemoveAt(i);
@@ -159,6 +170,7 @@ namespace TuringSimulatorDesktop.Input
             }
         }
 
+        //Debug feature, draws action groups brightly colored
         public static void DrawActionGroups()
         {
             for (int i = 0; i < ActionGroups.Count; i++)
@@ -183,6 +195,7 @@ namespace TuringSimulatorDesktop.Input
             }
         }
 
+        //Manually tell an elemnt to be CLickedAway from
         public static void ManuallyClickElement(IClickable Element)
         {
             if (PreviouslyClickedObject != null && Element != PreviouslyClickedObject) PreviouslyClickedObject.ClickedAway();
@@ -190,6 +203,7 @@ namespace TuringSimulatorDesktop.Input
             Element.Clicked();
         }
 
+        //Creates action groups
         public static ActionGroup CreateActionGroup(int X, int Y, int Width, int Height)
         {
             ActionGroup NewGroup = new ActionGroup(X, Y, Width, Height);
@@ -206,6 +220,7 @@ namespace TuringSimulatorDesktop.Input
             return NewGroup;
         }
 
+        //Make action group be first to be checked fore receiving input
         public static void SendActionGroupToFront(ActionGroup Group)
         {
             int Index = ActionGroups.IndexOf(Group);
@@ -219,6 +234,7 @@ namespace TuringSimulatorDesktop.Input
             PreviouslyClickedObject = null;
         }
 
+        //Start mouse dragging data
         public static void StartDragging(object Data)
         {
             DragData = Data;

@@ -61,7 +61,7 @@ namespace TuringSimulatorDesktop.UI
         public Label OutputLabel;
         public Vector2 Labeloffset;
 
-        //TODO - NOT FULLY IMPLEMENTED
+        //Modifiers allow you to limit what kind of text can be input into a input box
         public KeyboardModifiers Modifiers = new KeyboardModifiers();
         StringBuilder Builder = new StringBuilder();
         public bool IsFocused;
@@ -119,6 +119,7 @@ namespace TuringSimulatorDesktop.UI
             return (IsActive && MousePosition.X >= Position.X && MousePosition.X <= Position.X + bounds.X && MousePosition.Y >= Position.Y && MousePosition.Y <= Position.Y + bounds.Y);
         }
 
+        //Handles user typing
         public void TextInput(object Sender, TextInputEventArgs Args)
         {
             bool IllegalInput = false;
@@ -134,13 +135,15 @@ namespace TuringSimulatorDesktop.UI
                         else IllegalInput = true;
                         break;
                     case Keys.Back:
+                        //Backspace implementation
                         if (Builder.Length > 0)
                         {
                             if (Builder.Length > 1 && Builder[Builder.Length - 1] == 'n' && Builder[Builder.Length - 2] == '/') Builder.Remove(Builder.Length - 2, 2);
                             else Builder.Remove(Builder.Length - 1, 1);
                         }
                         break;
-                    default:                        
+                    default:                 
+                        //If not a special character as hnadled above, checks whther this chacrater is allowed according to the keyboard modifiers, if so, adds it to the text
                         if ((char.IsNumber(Args.Character) && Modifiers.AllowsNumbers) || ((char.IsLetter(Args.Character) || char.IsPunctuation(Args.Character)) && Modifiers.AllowsCharacters) || (char.IsSymbol(Args.Character) && Modifiers.AllowsSymbols)) Builder.Append(Args.Character);
                         break;
                 }

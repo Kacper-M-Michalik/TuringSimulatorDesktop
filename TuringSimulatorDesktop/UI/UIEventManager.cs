@@ -13,6 +13,7 @@ namespace TuringSimulatorDesktop.UI
         static Dictionary<int, List<SubscriberDataCallback>> FileUpdateSubscribers = new Dictionary<int, List<SubscriberDataCallback>>();
         static Dictionary<Guid, List<SubscriberDataCallback>> GUIDFileUpdateSubscribers = new Dictionary<Guid, List<SubscriberDataCallback>>();
 
+        //UI Elements subscribe for a response for a specific File/Folder by supplying the File/Folder ID they want to wait for, and a function pointer to the function that should be executed with the response data when the response arrives
         public static void Subscribe(int FileID, SubscriberDataCallback Function)
         {
             if (!FileUpdateSubscribers.ContainsKey(FileID)) FileUpdateSubscribers.Add(FileID, new List<SubscriberDataCallback>());
@@ -32,33 +33,28 @@ namespace TuringSimulatorDesktop.UI
             if (GUIDFileUpdateSubscribers.ContainsKey(FileID) && GUIDFileUpdateSubscribers[FileID].Contains(Function)) GUIDFileUpdateSubscribers[FileID].Remove(Function);
         }
 
+        //Push folder data responses to subscribers
         public static void PushFolderToListeners(int FolderID, FolderDataMessage Data)
         {
-            //if (!FileUpdateSubscribers.ContainsKey(FileID)) return;
-
             List<SubscriberDataCallback> Subscribers = FileUpdateSubscribers[FolderID];
-            //int BasePointer = Data.ReadPointerPosition;      
             
             for (int i = Subscribers.Count - 1; i > -1; i--)
             {
                 Subscribers[i](Data);
-                //Data.ReadPointerPosition = BasePointer;
             }
         }
+        //Push file data responses to subscribers
         public static void PushFileToListeners(Guid FileID, FileDataMessage Data)
         {
-            //if (!FileUpdateSubscribers.ContainsKey(FileID)) return;
-
             List<SubscriberDataCallback> Subscribers = GUIDFileUpdateSubscribers[FileID];
-            //int BasePointer = Data.ReadPointerPosition;
 
             for (int i = Subscribers.Count - 1; i > -1; i--)
             {
                 Subscribers[i](Data);
-                //Data.ReadPointerPosition = BasePointer;
             }
         }
 
+        //All Special Events we have so far
         public static bool WindowRequiresNextFrameResize;
         public static bool WindowRequiresNextFrameResizeStep;
 
@@ -68,9 +64,5 @@ namespace TuringSimulatorDesktop.UI
         public static EventHandler ClientFailedConnectingDelegate;
 
         public static EventHandler RecievedProjectDataFromServerDelegate;
-
-        //public static EventHandler RecievedErrorNotification;
-        // public static EventHandler UpdateFileBrowser;
-
     }
 }

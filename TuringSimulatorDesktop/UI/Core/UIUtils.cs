@@ -9,6 +9,7 @@ namespace TuringSimulatorDesktop.UI
 {
     public static class UIUtils
     {
+        //Marks to compiler to inline this function
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int ConvertFloatToMinInt(float Value, float Min)
         {
@@ -21,6 +22,7 @@ namespace TuringSimulatorDesktop.UI
             return Convert.ToInt32(Value);//MathF.Round(Value, MidpointRounding.AwayFromZero));
         }
 
+        //Generates overlapping rectangle of two input rectangles
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Viewport CalculateOverlapPort(Viewport Left, Viewport Right)
         {

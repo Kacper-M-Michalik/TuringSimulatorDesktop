@@ -9,7 +9,7 @@ using TuringSimulatorDesktop.Input;
 
 namespace TuringSimulatorDesktop.UI.Prefabs
 {
-    public class DefenitionAlphabetInputItem : IVisualElement, IClickable, IDragListener
+    public class DefinitionAlphabetInputItem : IVisualElement, IClickable, IDragListener
     {
         Vector2 position;
         public Vector2 Position
@@ -43,7 +43,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         public FileData ReferenceFileData;
 
-        public DefenitionAlphabetInputItem(ActionGroup group)
+        public DefinitionAlphabetInputItem(ActionGroup group)
         {
             group.ClickableObjects.Add(this);
 

@@ -19,6 +19,7 @@ namespace TuringSimulatorDesktop.UI
             Effect = GlobalInterfaceData.UIEffect;
         }
 
+        //Recalculates the projection matrix for the renderer
         public static void RecalculateProjection(int X, int Y, int Width, int Height)
         {
             Projection = Matrix.CreateOrthographicOffCenter(X, X + Width, Y + Height, Y, 0f, 1f);
@@ -98,6 +99,7 @@ namespace TuringSimulatorDesktop.UI
         }
         */
 
+        //Applies settings to UI Shader and then instructs GPU to draw mesh
         public static void Draw(Mesh DrawMesh, Matrix Transformations, Texture2D DrawTexture, Viewport? Port = null)
         {
             Viewport port;
@@ -112,6 +114,7 @@ namespace TuringSimulatorDesktop.UI
             Effect.Parameters["OverlayColor"].SetValue(Vector4.Zero);
             Effect.Parameters["Projection"].SetValue(Transformations * Projection);
 
+            //A shader an have multiple stages (passes), as such run through all of them
             foreach (EffectPass Pass in Effect.CurrentTechnique.Passes)
             {
                 Pass.Apply();

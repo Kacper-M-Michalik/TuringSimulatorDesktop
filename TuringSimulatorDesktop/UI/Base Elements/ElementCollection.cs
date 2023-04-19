@@ -9,6 +9,7 @@ using TuringSimulatorDesktop.Input;
 
 namespace TuringSimulatorDesktop.UI
 {
+    //Used to collate elements together at runtime
     public class ElementCollection : IVisualElement
     {
         Vector2 position;
@@ -82,13 +83,5 @@ namespace TuringSimulatorDesktop.UI
                 }
             }
         }
-
-      //  public void Close()
-      //  {
-          //  for (int i = 0; i < Elements.Count; i++)
-         //   {
-          //      Elements[i].Close();
-          //  }
-      //  }
     }
 }

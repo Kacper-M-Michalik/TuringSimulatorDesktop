@@ -22,6 +22,7 @@ namespace TuringSimulatorDesktop
     public static class Program
     {
         [STAThread]
+        //Entry point for our application
         static void Main()
         {
             using var game = new MainWindow();
@@ -35,6 +36,7 @@ namespace TuringSimulatorDesktop
         public ScreenView CurrentView;
         int BoundTop;
 
+        //Gives us access to specific MonoGame functions not exposed directly by the Game Class
         [DllImport("SDL2.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void SDL_MaximizeWindow(IntPtr window);
         [DllImport("SDL2.dll", CallingConvention = CallingConvention.Cdecl)]
@@ -48,12 +50,15 @@ namespace TuringSimulatorDesktop
         [DllImport("SDL2.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void SDL_SetWindowResizable(IntPtr window, byte Bool);
 
+        //Used in above functions 
         UInt32 Flags =  0x00000001U | 0x00001000U;
-
+                       
         Icon MouseIcon;
 
+        //Constructor
         public MainWindow()
         {
+            //Setup graphics correctly -> Want to preserve the contents of a texture when the GPU switches to a different one
             GraphicsManager = new GraphicsDeviceManager(this);
             GraphicsManager.PreparingDeviceSettings += (object s, PreparingDeviceSettingsEventArgs args) =>
             {
@@ -61,8 +66,8 @@ namespace TuringSimulatorDesktop
             };
 
             Content.RootDirectory = "Content";
-            IsMouseVisible = true;
-
+            
+            //Setup application windwo correctly
             Window.IsBorderless = true;
             Window.AllowUserResizing = false;
             Window.ClientSizeChanged += OnResize;
@@ -74,11 +79,13 @@ namespace TuringSimulatorDesktop
             MouseIcon = new Icon();
         }
 
+        //Default MonoGame class, not in use
         protected override void Initialize()
         {
             base.Initialize();
         }
 
+        //Load our assets here
         protected override void LoadContent()
         {
             GraphicsManager.PreferredBackBufferWidth = GlobalInterfaceData.MainMenuWidth;
@@ -94,11 +101,13 @@ namespace TuringSimulatorDesktop
             GlobalInterfaceData.Device = GraphicsDevice;
             GlobalInterfaceData.UIEffect = Content.Load<Effect>("UIShader");
 
+            //Setup font renderer correctly
             FontSystemDefaults.FontResolutionFactor = 1.0f;
             FontSystemDefaults.KernelWidth = 1;
             FontSystemDefaults.KernelHeight = 1;
             FontSystemDefaults.PremultiplyAlpha = true;
             FontSystemDefaults.FontLoader = new FreeTypeLoader();
+            //Load fonts
             GlobalInterfaceData.TextBatch = new SpriteBatch(GraphicsDevice);
             GlobalInterfaceData.StandardRegularFont = new FontSystem();
             GlobalInterfaceData.StandardRegularFont.AddFont(File.ReadAllBytes(@"Assets/Fonts/Roboto-Regular.ttf"));
@@ -107,10 +116,12 @@ namespace TuringSimulatorDesktop
             GlobalInterfaceData.MediumRegularFont = new FontSystem();
             GlobalInterfaceData.MediumRegularFont.AddFont(File.ReadAllBytes(@"Assets/Fonts/Roboto-Medium.ttf"));
 
+            //Setup rendering classes + load SVG/PNG Assets
             DateTime Start = DateTime.UtcNow;
             GlobalInterfaceData.BakeTextures();
             GlobalMeshRenderer.Setup();
 
+            //Load local user data
             DirectoryInfo Info = Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + Path.DirectorySeparatorChar + "Turing Machine - Desktop");
             string DataPath = Info.FullName + Path.DirectorySeparatorChar + "LocalUserData.txt";
 
@@ -133,43 +144,35 @@ namespace TuringSimulatorDesktop
 
             CustomLogging.Log("Load Time: " + (DateTime.UtcNow-Start).TotalSeconds.ToString());
 
+            //Set current view to be of main menu
             CurrentView = new MainScreenView();
         }
 
+        //Our main update loop
         protected override void Draw(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-            {
-                Exit();
-            }
-
+            //Marks next step in event to be true, meanign it is ready to be performed next frame
             UIEventManager.WindowRequiresNextFrameResizeStep = UIEventManager.WindowRequiresNextFrameResize;
 
             GlobalInterfaceData.Time = gameTime;
 
+            //Process inputs
             InputManager.Update();
 
+            //Process Responses
             Client.ProcessPackets();
 
-            //Process interrupts
+            //Process special events
             if (UIEventManager.ClientSuccessConnecting) UIEventManager.ClientSuccessConnectingDelegate?.Invoke(this, new EventArgs());
             if (UIEventManager.ClientFailedConnecting) UIEventManager.ClientFailedConnectingDelegate?.Invoke(this, new EventArgs());
-            //if (UIEventManager.RecievedProjectDataFromServer) UIEventManager.RecievedProjectDataFromServerDelegate?.Invoke(this, new EventArgs());
-
-            /*
-            if (UIEventManager.ServerSuccessLoadingProject) UIEventManager.ServerSuccessLoadingProjectDelegate?.Invoke(this, new EventArgs());
-            if (UIEventManager.NewProjectDataRecieved && CurrentView is ProjectScreenView)
-            {
-                ((ProjectScreenView)CurrentView).UpdatedProject();
-                UIEventManager.NewProjectDataRecieved = false;
-            }
-            */
-
+                       
             GraphicsDevice.SetRenderTarget(null);
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
+            //Draw Current View
             CurrentView.Draw();       
 
+            //Draw appropriate cursor
             GraphicsDevice.Viewport = GlobalInterfaceData.FullscreenViewport;
             if (InputManager.DragData != null)
             {
@@ -192,8 +195,7 @@ namespace TuringSimulatorDesktop
             MouseIcon.Draw();
             InputManager.IsMouseOverTypingArea = false;
 
-            //InputManager.DrawActionGroups();         
-
+            //Apply window resize changes when ready
             if (UIEventManager.WindowRequiresNextFrameResizeStep)
             {
                 GraphicsManager.PreferredBackBufferWidth = GraphicsDevice.PresentationParameters.BackBufferWidth;
@@ -207,20 +209,24 @@ namespace TuringSimulatorDesktop
             base.Draw(gameTime);
         }
 
+        //Maximise screen from small main menu version to fullscreen one
         public void LeaveMainMenu()
         {
             SDL_SetWindowResizable(Window.Handle, (byte)1U);
             MaximiseWindow(); 
         }
 
+        //Minimise application window to taskbar
         public void MinimiseWindow()
         {
             SDL_SetWindowBordered(Window.Handle, (byte)1U);
             SDL_MinimizeWindow(Window.Handle);
         }
 
+        //Fullscreen the application window
         public void MaximiseWindow()
         {
+            //Hack - As we have no border and implement top border ourselves, we need the window to maximise and position itself correctly with this hack
             SDL_SetWindowBordered(Window.Handle, (byte)1U);
             SDL_MaximizeWindow(Window.Handle);
             BoundTop = Window.ClientBounds.Top;
@@ -230,6 +236,7 @@ namespace TuringSimulatorDesktop
             UIEventManager.WindowRequiresNextFrameResize = true;
         }
 
+        //Called whenever application window is resized
         public void OnResize(object Sender, EventArgs Args)
         {
             if (GraphicsDevice.PresentationParameters.BackBufferWidth < GlobalInterfaceData.MinimumApplicationWindowWidth) GraphicsManager.PreferredBackBufferWidth = GlobalInterfaceData.MinimumApplicationWindowWidth;
@@ -240,6 +247,7 @@ namespace TuringSimulatorDesktop
             CurrentView.ScreenResize();            
         }
 
+        //Called whenever application is attempted to be closed
         protected override void OnExiting(Object sender, EventArgs args)
         {
             base.OnExiting(sender, args);

@@ -156,7 +156,6 @@ namespace TuringServer.ServerSide
                             {
                                 CustomLogging.Log("SERVER: Invalid Packet recieved");
                             }
-                            //Data.Dispose();
                         }
                     }
                 }

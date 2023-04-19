@@ -20,6 +20,7 @@ namespace TuringSimulatorDesktop
         public static LocalUserData UserData;
         public static ConnectedProjectData ProjectData;
 
+        //Add newly opened file to list
         public static void UpdateRecentlyOpenedFile(string FileDirectory)
         {
             for (int i = 0; i < UserData.RecentlyAccessedFiles.Count; i++)
@@ -36,6 +37,7 @@ namespace TuringSimulatorDesktop
             SaveUserData();
         }
 
+        //Save local user data
         public static void SaveUserData()
         {
             try
@@ -49,6 +51,7 @@ namespace TuringSimulatorDesktop
             }
         }
 
+        //Load local user data
         public static void LoadUserData(string Path)
         {
             try
@@ -67,7 +70,6 @@ namespace TuringSimulatorDesktop
     public class ConnectedProjectData
     {
         public string ProjectName;
-        public Dictionary<string, int> AlphabetToFileLookup;
 
         public ConnectedProjectData(string projectName)
         {

@@ -1,5 +1,4 @@
-﻿
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -44,6 +43,7 @@ namespace TuringSimulatorDesktop.UI
 
         public static Dictionary<UILookupKey, Texture2D> TextureLookup = new Dictionary<UILookupKey, Texture2D>();
 
+        //Rasterizes a SVG to a usable Texture object using 3rd party library
         public static Texture2D SVGToTexture(string Path)
         {
             SvgDocument svgDoc = SvgDocument.Open<SvgDocument>(Path, null);
@@ -56,6 +56,7 @@ namespace TuringSimulatorDesktop.UI
             return Texture;
         }
 
+        //Converts a PNG to a usable Texture object using 3rd party library
         public static Texture2D PNGToTexture(string Path)
         {
             Bitmap image = new Bitmap(Image.FromFile(Path));
@@ -67,6 +68,7 @@ namespace TuringSimulatorDesktop.UI
             return Texture;
         }
 
+        //Here we load in the textures, the enums in the UIKeyLookup are 1:1 with the file names of the SVG asset, as such we can automatically load them in based on the enum names, PNG assets are loaded in manually though due to being in a different folder location
         const int ManuallyGeneratedMaxEnum = (int)UILookupKey.TransitionTableIcon + 1;
         public static void BakeTextures()
         {
@@ -98,6 +100,7 @@ namespace TuringSimulatorDesktop.UI
             TextureLookup.Add(UILookupKey.DebugTexture, GenerateFilledTexture(1,1, Scheme.UIOverlayDebugColor1));
         }
 
+        //Generate a texture at runtime, this one makes it filled with a single color
         static Texture2D GenerateFilledTexture(int Width, int Height, Color Fill)
         {
             Texture2D Texture = new Texture2D(Device, Width, Height);
@@ -169,7 +172,7 @@ namespace TuringSimulatorDesktop.UI
         */
 
 
-
+        //Used for scalling UI based on monitor resolution
         const int ReferenceHeight = 1080;
         static double UIScale = 1f;
         public static void UpdateScaleManual(double NewScale)
@@ -223,6 +226,8 @@ namespace TuringSimulatorDesktop.UI
         public Color UIOverlayDebugColor4 = new Color(0, 255, 0);
     }
     */
+
+    //Color scheme, represented as class allows for multiple color scheme to exist and be interchangable
     public class ColorScheme
     {
         public Color Header = new Color(25, 27, 29);
@@ -258,7 +263,7 @@ namespace TuringSimulatorDesktop.UI
         public Color UIOverlayDebugColor4 = new Color(0, 255, 0);
     }
 
-
+    //Enum for accessing the appropriate loaded Textures
     public enum UILookupKey
     {
         MouseIcon,
@@ -312,7 +317,6 @@ namespace TuringSimulatorDesktop.UI
         ButtonRight,
         HelpButton,
 
-        //
         Run,
         RunIcon,
         AlphabetIcon,
@@ -321,7 +325,6 @@ namespace TuringSimulatorDesktop.UI
         SlateFileTCIcon,
         SlateFileTICIcon,
         TransitionTableIcon,
-        //
 
         Execute,
         ExecuteHighlight,
@@ -342,7 +345,6 @@ namespace TuringSimulatorDesktop.UI
 
         HelpMenuTuringExecution1,
         HelpMenuTuringExecution2,
-
 
         DebugTexture
     }

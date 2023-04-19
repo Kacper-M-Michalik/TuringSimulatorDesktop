@@ -8,7 +8,7 @@ using System.Text.Json.Serialization;
 
 namespace TuringSimulatorDesktop.Files
 {
-    [Serializable]
+    //C# Class + JSON Template
     public class FileInfoWrapper
     {
         [JsonInclude]

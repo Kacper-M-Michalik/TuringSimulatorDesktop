@@ -14,6 +14,7 @@ namespace TuringSimulatorDesktop.Networking
 {
     static class ClientReceiveFunctions
     {
+        //We use response type ID as a lookup to the appropriate function pointer to execute -> Allows cleaner code
         public delegate void PacketFunctionPointer(Packet Data);
         public static Dictionary<int, PacketFunctionPointer> PacketToFunction = new Dictionary<int, PacketFunctionPointer>()
         {
@@ -29,7 +30,9 @@ namespace TuringSimulatorDesktop.Networking
         {
             ProjectDataMessage Message = JsonSerializer.Deserialize<ProjectDataMessage>(Data.ReadByteArray());
 
+            //Create new project data object
             GlobalProjectAndUserData.ProjectData = new ConnectedProjectData(Message.ProjectName);
+            //Fire received project data event
             UIEventManager.RecievedProjectDataFromServerDelegate?.Invoke(null, null);// = true;
         }
 
@@ -37,7 +40,7 @@ namespace TuringSimulatorDesktop.Networking
         {
             ErrorNotificationMessage Message = JsonSerializer.Deserialize<ErrorNotificationMessage>(Data.ReadByteArray());
 
-            CustomLogging.Log("CLIENT: Received Error Notif: " + Message.ErrorMessage);
+            CustomLogging.Log("CLIENT: Received Error Notification: " + Message.ErrorMessage);
         }
 
         public static void ReceiveLogData(Packet Data)
@@ -49,35 +52,33 @@ namespace TuringSimulatorDesktop.Networking
 
         public static void ReceivedFileFromServer(Packet Data)
         {
-            CustomLogging.Log("CLIENT: Recieved FILE Data");
+            CustomLogging.Log("CLIENT: Received FILE Data");
 
             FileDataMessage Message = JsonSerializer.Deserialize<FileDataMessage>(Data.ReadByteArray(false));
 
-            //Guid ID = Data.ReadGuid(false);
-            //Data.ReadPointerPosition -= 4;
-
+            //Push payload to UI elements waiting for response
             UIEventManager.PushFileToListeners(Message.GUID, Message);
         }
 
         //deprecate?
         public static void ReceivedFileMetadataFromServer(Packet Data)
         {
-            CustomLogging.Log("CLIENT: Recieved METADATA");
-
+            CustomLogging.Log("CLIENT: Received METADATA");
+            
+            //Push payload to UI elements waiting for response
             FileDataMessage Message = JsonSerializer.Deserialize<FileDataMessage>(Data.ReadByteArray(false));
-           // Guid ID = Data.ReadGuid(false);
-           // Data.ReadPointerPosition -= 4;
 
-            // UIEventManager.PushToListeners(Data.ReadInt(false), Data);
+            //Push payload to UI elements waiting for response
             UIEventManager.PushFileToListeners(Message.GUID, Message);
         }
 
         public static void ReceivedFolderDataFromServer(Packet Data)
         {
-            CustomLogging.Log("CLIENT: Recieved FOLDER Data");
+            CustomLogging.Log("CLIENT: Received FOLDER Data");
 
             FolderDataMessage Message = JsonSerializer.Deserialize<FolderDataMessage>(Data.ReadByteArray(false));
 
+            //Push payload to UI elements waiting for response
             UIEventManager.PushFolderToListeners(Message.ID, Message);
         }
 

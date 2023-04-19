@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace TuringSimulatorDesktop.Input
 {
+    //Used to limit text box inputs
     public class KeyboardModifiers
     {
         public bool AllowsShift = true;
