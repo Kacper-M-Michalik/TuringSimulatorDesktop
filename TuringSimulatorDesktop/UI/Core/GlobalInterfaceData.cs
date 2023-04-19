@@ -14,7 +14,7 @@ using Image = System.Drawing.Image;
 using System.IO;
 using TuringSimulatorDesktop.UI;
 
-namespace TuringSimulatorDesktop
+namespace TuringSimulatorDesktop.UI
 {
     public static class GlobalInterfaceData
     {     
@@ -92,6 +92,8 @@ namespace TuringSimulatorDesktop
             TextureLookup.Add(UILookupKey.SpeedTwoHighlight, PNGToTexture(Environment.CurrentDirectory + @"\Assets\PNG\" + "SpeedTwoHighlight" + @".png"));
             TextureLookup.Add(UILookupKey.SpeedThree, PNGToTexture(Environment.CurrentDirectory + @"\Assets\PNG\" + "SpeedThree" + @".png"));
             TextureLookup.Add(UILookupKey.SpeedThreeHighlight, PNGToTexture(Environment.CurrentDirectory + @"\Assets\PNG\" + "SpeedThreeHighlight" + @".png"));
+            TextureLookup.Add(UILookupKey.HelpMenuTuringExecution1, PNGToTexture(Environment.CurrentDirectory + @"\Assets\PNG\" + "HelpMenuTuringExecution1" + @".png"));
+            TextureLookup.Add(UILookupKey.HelpMenuTuringExecution2, PNGToTexture(Environment.CurrentDirectory + @"\Assets\PNG\" + "HelpMenuTuringExecution2" + @".png"));
 
             TextureLookup.Add(UILookupKey.DebugTexture, GenerateFilledTexture(1,1, Scheme.UIOverlayDebugColor1));
         }
@@ -108,10 +110,12 @@ namespace TuringSimulatorDesktop
             return Texture;
         }
 
+        /*
         static Texture2D CopyTexture(UILookupKey SourceTextureKey)
         {
             return CopyTexture(TextureLookup[SourceTextureKey]);
         }
+        
 
         static Texture2D CopyTexture(Texture2D SourceTexture)
         {
@@ -136,7 +140,7 @@ namespace TuringSimulatorDesktop
                     Values[Texture.Width * y + x] = new Color(Col.R, Col.G, Col.B, Col.A);
                 }
             }
-            */
+            
 
             for (int i = 0; i < Texture.Width; i++)
             {
@@ -162,7 +166,7 @@ namespace TuringSimulatorDesktop
             Texture.SetData(Values);
             return Texture;
         }
-
+        */
 
 
 
@@ -234,12 +238,19 @@ namespace TuringSimulatorDesktop
         public Color DarkInteractableAccent = new Color(219, 219, 219);
         public Color InteractableAccent = new Color(235, 235, 235);
         public Color NonInteractableAccent = new Color(208, 208, 208);
-        public Color CanvasBackground = new Color(243, 245, 249);
+        public Color CanvasBackground = new Color(255, 255, 255);
+        
+        public Color CanvasProgrammingBackground = new Color(235, 235, 235);
+        public Color CanvasContextMenu = new Color(255, 255, 255);
+        public Color CanvasContextMenuSelected = new Color(219, 219, 219);
 
         public Color FontColor = Color.Black;
         public Color FontColorBright = Color.White;
         public Color FontGrayedOutColor = new Color(94, 94, 94);
 
+        public Color FileBrowserSelected = new Color(208, 208, 208);
+        public Color ContextMenuBackground = new Color(235, 235, 235);
+        public Color ContextMenuSelected = new Color(219, 219, 219);
 
         public Color UIOverlayDebugColor1 = new Color(124, 0, 124);
         public Color UIOverlayDebugColor2 = new Color(255, 124, 255);
@@ -297,6 +308,10 @@ namespace TuringSimulatorDesktop
         Arrow,
         ArrowIcon,
 
+        ButtonLeft,
+        ButtonRight,
+        HelpButton,
+
         //
         Run,
         RunIcon,
@@ -324,6 +339,9 @@ namespace TuringSimulatorDesktop
         SpeedTwoHighlight,
         SpeedThree,
         SpeedThreeHighlight,
+
+        HelpMenuTuringExecution1,
+        HelpMenuTuringExecution2,
 
 
         DebugTexture

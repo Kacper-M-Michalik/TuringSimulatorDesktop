@@ -13,10 +13,12 @@ using System.Text.Json.Serialization;
 using TuringCore.TextProgramming;
 using TuringCore.Files;
 using TuringCore.Networking;
+using TuringSimulatorDesktop.Debugging;
+using TuringSimulatorDesktop.Networking;
 
 namespace TuringSimulatorDesktop.UI.Prefabs
 {    
-    public class TextProgrammingView : IView, IPollable, IRunnable, ISaveable
+    public class TextProgrammingView : IView, IPollable, IRunnable, ISaveable, IUndoRedoable
     {
         Vector2 position;
         public Vector2 Position
@@ -74,8 +76,10 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         ActionGroup Group;
 
-
         Icon Background;
+
+        TextureButton HelpMenuButton;
+        List<Texture2D> HelpMenus;
 
         Label DefenitionAlphabetTitle;
         DefenitionAlphabetInputItem DefenitionAlphabetBox;
@@ -90,6 +94,9 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         int FileVersion;
         TransitionFile OpenedFile;
 
+        Stack<(InputBox, string)> StateTransitionChangeUndoStack = new Stack<(InputBox, string)>();
+        Stack<(InputBox, string)> StateTransitionChangeRedoStack = new Stack<(InputBox, string)>();
+
         public IClosable OpenMenu;
 
         public TextProgrammingView(Guid FileToDisplay)
@@ -102,10 +109,13 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Group.PollableObjects.Add(this);
             //Group.ClickableObjects.Add(this);
 
-            Background = new Icon(GlobalInterfaceData.Scheme.CanvasBackground);
+            Background = new Icon(GlobalInterfaceData.Scheme.CanvasProgrammingBackground);
+
+            HelpMenuButton = new TextureButton(Group);
+            HelpMenuButton.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.HelpButton];
 
             DefenitionAlphabetTitle = new Label();
-            DefenitionAlphabetTitle.Text = "Defenition Alphabet ID:";
+            DefenitionAlphabetTitle.Text = "Definition Alphabet ID:";
 
             DefenitionAlphabetBox = new DefenitionAlphabetInputItem(Group);
             
@@ -155,7 +165,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             if (Message.GUID != CurrentlyOpenedFileID)
             {
-                CustomLogging.Log("CLIENT: State Transition Editor Fatal Error, recived unwanted file data!");
+                CustomLogging.Log("CLIENT: State Transition Editor Fatal Error, received unwanted file data!");
                 return;
             }
 
@@ -385,7 +395,32 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         {
             Matrix CanvasPos = TransitionCanvas.InverseMatrix * Matrix.CreateTranslation(InputManager.MouseData.X, InputManager.MouseData.Y, 0);
             Item.Position = new Vector2(CanvasPos.Translation.X + Offset.Translation.X, CanvasPos.Translation.Y + Offset.Translation.Y);
+        }       
+
+        public void Undo()
+        {
+            if (StateTransitionChangeUndoStack.Count == 0) return;
+
+            (InputBox, string) Pair = StateTransitionChangeUndoStack.Pop();
+            StateTransitionChangeRedoStack.Push((Pair.Item1, Pair.Item1.Text));
+            Pair.Item1.Text = Pair.Item2;
         }
+
+        public void Redo()
+        {
+            if (StateTransitionChangeRedoStack.Count == 0) return;
+
+            (InputBox, string) Pair = StateTransitionChangeRedoStack.Pop();
+            StateTransitionChangeUndoStack.Push((Pair.Item1, Pair.Item1.Text));
+            Pair.Item1.Text = Pair.Item2;
+        }
+
+        public void AddUndo(InputBox Box)
+        {
+            StateTransitionChangeRedoStack.Clear();
+            StateTransitionChangeUndoStack.Push((Box, Box.Text));
+        }
+
 
         void MoveLayout()
         {
@@ -393,6 +428,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Group.Y = UIUtils.ConvertFloatToInt(position.Y);
 
             Background.Position = position;
+
+            HelpMenuButton.Position = Position + new Vector2(bounds.X - 37, 7);
 
             DefenitionAlphabetTitle.Position = new Vector2(position.X + 10, position.Y + 10);
             DefenitionAlphabetBox.Position = new Vector2(position.X + 10, position.Y + 30);
@@ -410,6 +447,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Group.Height = bounds.Y;
 
             Background.Bounds = bounds;
+
+            HelpMenuButton.Bounds = new Point(30, 30);
 
             TransitionCanvas.Bounds = bounds;
 
@@ -435,6 +474,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
                 HaltStatesTitle.Draw(BoundPort);
                 HaltStateInputBox.Draw(BoundPort);
+
+                HelpMenuButton.Draw(BoundPort);
 
                 OpenMenu?.Draw();
             }

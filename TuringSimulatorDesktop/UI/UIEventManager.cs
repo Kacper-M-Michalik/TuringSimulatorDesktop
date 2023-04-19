@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using TuringCore;
 using TuringCore.Networking;
 using TuringServer;
-using TuringSimulatorDesktop.UI;
 
-namespace TuringSimulatorDesktop
+namespace TuringSimulatorDesktop.UI
 {
     public delegate void SubscriberDataCallback(object Data);
 

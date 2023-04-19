@@ -64,34 +64,34 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Background = new Icon(GlobalInterfaceData.Scheme.InteractableAccent);
 
             CreateFolderButton = new ColorButton(Group);
-            CreateFolderButton.BaseColor = GlobalInterfaceData.Scheme.InteractableAccent;
-            CreateFolderButton.HighlightColor = GlobalInterfaceData.Scheme.DarkInteractableAccent;
+            CreateFolderButton.BaseColor = GlobalInterfaceData.Scheme.ContextMenuBackground;
+            CreateFolderButton.HighlightColor = GlobalInterfaceData.Scheme.ContextMenuSelected;
             CreateFolderButton.HighlightOnMouseOver = true;
             CreateFolderButton.OnClickedEvent += browser.CreateFolder;
 
             Divider1 = new Icon(GlobalInterfaceData.Scheme.NonInteractableAccent);
 
             CreateTransitionFileButton = new ColorButton(Group);
-            CreateTransitionFileButton.BaseColor = GlobalInterfaceData.Scheme.InteractableAccent;
-            CreateTransitionFileButton.HighlightColor = GlobalInterfaceData.Scheme.DarkInteractableAccent;
+            CreateTransitionFileButton.BaseColor = GlobalInterfaceData.Scheme.ContextMenuBackground;
+            CreateTransitionFileButton.HighlightColor = GlobalInterfaceData.Scheme.ContextMenuSelected;
             CreateTransitionFileButton.HighlightOnMouseOver = true;
             CreateTransitionFileButton.OnClickedEvent += browser.CreateTransitionFile;
 
             CreateSlateFileButton = new ColorButton(Group);
-            CreateSlateFileButton.BaseColor = GlobalInterfaceData.Scheme.InteractableAccent;
-            CreateSlateFileButton.HighlightColor = GlobalInterfaceData.Scheme.DarkInteractableAccent;
+            CreateSlateFileButton.BaseColor = GlobalInterfaceData.Scheme.ContextMenuBackground;
+            CreateSlateFileButton.HighlightColor = GlobalInterfaceData.Scheme.ContextMenuSelected;
             CreateSlateFileButton.HighlightOnMouseOver = true;
             CreateSlateFileButton.OnClickedEvent += browser.CreateSlateFile;
 
             CreateTapeFileButton = new ColorButton(Group);
-            CreateTapeFileButton.BaseColor = GlobalInterfaceData.Scheme.InteractableAccent;
-            CreateTapeFileButton.HighlightColor = GlobalInterfaceData.Scheme.DarkInteractableAccent;
+            CreateTapeFileButton.BaseColor = GlobalInterfaceData.Scheme.ContextMenuBackground;
+            CreateTapeFileButton.HighlightColor = GlobalInterfaceData.Scheme.ContextMenuSelected;
             CreateTapeFileButton.HighlightOnMouseOver = true;
             CreateTapeFileButton.OnClickedEvent += browser.CreateTapeFile;
 
             CreateAlphabetFileButton = new ColorButton(Group);
-            CreateAlphabetFileButton.BaseColor = GlobalInterfaceData.Scheme.InteractableAccent;
-            CreateAlphabetFileButton.HighlightColor = GlobalInterfaceData.Scheme.DarkInteractableAccent;
+            CreateAlphabetFileButton.BaseColor = GlobalInterfaceData.Scheme.ContextMenuBackground;
+            CreateAlphabetFileButton.HighlightColor = GlobalInterfaceData.Scheme.ContextMenuSelected;
             CreateAlphabetFileButton.HighlightOnMouseOver = true;
             CreateAlphabetFileButton.OnClickedEvent += browser.CreateAlphabetFile;
 

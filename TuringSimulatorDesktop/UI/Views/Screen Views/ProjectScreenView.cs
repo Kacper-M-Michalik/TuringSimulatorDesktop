@@ -161,7 +161,7 @@ namespace TuringSimulatorDesktop.UI
                     {
                         AssignedFocus = true;
                         CurrentlyFocusedWindow = Windows[j];
-                        DebugManager.CurrentWindow = CurrentlyFocusedWindow;
+                        //DebugManager.CurrentWindow = CurrentlyFocusedWindow;
 
                         if (InputManager.LeftMousePressed)
                         {
@@ -171,7 +171,7 @@ namespace TuringSimulatorDesktop.UI
                     }
                     j--;
                 }
-                if (!AssignedFocus) DebugManager.CurrentWindow = null;
+                //if (!AssignedFocus) DebugManager.CurrentWindow = null;
             }
 
             if (IsDragging)
@@ -191,11 +191,28 @@ namespace TuringSimulatorDesktop.UI
             }
         }
 
+        /*
         public void CreateWindow()
         {
             Window NewWindow = new Window(new Vector2(100, 100), new Point(300, 400), this);
 
             Windows.Add(NewWindow);
+        }
+        */
+
+        public Window CreateWindow(int X, int Y, int Width, int Height)
+        {
+            Window NewWindow = new Window(new Vector2(X, Y), new Point(Width, Height), this);
+
+            Windows.Add(NewWindow);
+
+            return NewWindow;
+        }
+
+        public void DeleteWindow(Window DeleteWindow)
+        {
+            Windows.Remove(DeleteWindow);
+            DeleteWindow.Close();
         }
 
         public void Minimise(Button Sender)
@@ -213,12 +230,14 @@ namespace TuringSimulatorDesktop.UI
 
         public void Undo(Button Sender)
         {
-
+            IUndoRedoable Target = (IUndoRedoable)CurrentlyFocusedWindow.CurrentView;
+            if (Target != null) Target.Undo();
         }
 
         public void Redo(Button Sender)
         {
-
+            IUndoRedoable Target = (IUndoRedoable)CurrentlyFocusedWindow.CurrentView;
+            if (Target != null) Target.Redo();
         }
 
         public void Save(Button Sender)

@@ -12,6 +12,10 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Runtime.InteropServices;
 using System.Text;
+using TuringServer;
+using TuringSimulatorDesktop.Networking;
+using TuringSimulatorDesktop.Debugging;
+using TuringSimulatorDesktop.Files;
 
 namespace TuringSimulatorDesktop
 {
@@ -245,7 +249,7 @@ namespace TuringSimulatorDesktop
         {
             base.OnExiting(sender, args);
             Client.Disconnect();
-            TuringServer.Server.CloseServer();
+            BackendInterface.CloseProject();
         }
     }
 }

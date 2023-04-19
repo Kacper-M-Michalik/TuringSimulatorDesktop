@@ -7,7 +7,9 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using TuringCore;
 using TuringCore.Networking;
+using TuringSimulatorDesktop.Debugging;
 using TuringSimulatorDesktop.Input;
+using TuringSimulatorDesktop.Networking;
 
 namespace TuringSimulatorDesktop.UI.Prefabs
 {

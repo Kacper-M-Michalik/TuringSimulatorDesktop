@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 
-namespace TuringSimulatorDesktop
+namespace TuringSimulatorDesktop.UI
 {
     public static class GlobalMeshRenderer
     {
@@ -77,6 +77,7 @@ namespace TuringSimulatorDesktop
 
 
         //Not in use yet
+        /*
         public static void Draw(MeshBuffer Buffer, Viewport Port)
         {
             Device.Viewport = Port;
@@ -95,6 +96,7 @@ namespace TuringSimulatorDesktop
                 Device.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, DrawMesh.Vertices, 0, DrawMesh.Vertices.Length, DrawMesh.Indices, 0, DrawMesh.Indices.Length / 3);
             }
         }
+        */
 
         public static void Draw(Mesh DrawMesh, Matrix Transformations, Texture2D DrawTexture, Viewport? Port = null)
         {

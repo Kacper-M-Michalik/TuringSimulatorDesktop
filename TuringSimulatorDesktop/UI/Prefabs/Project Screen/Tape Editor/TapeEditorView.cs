@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using TuringCore;
 using TuringCore.Files;
 using TuringCore.Networking;
+using TuringSimulatorDesktop.Debugging;
+using TuringSimulatorDesktop.Networking;
 
 namespace TuringSimulatorDesktop.UI.Prefabs
 {
@@ -74,6 +76,10 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         Tape ActivelyEditedTape;
 
         Icon Background;
+
+        TextureButton HelpMenuButton;
+        List<Texture2D> HelpMenus;
+
         DraggableCanvas Canvas;
         TapeVisualItem VisualTape;
 
@@ -87,6 +93,9 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Background = new Icon(GlobalInterfaceData.Scheme.CanvasBackground);
 
             Canvas = new DraggableCanvas();
+
+            HelpMenuButton = new TextureButton(Canvas.Group);
+            HelpMenuButton.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.HelpButton];
 
             VisualTape = new TapeVisualItem(Canvas.Group);
 
@@ -149,6 +158,14 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             TapeTemplate NewTemplate = new TapeTemplate();
 
+            foreach (KeyValuePair<int, string> Pair in ActivelyEditedTape.Data)
+            {
+                if (Pair.Value == "")
+                {
+                    ActivelyEditedTape.Data.Remove(Pair.Key);
+                }
+            }
+
             NewTemplate.Data = ActivelyEditedTape.Data;
             NewTemplate.HighestIndex = ActivelyEditedTape.HighestIndex;
             NewTemplate.LowestIndex = ActivelyEditedTape.LowestIndex;
@@ -160,12 +177,14 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         {
             Background.Position = position;
             Canvas.Position = position;
+            HelpMenuButton.Position = Position + new Vector2(bounds.X - 37, 7);
         }
 
         void ResizeLayout()
         {
             Background.Bounds = bounds;
             Canvas.Bounds = bounds;
+            HelpMenuButton.Bounds = new Point(30, 30);
         }
 
         public void Draw(Viewport? BoundPort = null)
@@ -178,6 +197,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 VisualTape.CameraMax = (Matrix.CreateTranslation(Canvas.Position.X + Canvas.Bounds.X, 0, 0) * Canvas.InverseMatrix).Translation.X;
                 VisualTape.UpdateLayout();
                 Canvas.Draw(BoundPort);
+
+                HelpMenuButton.Draw(BoundPort);
             }
         }
 

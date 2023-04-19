@@ -7,7 +7,7 @@ using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace TuringSimulatorDesktop
+namespace TuringSimulatorDesktop.Files
 {
     [Serializable]
     public class LocalUserData

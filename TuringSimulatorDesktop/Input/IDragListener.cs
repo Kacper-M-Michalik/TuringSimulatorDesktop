@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TuringSimulatorDesktop.UI
+namespace TuringSimulatorDesktop.Input
 {
     public interface IDragListener : IClickable
     {

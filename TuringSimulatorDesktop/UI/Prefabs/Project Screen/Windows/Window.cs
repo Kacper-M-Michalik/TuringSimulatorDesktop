@@ -78,7 +78,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Position = position;
             Bounds = bounds;
 
-            DebugManager.LastCreatedWindow = this;
+            //DebugManager.LastCreatedWindow = this;
         }
 
         public bool IsMouseOverHeader()
@@ -139,6 +139,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 else
                 {
                     CurrentView = null;
+                    OwnerScreen.DeleteWindow(this);
                 }
             }
 
@@ -167,7 +168,14 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         public void Close()
         {
-            throw new NotImplementedException();
+            foreach (WindowHeaderItem CurrentHeader in Headers)
+            {
+                CurrentHeader.Close();
+            }
+            Headers.Clear();
+            ButtonLayout.Clear();
+            ButtonLayout.Close();
+            IsActive = false;            
         }
     }
 }

@@ -5,21 +5,26 @@ using TuringServer.Logging;
 using System.Text.Json.Serialization;
 using System.Text.Json;
 using TuringCore.Networking;
+using TuringServer.Data;
 
-namespace TuringServer
+namespace TuringServer.ServerSide
 {
     static class ServerSendPacketFunctions
     {
         #region Main
+        //Generates a specific packet
         public static Packet LogData(string LogData)
         {
             Packet Data = new Packet();
 
+            //Generating our contents/payload
             LogDataMessage Payload = new LogDataMessage();
             Payload.RequestType = (int)ServerSendPackets.LogData;
             Payload.LogMessage = LogData;
 
+            //Writing our Header information
             Data.Write((int)ServerSendPackets.LogData);
+            //WRiting our Payload
             Data.Write(JsonSerializer.SerializeToUtf8Bytes(Payload));
 
             return Data;
@@ -29,7 +34,7 @@ namespace TuringServer
         {
             Packet Data = new Packet();
 
-            CustomLogging.Log("SERVER: Error Notif Copy - " + ErrorString);
+            CustomLogging.Log("SERVER: Error Notification Copy - " + ErrorString);
 
             ErrorNotificationMessage Payload = new ErrorNotificationMessage();
             Payload.RequestType = (int)ServerSendPackets.ErrorNotification;
@@ -104,6 +109,7 @@ namespace TuringServer
             Payload.ID = FolderID;
             Payload.Name = SendFolder.Name;
 
+            //Add a list of parent folders
             DirectoryFolder CurrentFolder = SendFolder;
             List<FolderDataMessage> ParentFolders = new List<FolderDataMessage>();
             while (CurrentFolder.ParentFolder != null)
@@ -114,6 +120,7 @@ namespace TuringServer
 
             Payload.ParentFolders = ParentFolders;
 
+            //Add our list of subfolders
             List<FolderDataMessage> SubFolders = new List<FolderDataMessage>();
             foreach (DirectoryFolder Folder in SendFolder.SubFolders)
             {
@@ -122,6 +129,7 @@ namespace TuringServer
 
             Payload.SubFolders = SubFolders;
 
+            //Add our list of subfiles
             List<FileDataMessage> Files = new List<FileDataMessage>();
             foreach (DirectoryFile File in SendFolder.SubFiles)
             {
@@ -130,7 +138,9 @@ namespace TuringServer
 
             Payload.Files = Files;
 
+            //Header
             Data.Write((int)ServerSendPackets.SentFolderData);
+            //Payload
             Data.Write(JsonSerializer.SerializeToUtf8Bytes(Payload));
 
             return Data;
@@ -167,7 +177,6 @@ namespace TuringServer
             Data.Write((int)ServerSendPackets.DeletedFile);
             Data.Write(FileGUID);
 
-            //SendTCPToAllClients(Data);
             return Data;
         }
 
@@ -226,7 +235,6 @@ namespace TuringServer
             Data.Write((int)ServerSendPackets.DeletedFolder);
             Data.Write(FolderID);
 
-            //SendTCPToAllClients(Data);
             return Data;
         }
         #endregion

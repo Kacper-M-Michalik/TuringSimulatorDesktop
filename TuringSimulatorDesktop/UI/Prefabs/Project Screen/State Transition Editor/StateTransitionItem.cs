@@ -83,22 +83,27 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             CurrentStateTextBox.OutputLabel.FontSize = 16;
             CurrentStateTextBox.OutputLabel.DrawCentered = true;
             CurrentStateTextBox.BackgroundColor = GlobalInterfaceData.Scheme.InteractableAccent;
+            CurrentStateTextBox.ClickEvent += (InputBox Sender) => { ProgrammingView.AddUndo(CurrentStateTextBox); };
             TapeValueTextBox = new InputBox(54, 34, group);
             TapeValueTextBox.OutputLabel.FontSize = 16;
             TapeValueTextBox.OutputLabel.DrawCentered = true;
             TapeValueTextBox.BackgroundColor = GlobalInterfaceData.Scheme.InteractableAccent;
+            TapeValueTextBox.ClickEvent += (InputBox Sender) => { ProgrammingView.AddUndo(TapeValueTextBox); };
             NewStateTextBox = new InputBox(54, 34, group);
             NewStateTextBox.OutputLabel.FontSize = 16;
             NewStateTextBox.OutputLabel.DrawCentered = true;
             NewStateTextBox.BackgroundColor = GlobalInterfaceData.Scheme.InteractableAccent;
+            NewStateTextBox.ClickEvent += (InputBox Sender) => { ProgrammingView.AddUndo(NewStateTextBox); };
             NewTapeValueTextBox = new InputBox(54, 34, group);
             NewTapeValueTextBox.OutputLabel.FontSize = 16;
             NewTapeValueTextBox.OutputLabel.DrawCentered = true;
             NewTapeValueTextBox.BackgroundColor = GlobalInterfaceData.Scheme.InteractableAccent;
+            NewTapeValueTextBox.ClickEvent += (InputBox Sender) => { ProgrammingView.AddUndo(NewTapeValueTextBox); };
             MoveDirectionTextBox = new InputBox(54, 34, group);
             MoveDirectionTextBox.OutputLabel.FontSize = 16;
             MoveDirectionTextBox.OutputLabel.DrawCentered = true;
             MoveDirectionTextBox.BackgroundColor = GlobalInterfaceData.Scheme.InteractableAccent;
+            MoveDirectionTextBox.ClickEvent += (InputBox Sender) => { ProgrammingView.AddUndo(MoveDirectionTextBox); };
 
             CurrentStateTextBox.EditEvent += EditBoxResize;
             TapeValueTextBox.EditEvent += EditBoxResize;

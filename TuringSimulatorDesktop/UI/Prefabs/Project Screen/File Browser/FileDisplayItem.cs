@@ -5,6 +5,7 @@ using TuringCore;
 using TuringCore.Networking;
 using TuringSimulatorDesktop.Input;
 using Microsoft.Xna.Framework.Input;
+using TuringSimulatorDesktop.Networking;
 
 namespace TuringSimulatorDesktop.UI.Prefabs
 {
@@ -99,7 +100,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         public void Clicked()
         {
-            Background.DrawColor = GlobalInterfaceData.Scheme.InteractableAccent;
+            Background.DrawColor = GlobalInterfaceData.Scheme.FileBrowserSelected;
 
             if (InputManager.RightMousePressed)
             {
