@@ -94,11 +94,14 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         int FileVersion;
         TransitionFile OpenedFile;
 
+        //Implements the undo/redo feature
         Stack<(InputBox, string)> StateTransitionChangeUndoStack = new Stack<(InputBox, string)>();
         Stack<(InputBox, string)> StateTransitionChangeRedoStack = new Stack<(InputBox, string)>();
 
         public IClosable OpenMenu;
 
+        //Constructor
+        //Takes in GUID of file to display
         public TextProgrammingView(Guid FileToDisplay)
         {
             TransitionCanvas = new DraggableCanvas();
@@ -107,7 +110,6 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             Group = InputManager.CreateActionGroup();
             Group.PollableObjects.Add(this);
-            //Group.ClickableObjects.Add(this);
 
             Background = new Icon(GlobalInterfaceData.Scheme.CanvasProgrammingBackground);
 
@@ -128,10 +130,12 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             IsActive = false;
 
+            //Switches to display the file
             CurrentlyOpenedFileID = FileToDisplay;
             SwitchOpenedFile(FileToDisplay);
         }
 
+        //Polls if the user has interacted with this view, if so, sets itself as the last focused editor
         public void PollInput(bool IsInActionGroupFrame)
         {
             if ((InputManager.LeftMousePressed || InputManager.RightMousePressed) && OwnerWindow.OwnerScreen.ActiveEditorView != this && IsMouseOver())
@@ -147,11 +151,14 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         public void SwitchOpenedFile(Guid ID)
         {
+            //Unsubscribe from UI events regarding receiving responses regarding previously displayed Transition Program
             FullyLoadedFile = false;
             UIEventManager.Unsubscribe(CurrentlyOpenedFileID, ReceivedStateTransitionFile);
             Client.SendTCPData(ClientSendPacketFunctions.UnsubscribeFromFileUpdates(CurrentlyOpenedFileID));
             CurrentlyOpenedFileID = ID;
+            //Unsubscribe for UI events regarding responses regarding newly requested Transition Program
             UIEventManager.Subscribe(CurrentlyOpenedFileID, ReceivedStateTransitionFile);
+            //Create request packet and send to server
             Client.SendTCPData(ClientSendPacketFunctions.RequestFile(ID, true));
         }
 
@@ -161,8 +168,15 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             FileDataMessage Message = (FileDataMessage)Data;
 
-            if ((ServerSendPackets)Message.RequestType == ServerSendPackets.SentFileMetadata) return;
+            //If a metadata update is received, we only update the metadata relevant data/UI elements
+            if ((ServerSendPackets)Message.RequestType == ServerSendPackets.SentFileMetadata)
+            {
+                title = Message.Name;
+                FileVersion = Message.Version;
+                return;
+            }
 
+            //Security check, ensures the received JSON object represents the wanted file
             if (Message.GUID != CurrentlyOpenedFileID)
             {
                 CustomLogging.Log("CLIENT: State Transition Editor Fatal Error, received unwanted file data!");
@@ -172,22 +186,22 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             title = Message.Name;
             FileVersion = Message.Version;
 
+            //Security check, ensures the received Transition File is valid
             try
             {
                 OpenedFile = JsonSerializer.Deserialize<TransitionFile>(Message.Data);
             }
             catch
             {
-                CustomLogging.Log("CLIENT: Window - Invalid Transition table recieved");
+                CustomLogging.Log("CLIENT: Window - Invalid Transition table received");
                 return;
             }
 
-            //TestLabel.Text = "VERSION: " + FileVersion.ToString() + "/n" + Encoding.ASCII.GetString(Data.ReadByteArray()) + "/n" + OpenedFile.DefinitionAlphabetID;
-
+            //Reset UI elements
             DefenitionAlphabetBox.ReferenceFileData = null;
             DefenitionAlphabetBox.FileLabel.Text = "";
 
-            //request metadata
+            //Request metadata regarding the referenced Definition Alphabet
             if (OpenedFile.DefinitionAlphabetFileID != Guid.Empty)
             {
                 UIEventManager.Subscribe(OpenedFile.DefinitionAlphabetFileID, ReceiveAlphabetMetaData);
@@ -195,12 +209,13 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             }
             else
             {
+                //If there is no Definition Alphabet, indicate in the UI as such
                 DefenitionAlphabetBox.ReferenceFileData = null;
                 DefenitionAlphabetBox.FileLabel.Text = "No Referenced Alphabet";
                 FullyLoadedFile = true;
             }
 
-
+            //Translate all transitions in the Transition File as nodes on the programming canvas
             TransitionCanvas.Clear();
 
             for (int i = 0; i < OpenedFile.Transitions.Count; i++)
@@ -232,6 +247,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 TransitionCanvas.Elements.Add(Item);
             }
 
+            //Populate halt states UI
             StringBuilder Builder = new StringBuilder();
             foreach (string HaltState in OpenedFile.HaltStates)
             {
@@ -244,34 +260,32 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             TransitionCanvas.ApplyMatrices();
         }
 
+        //Process Alphabet Metadat Resposne
         public void ReceiveAlphabetMetaData(object Data)
         {
             CustomLogging.Log("CLIENT: Window received State Alphabet Data");
 
             FileDataMessage Message = (FileDataMessage)Data;
-
+            
+            //Ignore file contents requests
             if ((ServerSendPackets)Message.RequestType == ServerSendPackets.SentOrUpdatedFile) return;
 
+            //Secuirty check, ensure received JSON object represents the file we requested
             if (Message.GUID != OpenedFile.DefinitionAlphabetFileID)
             {
-                CustomLogging.Log("CLIENT: State Transition Editor Fatal Error, recived unwanted alphabet file data!");
+                CustomLogging.Log("CLIENT: State Transition Editor Fatal Error, received unwanted alphabet file data!");
                 return;
             }
             
-            //may want to change in future
-            UIEventManager.Unsubscribe(OpenedFile.DefinitionAlphabetFileID, ReceiveAlphabetMetaData);
+           // UIEventManager.Unsubscribe(OpenedFile.DefinitionAlphabetFileID, ReceiveAlphabetMetaData);
 
             Guid AlphabetID = Message.GUID;
             string AlphabetFileName = Message.Name;
             int AlphabetFileVersion = Message.Version;
 
+            //Update UI element
             DefenitionAlphabetBox.ChangeAlphabet(new FileData(AlphabetFileName, AlphabetID, CoreFileType.Alphabet));
-
-
-         //   DefenitionAlphabetBox.FileLabel.Text = AlphabetFileName;
-           // DefenitionAlphabetBox.Bounds = new Point(DefenitionAlphabetBox.FileLabel.RichText.Size.X + 4 , 15);
-
-            //may have to move back 
+            
             FullyLoadedFile = true;
         }
 
@@ -282,6 +296,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 return;
             }
 
+            //Generate Transition File Object and populate with data based on UI elements, such as programming canvas and halt state input box
             TransitionFile NewFile = new TransitionFile();
 
             if (DefenitionAlphabetBox.ReferenceFileData != null)
@@ -299,11 +314,6 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             {
                 NewFile.HaltStates.Add(HaltStates[i]);
             }
-
-            //for (int i = 0; i < HaltStateInputBoxes.Count; i++)
-            //{
-            //    NewFile.HaltStates.Add(HaltStateInputBoxes[i].Text);
-           // }
 
             for (int i = 0; i < TransitionCanvas.Elements.Count; i++)
             {
@@ -334,9 +344,11 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 NewFile.Transitions.Add(NewTransition);
             }
 
+            //Generate and send File Update Request using generated object
             Client.SendTCPData(ClientSendPacketFunctions.UpdateFile(CurrentlyOpenedFileID, FileVersion, JsonSerializer.SerializeToUtf8Bytes(NewFile, GlobalProjectAndUserData.JsonOptions)));
         }
 
+        //Close any previous context menu when right clicked and display the NodeCreation context menu
         public void Clicked(DraggableCanvas Sender)
         {
             if (InputManager.RightMousePressed)
@@ -347,11 +359,13 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             }
         }
 
+        //Close cotnext menu when clicked away from
         public void ClickedAway(DraggableCanvas Sender)
         {
             OpenMenu?.Close();
         }
 
+        //Generate new transition node on canvas
         public void AddNewTransition(Button Sender)
         {
             Matrix CanvasPos = TransitionCanvas.InverseMatrix * Matrix.CreateTranslation(OpenMenu.Position.X, OpenMenu.Position.Y, 0);
@@ -361,6 +375,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             OpenMenu?.Close();
         }
 
+        //Close any previous context menu and display the NodeEdit context menu
         public void OpenNodeEditMenu(StateTransitionItem Node)
         {
             OpenMenu?.Close();
@@ -368,6 +383,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             OpenMenu.Position = new Vector2(InputManager.MouseData.X, InputManager.MouseData.Y);
         }
 
+        //Clones a target transition node onto the canvas
         public void CloneTransition(StateTransitionItem Item)
         {
             Matrix CanvasPos = TransitionCanvas.InverseMatrix * Matrix.CreateTranslation(OpenMenu.Position.X, OpenMenu.Position.Y, 0);
@@ -382,6 +398,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             OpenMenu?.Close();
         }
 
+        //Deletes a transition node off the canvas
         public void DeleteTransition(StateTransitionItem Item)
         {
             TransitionCanvas.Elements.Remove(Item);
@@ -391,30 +408,46 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             OpenMenu?.Close();
         }
 
+        //Updates the position of a transition node on the canvas
         public void  MoveTansition(StateTransitionItem Item, Matrix Offset)
         {
             Matrix CanvasPos = TransitionCanvas.InverseMatrix * Matrix.CreateTranslation(InputManager.MouseData.X, InputManager.MouseData.Y, 0);
             Item.Position = new Vector2(CanvasPos.Translation.X + Offset.Translation.X, CanvasPos.Translation.Y + Offset.Translation.Y);
         }       
 
+        //Undos the last transition node edit
         public void Undo()
         {
+            //Check an action to undo exists
             if (StateTransitionChangeUndoStack.Count == 0) return;
 
+            //Pop action off of stack
             (InputBox, string) Pair = StateTransitionChangeUndoStack.Pop();
+
+            //Add action to redo stack
             StateTransitionChangeRedoStack.Push((Pair.Item1, Pair.Item1.Text));
+
+            //Apply undo
             Pair.Item1.Text = Pair.Item2;
         }
 
+        //Redos the last transition node edit
         public void Redo()
         {
+            //Check an action to redo exists
             if (StateTransitionChangeRedoStack.Count == 0) return;
 
+            //Pop action off of stack
             (InputBox, string) Pair = StateTransitionChangeRedoStack.Pop();
+
+            //Add action to undo stack
             StateTransitionChangeUndoStack.Push((Pair.Item1, Pair.Item1.Text));
+
+            //Apply redo
             Pair.Item1.Text = Pair.Item2;
         }
 
+        //Adding an undo clears and redo actions and adds the uno action onto the stack
         public void AddUndo(InputBox Box)
         {
             StateTransitionChangeRedoStack.Clear();
@@ -435,7 +468,6 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             DefenitionAlphabetBox.Position = new Vector2(position.X + 10, position.Y + 30);
 
             HaltStatesTitle.Position = new Vector2(position.X + 10, position.Y + 60);
-            //HaltStatesLayout.Position = new Vector2(position.X + 10, position.Y + 80);
             HaltStateInputBox.Position = new Vector2(position.X + 10, position.Y + 80);
             
             TransitionCanvas.Position = position;
@@ -452,11 +484,6 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             TransitionCanvas.Bounds = bounds;
 
-            //DefenitionAlphabetTitle.Bounds = new Point(70, 15);
-            //DefenitionAlphabetBox.Bounds = new Point(70, 15);
-
-            //HaltStatesTitle.Bounds = new Point(70, 15);
-            //HaltStatesLayout.Bounds = new Point(45, 80);
             HaltStateInputBox.Bounds = new Point(120, 90);
         
         }

@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TuringSimulatorDesktop.Input;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -21,9 +18,6 @@ namespace TuringSimulatorDesktop.UI
         Icon Background;
             
         Label AppTitle;
-        //screen drop down
-        //view drop dwon
-        //help dropdown
 
         TextureButton CloseButton;
         TextureButton FullscreenIcon;
@@ -99,7 +93,6 @@ namespace TuringSimulatorDesktop.UI
 
             UndoButton = new TextureButton(Group);
             UndoButton.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.UndoIcon];
-            //UndoButton.HighlightTexture
             UndoButton.HighlightOnMouseOver = true;
             UndoButton.OnClickedEvent += Undo;
 
@@ -141,16 +134,17 @@ namespace TuringSimulatorDesktop.UI
         public void UpdatedProject(object sender, EventArgs e)
         {
             ProjectTitle.Text = GlobalProjectAndUserData.ProjectData.ProjectName;
-            //do clearing etc here
         }
 
         public void PollInput(bool IsInActionFrameGroup)
         {
+            //Delete any windows that have been marked for deletion
             for (int i = Windows.Count - 1; i > -1; i--)
             {
                 if (Windows[i].IsMarkedForDeletion) Windows.RemoveAt(i);
             }
 
+            //Assigns the window the mouse is currently over as the main focus window
             int j = Windows.Count - 1;
             bool AssignedFocus = false;
             if (!IsDragging)
@@ -161,8 +155,8 @@ namespace TuringSimulatorDesktop.UI
                     {
                         AssignedFocus = true;
                         CurrentlyFocusedWindow = Windows[j];
-                        //DebugManager.CurrentWindow = CurrentlyFocusedWindow;
 
+                        //Moves the last pressed window to the top of the window list, making it get drawn on top of all other windows
                         if (InputManager.LeftMousePressed)
                         {
                             Windows.RemoveAt(j);
@@ -171,35 +165,27 @@ namespace TuringSimulatorDesktop.UI
                     }
                     j--;
                 }
-                //if (!AssignedFocus) DebugManager.CurrentWindow = null;
             }
 
+            //If a window is currently being dragged, this updates the windows position and checks if dragging has finished
             if (IsDragging)
             {
                 CurrentlyFocusedWindow.Position += new Vector2(InputManager.MouseDeltaX, InputManager.MouseDeltaY);
 
                 if (InputManager.LeftMouseReleased)
                 {
-                    //do snap here
                     IsDragging = false;
                 }
             }
 
+            //If a windwo drag are is selected and no other windwo is being dragged currently, start dragging the newly selected window
             if (!IsDragging && InputManager.LeftMousePressed && CurrentlyFocusedWindow != null && CurrentlyFocusedWindow.IsMouseOverHeader())
             {
                 IsDragging = true;
             }
         }
 
-        /*
-        public void CreateWindow()
-        {
-            Window NewWindow = new Window(new Vector2(100, 100), new Point(300, 400), this);
-
-            Windows.Add(NewWindow);
-        }
-        */
-
+        //Create a new window
         public Window CreateWindow(int X, int Y, int Width, int Height)
         {
             Window NewWindow = new Window(new Vector2(X, Y), new Point(Width, Height), this);
@@ -215,6 +201,7 @@ namespace TuringSimulatorDesktop.UI
             DeleteWindow.Close();
         }
 
+        //Application window controls
         public void Minimise(Button Sender)
         {
             GlobalInterfaceData.MainWindow.MinimiseWindow();
@@ -228,6 +215,7 @@ namespace TuringSimulatorDesktop.UI
             GlobalInterfaceData.MainWindow.Exit();
         }
 
+        //When the user clicks the undo or redo buttons, th currently focused window is made to redo/undo the last action
         public void Undo(Button Sender)
         {
             IUndoRedoable Target = (IUndoRedoable)CurrentlyFocusedWindow.CurrentView;
@@ -240,11 +228,13 @@ namespace TuringSimulatorDesktop.UI
             if (Target != null) Target.Redo();
         }
 
+        //Saves file opened in currently focused window
         public void Save(Button Sender)
         {
             if (LastActiveWindow.CurrentView is ISaveable) ((ISaveable)LastActiveWindow.CurrentView).Save();            
         }
 
+        //Saves all files in all windows
         public void SaveAll(Button Sender)
         {
             for (int i = 0; i < Windows.Count; i++)
@@ -256,6 +246,7 @@ namespace TuringSimulatorDesktop.UI
             }
         }
 
+        //Sets a windwo to be the program source window of the run program button
         public void SetActiveEditorWindow(IRunnable RunnableView)
         {
             //set button to clickable here
@@ -263,6 +254,7 @@ namespace TuringSimulatorDesktop.UI
             ActiveEditorView = RunnableView;
         }
 
+        //When the run button is clicked, a new Turign Exdection window is created with the currently selected program source
         public void Run(Button Sender)
         {
             if (ActiveEditorView != null)
@@ -271,6 +263,7 @@ namespace TuringSimulatorDesktop.UI
             }
         }
 
+        //Draw Application header, toolbar and background
         public override void Draw()
         {
             Background.Draw();
@@ -299,6 +292,7 @@ namespace TuringSimulatorDesktop.UI
             
         }
 
+        //Resizes and repositions UI on an applciation window resize 
         public override void ScreenResize()
         {
             int Width = GlobalInterfaceData.Device.PresentationParameters.BackBufferWidth;

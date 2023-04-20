@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using TuringCore;
 using TuringCore.Networking;
+using TuringSimulatorDesktop;
 using TuringSimulatorDesktop.Input;
 using Microsoft.Xna.Framework.Input;
 using TuringSimulatorDesktop.Networking;
@@ -102,6 +103,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         {
             Background.DrawColor = GlobalInterfaceData.Scheme.FileBrowserSelected;
 
+            //Create file editing context menu if this file/folder is right clicked
             if (InputManager.RightMousePressed)
             {
                 Browser.OpenMenu?.Close();
@@ -110,6 +112,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 return;
             }
 
+            //Call appropriate open function based on if this item is a folder or file
             if (ClickedOnce && InputManager.LeftMousePressed)
             {               
                 ClickedOnce = false;
@@ -135,20 +138,22 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             ClickedOnce = false;
             Background.DrawColor = GlobalInterfaceData.Scheme.Background;
         }
-
+        
+        //Starts the renaming process, causing the new name entry input box to appear
         public void RenameFile()
         {
             RenameBox.IsActive = true;
             InputManager.ManuallyClickElement(RenameBox);
             RenameBox.Text = "";
-            //RenameBox.Text = Data.Name;
         }
 
+        //Used when the user clicks away from the nwe name input box, as an alternative to hitting enter, to finalise the rename
         void EndRenameEvent(InputBox Sender)
         {
             EndRename();
         }
 
+        //Causes file browser to send rename request once the user finalises renaming this file/folder
         public void EndRename()
         {
             RenameBox.IsActive = false;
@@ -160,6 +165,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             return (IsActive && InputManager.MouseData.X >= Position.X && InputManager.MouseData.X <= Position.X + bounds.X && InputManager.MouseData.Y >= Position.Y && InputManager.MouseData.Y <= Position.Y + bounds.Y);
         }
 
+        //Polls user inputs to decide if the user is trying to drag & drop this file/folder
         public void PollInput(bool IsInActionGroupFrame)
         {
             if (ClickedOnce && InputManager.MouseData.LeftButton == ButtonState.Pressed && !IsMouseOver())
@@ -168,12 +174,14 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 ClickedOnce = false;
             }
 
+            //Once the user hits enter that means the user has finished renaming the file/folder
             if (RenameBox.IsActive && Keyboard.GetState().IsKeyDown(Keys.Enter))
             {
                 EndRename();
             }
         }
 
+        //If this is a folder and it receives a drag and drop for a file/folder, we move that file/folder into this folder
         public void RecieveDragData()
         {
             FileData ReceivedData = InputManager.DragData as FileData;
@@ -216,30 +224,5 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 if (RenameBox.IsActive) RenameBox.Draw();
             }
         }
-    }
-
-    public class FileData
-    {
-        public string Name;
-        public int ID;
-        public Guid GUID;
-        public CoreFileType Type;
-        public bool IsFolder;
-
-        public FileData(string SetName, Guid SetGUID, CoreFileType SetType)
-        {
-            Name = SetName;
-            GUID = SetGUID;
-            Type = SetType;
-            IsFolder = false;
-        }
-
-        public FileData(string SetName, int SetID)
-        {
-            Name = SetName;
-            ID = SetID;
-            Type = CoreFileType.Other;
-            IsFolder = true;
-        }
-    }
+    }  
 }

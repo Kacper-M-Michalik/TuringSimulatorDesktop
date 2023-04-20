@@ -60,17 +60,15 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             LayoutBox.Scrollable = true;
             LayoutBox.ScrollFactor = 0.2f;
             LayoutBox.ViewOffsetBoundsMin = new Vector2(15f, 5f);            
-            LayoutBox.ViewOffset = new Vector2(15f, 5f);
-            
-            //Bounds = new Point(width, height);
-            //Position = position;
+            LayoutBox.ViewOffset = new Vector2(15f, 5f);            
         }
 
+        //Create display objects for each recently opened file entry
         public void DisplayRecentFiles()
         {
             for (int i = 0; i < GlobalProjectAndUserData.UserData.RecentlyAccessedFiles.Count; i++)
             {
-                LayoutBox.AddElement(new RecentFileCard(GlobalProjectAndUserData.UserData.RecentlyAccessedFiles[i], MainScreen, LayoutBox.Group));
+                LayoutBox.AddElement(new RecentFileItem(GlobalProjectAndUserData.UserData.RecentlyAccessedFiles[i], MainScreen, LayoutBox.Group));
             }
             LayoutBox.UpdateLayout();
         }
@@ -102,97 +100,6 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         public void Close()
         {
             LayoutBox.Close();
-        }
-    }
-
-    public class RecentFileCard : IVisualElement
-    {
-        Vector2 position;
-        public Vector2 Position 
-        { 
-            get => position;
-            set 
-            {
-                position = value;
-                MoveLayout();
-            } 
-        }
-
-        Point bounds;
-        public Point Bounds 
-        {
-            get => bounds; 
-            set 
-            { 
-            } 
-        }
-
-        public bool IsActive { get; set; } = true;
-
-        ColorButton Background;
-        Label FileName;
-        Label FileLocation;
-        Label FileLastAccessed;
-
-        FileInfoWrapper FileInfo;
-        MainScreenView MainScreen;
-
-        public static int ReferenceWidth = 420;
-        public static int ReferenceHeight = 60;
-
-        public RecentFileCard(FileInfoWrapper Info, MainScreenView Screen, ActionGroup group)
-        {
-            FileInfo = Info;
-            MainScreen = Screen;
-
-            Background = new ColorButton(ReferenceWidth, ReferenceHeight, group);
-            Background.BaseColor = GlobalInterfaceData.Scheme.Background;//, ,Vector2.Zero, GlobalRenderingData.SubHeaderColor);
-            Background.HighlightColor = GlobalInterfaceData.Scheme.DarkInteractableAccent;
-            Background.HighlightOnMouseOver = true;
-            Background.OnClickedEvent += LoadRecentProject;
-
-            FileName = new Label();
-            FileName.FontSize = 20;
-
-            FileLocation = new Label();
-            FileLastAccessed = new Label();
-
-            FileName.Text = FileInfo.FileName;
-
-            if (FileInfo.FullPath.Length > 65)
-            {
-                FileLocation.Text = FileInfo.FullPath.Substring(0, 65)+"...";
-            }
-            else
-            {
-                FileLocation.Text = FileInfo.FullPath;
-            }
-
-            FileLastAccessed.Text = FileInfo.LastAccessed.ToString("g");
-
-            bounds = new Point(ReferenceWidth, ReferenceHeight);
-            Position = Vector2.Zero;
-        }
-
-        void LoadRecentProject(Button Sender)
-        {
-            MainScreen.SelectedProject(FileInfo.FullPath, 1);
-        }
-
-        void MoveLayout()
-        {
-            Background.Position = Position;
-            FileName.Position = new Vector2(Position.X + 8, Position.Y + 19);
-            FileLocation.Position = new Vector2(Position.X + 8, Position.Y + 45);
-            FileLastAccessed.Position = new Vector2(Position.X + ReferenceWidth - FileLastAccessed.Bounds.X - 10, Position.Y + 19);
-        }
-
-        public void Draw(Viewport? BoundPort = null)
-        {
-            Background.Draw(BoundPort);
-            FileName.Draw(BoundPort);
-            FileLocation.Draw(BoundPort);
-            FileLastAccessed.Draw(BoundPort);
         }
     }
 }

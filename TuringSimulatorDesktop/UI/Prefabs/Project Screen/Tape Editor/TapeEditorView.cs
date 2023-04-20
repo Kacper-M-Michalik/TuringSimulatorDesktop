@@ -88,6 +88,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             EmptyCharacter = ""
         };
 
+        //Constructor
+        //Takes in GUID of file to display
         public TapeEditorView(Guid FileToDisplay)
         {
             Background = new Icon(GlobalInterfaceData.Scheme.CanvasBackground);
@@ -126,7 +128,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             if (Message.GUID != CurrentlyOpenedFileID)
             {
-                CustomLogging.Log("CLIENT: Tape Editor Window Fatal Error, recived unwanted file data!");
+                CustomLogging.Log("CLIENT: Tape Editor Window Fatal Error, received unwanted file data!");
                 return;
             }
 
@@ -143,6 +145,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             title = Message.Name;
             FileVersion = Message.Version;
 
+            //Update UI elements
             ActivelyEditedTape = OpenedFile.Clone(EditorAlphabet);
             VisualTape.SetSourceTape(ActivelyEditedTape);
 
@@ -156,6 +159,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 return;
             }
 
+            //Generate new TapeTempalte Object
+            //Populate with data from UI
             TapeTemplate NewTemplate = new TapeTemplate();
 
             foreach (KeyValuePair<int, string> Pair in ActivelyEditedTape.Data)
@@ -170,6 +175,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             NewTemplate.HighestIndex = ActivelyEditedTape.HighestIndex;
             NewTemplate.LowestIndex = ActivelyEditedTape.LowestIndex;
 
+            //Send File Update Request to server
             Client.SendTCPData(ClientSendPacketFunctions.UpdateFile(CurrentlyOpenedFileID, FileVersion, JsonSerializer.SerializeToUtf8Bytes(NewTemplate, GlobalProjectAndUserData.JsonOptions)));
         }
 
@@ -193,6 +199,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             {
                 Background.Draw(BoundPort);
 
+                //Calculate where the camera/views edges lie on the canvas coordinate space, and feed this data to the tape instance
+                //Required for tape to render appropriate tape cells (tape is infinite so rendering every cell is impossible, using previous calculations we can figure out which nodes are visible and the render them when calling the VisualTape objects Draw() function) 
                 VisualTape.CameraMin = (Matrix.CreateTranslation(Canvas.Position.X, 0, 0) * Canvas.InverseMatrix).Translation.X;
                 VisualTape.CameraMax = (Matrix.CreateTranslation(Canvas.Position.X + Canvas.Bounds.X, 0, 0) * Canvas.InverseMatrix).Translation.X;
                 VisualTape.UpdateLayout();

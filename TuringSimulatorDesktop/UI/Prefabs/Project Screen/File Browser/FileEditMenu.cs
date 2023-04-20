@@ -70,6 +70,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         FileBrowserView Browser;
         FileDisplayItem Item;
 
+        //Constructor
+        //Thsi context Menu requires the owner File Browser and the FileDisplaYitem it is going to target with options such as rename or delete
         public FileEditMenu(FileBrowserView browser, FileDisplayItem item)
         {
             Browser = browser;
@@ -216,12 +218,14 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             CreateAlphabetFileLabel.FontSize = FontSize;
         }
 
+        //Tells the selected FileDisplayItem to start the rename process for the file/folder it represents
         public void Rename(Button Sender)
         {
             Item.RenameFile();
             Close();
         }
 
+        //Tells the selected FileDisplayItem to delete the file it represents
         public void Delete(Button Sender)
         {
             Browser.Delete(Item.Data);

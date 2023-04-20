@@ -114,7 +114,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             ClientsInputBox.OutputLabel.DrawCentered = true;
             ClientsInputBox.OutputLabel.FontSize = 20f;
             ClientsInputBox.OutputLabel.FontColor = GlobalInterfaceData.Scheme.FontGrayedOutColor;
-            ClientsInputBox.EditEvent += SanitiseClientCount;
+            ClientsInputBox.ClickAwayEvent += FinaliseClientCount;
             ClientsInputBox.IsActive = false;
 
             LoadButton = new TextureButton(Group);
@@ -126,39 +126,49 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         public void SelectLocation(Button Sender)
         {
-            OpenFileDialog Dialog = new OpenFileDialog
+            //Use windows file browser if on Windows device
+            if (OperatingSystem.IsWindows())
             {
-                InitialDirectory = @"C:\",
-                Title = "Browse tproj Files",
+                OpenFileDialog Dialog = new OpenFileDialog
+                {
+                    InitialDirectory = @"C:\",
+                    Title = "Browse tproj Files",
 
-                CheckFileExists = true,
-                CheckPathExists = true,
+                    CheckFileExists = true,
+                    CheckPathExists = true,
 
-                DefaultExt = "tproj",
-                Filter = "tproj files (*.tproj)|*.tproj",
-                FilterIndex = 2,
-                RestoreDirectory = true,
+                    DefaultExt = "tproj",
+                    Filter = "tproj files (*.tproj)|*.tproj",
+                    FilterIndex = 2,
+                    RestoreDirectory = true,
 
-                ReadOnlyChecked = true,
-                ShowReadOnly = true
-            };
+                    ReadOnlyChecked = true,
+                    ShowReadOnly = true
+                };
 
-            if (Dialog.ShowDialog() == DialogResult.OK)
-            {
-                ProjectLocationInputBox.Text = Dialog.FileName;
+                if (Dialog.ShowDialog() == DialogResult.OK)
+                {
+                    ProjectLocationInputBox.Text = Dialog.FileName;
+                }
             }
         }
 
         public void LoadProject(Button Sender)
         {
+            //A Project File must end in ".tproj" which is 6charcaters, if the input is less than 6 character we can guarentee it is incorrect
             if (ProjectLocationInputBox.Text.Length < 6) return;
+
+            //Check for valid client count if hosting
+            int ClientCount = 1;
+            if (IsHosting && !int.TryParse(ClientsInputBox.Text, out ClientCount)) return;
 
             if (IsHosting)
             {
-                MainScreen.SelectedProject(ProjectLocationInputBox.Text, int.Parse(ClientsInputBox.Text));
+                MainScreen.SelectedProject(ProjectLocationInputBox.Text, ClientCount);
             }
             else
             {
+                //Only need 1 slot client for ourselves if we are hosting server for a local project without hosting
                 MainScreen.SelectedProject(ProjectLocationInputBox.Text, 1);
             }
         }
@@ -181,9 +191,10 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             }
         }
 
-        public void SanitiseClientCount(InputBox Sender)
+        public void FinaliseClientCount(InputBox Sender)
         {
-            if (!int.TryParse(ClientsInputBox.Text, out int Result) || Result < 1) ClientsInputBox.Text = "1";
+            if (ClientsInputBox.Text == "") ClientsInputBox.Text = "Count";
+            else if (!int.TryParse(ClientsInputBox.Text, out int Result) || Result < 1) ClientsInputBox.Text = "1";
         }
 
         void MoveLayout()

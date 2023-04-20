@@ -43,6 +43,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             get => isActive;
             set
             {
+                //Set active status to all interactive UI elements
                 isActive = value;
                 Group.IsActive = isActive;
                 HierarchyLayout.Group.IsActive = isActive;
@@ -84,6 +85,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         string DefaultText = "Search:";
 
+        //Constructor
         public FileBrowserView()
         {
             Group = InputManager.CreateActionGroup();
@@ -107,8 +109,6 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             HierarchyLayout.Scrollable = false;
             HierarchyLayout.Centering = HorizontalCentering.Middle;
             HierarchyLayout.Spacing = GlobalInterfaceData.Scale(-1);
-            //HierarchyLayout.Spacing = 5;
-            //HierarchyLayout.ViewOffset = new Vector2(5, 0);
 
             Divider2 = new Icon(GlobalInterfaceData.Scheme.NonInteractableAccent);
 
@@ -120,38 +120,47 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             IsActive = false;
 
+            //By default the file browser displays the base folder of the project, which is guaranteed to exist
             SwitchOpenedFolder(0);
         }
         
+        //Switch current folder
         public void SwitchOpenedFolder(int ID)
         {
+            //Unsubscribe from UI events regarding receiving responses regarding previously displayed folder
             UIEventManager.Unsubscribe(CurrentlyOpenedFolderID, FolderUpdated);
             Client.SendTCPData(ClientSendPacketFunctions.UnsubscribeFromFolderUpdates(CurrentlyOpenedFolderID));
             CurrentlyOpenedFolderID = ID;
+            //Subscribe to UI event regarding receiving response regarding new folder to display
             UIEventManager.Subscribe(CurrentlyOpenedFolderID, FolderUpdated);
+            //Generate request packet and send to server
             Client.SendTCPData(ClientSendPacketFunctions.RequestFolderData(ID,true));
         }
 
+        //Process Response
         public void FolderUpdated(object Data)
         {
             CustomLogging.Log("CLIENT: Window received Folder Data");
 
             FolderDataMessage Message = (FolderDataMessage)Data;
-
+            
+            //Security check, check response JSON object is valid
             if (Message.ID != CurrentlyOpenedFolderID)
             {
                 CustomLogging.Log("Client: File Browser Window Fatal Error, recived unwated folder data!");
                 return;
             }
 
+            //Reset UI elements
             FileLayout.Clear();
             Files.Clear();
 
             HierarchyLayout.Clear();
 
+            //Generate folder heierarchy UI structure
             string FolderName = Message.Name;
             List<IVisualElement> Items = new List<IVisualElement>();
-
+                        
             int Max = Message.ParentFolders.Count;
             for (int i = 0; i < Max; i++)
             {
@@ -183,6 +192,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             HierarchyLayout.UpdateLayout();
 
+            //Create folder and file items for all subfiles/subfolders
             int FolderCount = Message.SubFolders.Count;
             for (int i = 0; i < FolderCount; i++)
             {
@@ -200,10 +210,12 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 FileLayout.AddElement(Item);
             }
 
+            //Reset file filter
             FilterFiles(null);
             
         }
 
+        //Displays only files which contain searched string
         void FilterFiles(InputBox Sender)
         {
             for (int i = 0; i < Files.Count; i++)
@@ -231,24 +243,28 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             FileLayout.UpdateLayout();
         }
 
+        //Resets searchbar text
         void ResetSearchbar(InputBox Sender)
         {
             if (Searchbar.Text == "") Searchbar.Text = DefaultText;
             FilterFiles(null);
         }
 
+        //Clear searchbar text
         void ClearSearchbar(InputBox Sender)
         {
             Searchbar.Text = "";
             FilterFiles(null);
         }
 
+        //Sends folder creation request
         public void CreateFolder(Button Sender)
         {
             OpenMenu?.Close();
             Client.SendTCPData(ClientSendPacketFunctions.CreateFolder(CurrentlyOpenedFolderID, "Empty Folder"));
-            //add auto select of fodler to rename here
         }
+
+        //Sends file/folder deletion request
         public void Delete(FileData Data)
         {
             if (Data.IsFolder)
@@ -260,6 +276,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 Client.SendTCPData(ClientSendPacketFunctions.DeleteFile(Data.GUID));
             }
         }
+
+        //Sends file/folder renaming request
         public void Rename(FileData Data, string NewName)
         {
             if (Data.IsFolder)
@@ -271,6 +289,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 Client.SendTCPData(ClientSendPacketFunctions.RenameFile(Data.GUID, NewName));
             }
         }
+
+        //Requests for creating specific files
         public void CreateTransitionFile(Button Sender)
         {
             OpenMenu?.Close();
@@ -292,6 +312,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Client.SendTCPData(ClientSendPacketFunctions.CreateFile(CurrentlyOpenedFolderID, "Empty Alphabet", CoreFileType.Alphabet));
         }
 
+        //Opens appropirate new view in currently focused window and supplies it with file ID to open
         public void OpenFile(FileData Data)
         {
             IView ViewToAdd = null;
@@ -309,10 +330,9 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                     break;
                 case CoreFileType.CustomGraphFile:
                     ViewToAdd = new VisualProgrammingView(Data.GUID);
-                    //OwnerWindow.OwnerScreen.SetActiveEditorWindow((IRunnable)ViewToAdd);
+                    OwnerWindow.OwnerScreen.SetActiveEditorWindow((IRunnable)ViewToAdd);
                     break;
                 case CoreFileType.Other:
-                    //display error
                     return;
             }
 
@@ -327,6 +347,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             }
         }
 
+        //Makes context menu appear when clicked
         public void Clicked()
         {
             if (InputManager.RightMousePressed)
@@ -339,7 +360,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         public void ClickedAway()
         {
-            //remove the create window
+
         }
 
         public bool IsMouseOver()
@@ -397,6 +418,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             }
         }
 
+        //Close context menu and all other UI resources
         public void Close()
         {
             OpenMenu?.Close();

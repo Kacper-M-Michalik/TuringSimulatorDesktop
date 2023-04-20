@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using TuringSimulatorDesktop.UI;
-using TuringCore;
 using TuringServer;
 using TuringSimulatorDesktop.Input;
 using System.IO;
@@ -9,7 +7,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using TuringSimulatorDesktop.UI.Prefabs;
-using System.Windows.Forms;
 using System.Net;
 using TuringCore.Networking;
 using TuringSimulatorDesktop.Networking;
@@ -40,12 +37,14 @@ namespace TuringSimulatorDesktop.UI
 
         public MainScreenView()
         {          
-            //Create acyion group
+            //Create action group
             Group = InputManager.CreateActionGroup();
             Group.PollableObjects.Add(this);
 
-            //Place 
+            //Instantiate elements
+            //Given size, position and group
             CloseButton = new TextureButton(45, 32, new Vector2(705, 0), Group);
+            //Events connected to functions and textures set
             CloseButton.OnClickedEvent += Close;
             CloseButton.HighlightOnMouseOver = true;
             CloseButton.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.CloseApplicationIcon];
@@ -72,6 +71,7 @@ namespace TuringSimulatorDesktop.UI
             CreateLabel.FontSize = 20;
             CreateLabel.Text = "Create Project";
 
+            //Element collection seen in use here, allows us to group elements together and only move one thing instead of each element seperately
             NewProjectButton.AddElement(CreateButton);
             NewProjectButton.AddElement(CreateIcon);
             NewProjectButton.AddElement(CreateLabel);
@@ -151,6 +151,7 @@ namespace TuringSimulatorDesktop.UI
             Viewer.Bounds = new Point(450, GlobalInterfaceData.MainMenuHeight - 36 - 32);
             Viewer.Position = new Vector2(282, 50);
 
+            //If valid user data loaded, open a recent files menu
             if (GlobalProjectAndUserData.UserData != null)
             {
                 Viewer.DisplayRecentFiles();
@@ -161,7 +162,7 @@ namespace TuringSimulatorDesktop.UI
             ScreenResize();
         }
 
-
+        //Opens the Create New Project menu
         public void CreateNewProject(Button Sender)
         {
             OpenMenu.Close();
@@ -173,6 +174,7 @@ namespace TuringSimulatorDesktop.UI
             OpenMenu = Menu;
         }
 
+        //Opens the Join Project Menu
         public void JoinProject(Button Sender)
         {
             OpenMenu.Close();
@@ -184,6 +186,7 @@ namespace TuringSimulatorDesktop.UI
             OpenMenu = Menu;
         }
 
+        //Opens the Load Project Menu
         public void LoadProject(Button Sender)
         {
             OpenMenu.Close();
@@ -199,6 +202,7 @@ namespace TuringSimulatorDesktop.UI
 
         public bool IsMarkedForDeletion { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
+        //When the user decides to open a local project, we use the backend API to start a server, setup our connection events and start an attempt to connect to the server
         public void SelectedProject(string location, int MaxClientCount)
         {
             BackendInterface.StartProjectServer(MaxClientCount, 28104);
@@ -207,15 +211,17 @@ namespace TuringSimulatorDesktop.UI
             UIEventManager.ClientFailedConnectingDelegate = ResetConnection;
             Client.ConnectToServer(IPAddress.Parse("127.0.0.1"), 28104);
         }
+
+        //Once we have successfully connected to a server we are hosting, we tell it to load the project we have selected
         void ConnectedToLocalServer(object sender, EventArgs e)
         {
             UIEventManager.ClientSuccessConnecting = false;
             UIEventManager.ClientSuccessConnectingDelegate = null;
-            //add some sort of timeout to this
             UIEventManager.RecievedProjectDataFromServerDelegate = ServerSentProjectData;
             Client.SendTCPData(ClientSendPacketFunctions.LoadProject(Location));
-
         }
+
+        //Once we receive project data from the server, we finalise the loading process
         void ServerSentProjectData(object sender, EventArgs e)
         {   
             GlobalProjectAndUserData.UpdateRecentlyOpenedFile(Location);
@@ -223,7 +229,7 @@ namespace TuringSimulatorDesktop.UI
             FullyConnectedToServer(this, null);
         }
 
-
+        //Start connection to project server on another device
         public void ConnectToOtherDevice(IPAddress IP)
         {
             UIEventManager.RecievedProjectDataFromServerDelegate = FullyConnectedToServer;
@@ -231,6 +237,7 @@ namespace TuringSimulatorDesktop.UI
             Client.ConnectToServer(IP, 28104);
         }
 
+        //Reset all conenction events
         void ResetConnection(object sender, EventArgs e)
         {
             UIEventManager.ClientSuccessConnecting = false;
@@ -239,6 +246,7 @@ namespace TuringSimulatorDesktop.UI
             UIEventManager.ClientFailedConnectingDelegate = null;
         }
 
+        //Finalise the connection process: open the project screen and display the connected project details
         void FullyConnectedToServer(object sender, EventArgs e)
         {
             ResetConnection(null, null);
@@ -248,10 +256,11 @@ namespace TuringSimulatorDesktop.UI
             ProjectScreenView ProjectView = new ProjectScreenView();
             UIEventManager.RecievedProjectDataFromServerDelegate = ProjectView.UpdatedProject;
             GlobalInterfaceData.MainWindow.CurrentView = ProjectView;
-            //temp?
+
             ProjectView.UpdatedProject(null, null);
         }
 
+        //Application window controls
         public void Minimise(Button Sender)
         {
             GlobalInterfaceData.MainWindow.MinimiseWindow();
@@ -270,6 +279,7 @@ namespace TuringSimulatorDesktop.UI
             return (InputManager.MouseData.X >= 0 && InputManager.MouseData.X <= Width && InputManager.MouseData.Y >= 0 && InputManager.MouseData.Y <= Header.Bounds.Y);
         }
 
+        //Our implementation of the top border the drag the main menu around the screen
         public void PollInput(bool IsInActionGroupFrame)
         {
             if (IsDragging)
@@ -291,7 +301,7 @@ namespace TuringSimulatorDesktop.UI
             }
         }
 
-
+        //Draw main menu
         public override void Draw()
         {
             Background.Draw();
@@ -308,6 +318,7 @@ namespace TuringSimulatorDesktop.UI
             OpenMenu.Draw();
         }
 
+        //When the screen is resized, here we update our action group and certain elements
         public override void ScreenResize()
         {
             Width = GlobalInterfaceData.Device.PresentationParameters.BackBufferWidth;

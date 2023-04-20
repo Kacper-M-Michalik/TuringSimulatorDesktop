@@ -47,6 +47,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             }
         }
 
+        //Apply canvas transformations/offsets to all visual cells
         public void SetProjectionMatrix(Matrix projectionMatrix, Matrix inverseProjectionMatrix)
         {
             ProjectionMatrix = projectionMatrix;
@@ -74,16 +75,20 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             IsActive = true;
         }
 
+        //Set core model Tape object this tape will represent
         public void SetSourceTape(Tape Data)
         {
             SourceTape = Data;
             UpdateLayout();
         }
 
+        //Here we calculate which cells of the visual tape we can actually see
         public void UpdateLayout()
         {
+            //Calculate how many cells we can see in the current view
             int TargetCellCount = Convert.ToInt32(MathF.Ceiling((CameraMax - CameraMin) / TapeCell.ReferenceTotalWidth)) + 1;
 
+            //Add/Remove appropriate number of cells
             //redo!!!, zoom out nmegative value bug, need to multiply movement by zoom too
             if (Cells.Count < TargetCellCount)
             {
@@ -104,6 +109,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 }
             }
 
+            //Calculate what index on tape the first visible node is
             float Difference = CameraMin - position.X;
             int StartCellIndex;
 
@@ -116,6 +122,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 StartCellIndex = Convert.ToInt32(MathF.Floor(Difference / TapeCell.ReferenceTotalWidth));
             }
 
+            //Position each cell where it should be in the view and assign its index on the tape
             for (int i = 0; i < Cells.Count; i++)
             {
                 Cells[i].Position = new Vector2(position.X + StartCellIndex * TapeCell.ReferenceTotalWidth, position.Y);
@@ -126,6 +133,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 StartCellIndex++;
             }
 
+            //Populate visual cells with data from Tape model object if we have any
             if (SourceTape != null)
             {
                 for (int i = 0; i < Cells.Count; i++)
@@ -143,6 +151,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         }
 
+        //Update underlying core model
         public void UpdateTapeContents(int Index, InputBox Sender)
         {
             if (SourceTape != null)
@@ -155,6 +164,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             }
         }
 
+        //Convert position of an index to world space coordinates
         public Vector2 GetIndexWorldPosition(int Index)
         {
             return Position + new Vector2(TapeCell.ReferenceTotalWidth * Index + TapeCell.ReferenceTotalWidth * 0.5f, Position.Y + TapeCell.ReferenceCellHeight * 0.5f);
@@ -165,6 +175,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             UpdateLayout();
         }
 
+        //Draw all visual cells
         public void Draw(Viewport? BoundPort = null)
         {
             if (IsActive)

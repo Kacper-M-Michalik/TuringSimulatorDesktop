@@ -97,6 +97,7 @@ namespace TuringSimulatorDesktop.UI
         {
             if (IsInActionGroupFrame && HighlightOnMouseOver && IsMouseOver())
             {
+                //Draws debug color if no texture applied
                 if (HighlightTexture != null) Background.DrawTexture = HighlightTexture;
                 else Background.DrawColor = GlobalInterfaceData.Scheme.UIOverlayDebugColor3;
             }

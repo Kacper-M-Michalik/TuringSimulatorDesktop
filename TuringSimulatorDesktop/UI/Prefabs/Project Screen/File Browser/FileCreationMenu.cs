@@ -57,6 +57,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         Label CreateTapeFileLabel;
         Label CreateAlphabetFileLabel;
 
+        //Constructor
+        //Requires owner file browser view be passed for this context menu
         public FileCreationMenu(FileBrowserView browser)
         {
             Group = InputManager.CreateActionGroup();

@@ -59,6 +59,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         StateTransitionItem CurrentNode;
 
+        //Constructor
+        //This context menu requires the owner Text Programming View and the state transition it is going to be targeting with interaction options
         public NodeEditMenu(TextProgrammingView editor, StateTransitionItem Node)
         {
             CurrentNode = Node;
@@ -67,6 +69,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             Background = new Icon(GlobalInterfaceData.Scheme.CanvasContextMenu);
 
+            //This context menu has more options than the creation one as it also allows special action with the selected node
             DeleteNodeButton = new ColorButton(Group);
             DeleteNodeButton.BaseColor = GlobalInterfaceData.Scheme.CanvasContextMenu;
             DeleteNodeButton.HighlightColor = GlobalInterfaceData.Scheme.CanvasContextMenuSelected;
@@ -108,15 +111,16 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Position = Vector2.Zero;
         }
 
+        //Causes the Programming View to delete the selected state transition node
         public void Delete(Button Sender)
         {
             Editor.DeleteTransition(CurrentNode);
         }
+        //Causes the Programming View to clone the selected state transition node
         public void Clone(Button Sender)
         {
             Editor.CloneTransition(CurrentNode);
         }
-
 
         void MoveLayout()
         {

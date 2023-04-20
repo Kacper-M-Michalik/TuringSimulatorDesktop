@@ -55,6 +55,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         FileData Data;
         public const int ReferencePadding = 16;
 
+        //Constructor
+        //Requires data on the folder this object is representing, the owner File Browser and the action group of the File Browser
         public FolderHierarchyItem(FileData data,  FileBrowserView browser, ActionGroup group)
         {
             Group = group;
@@ -77,21 +79,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Position = new Vector2(0, 0);
         }
 
-
-        void MoveLayout()
-        {
-            SelectFolderButton.Position = Position;
-            FolderLabel.Position = Position + new Vector2(GlobalInterfaceData.Scale(ReferencePadding/2f), bounds.Y/2f);
-        }
-
-        void ResizeLayout()
-        {
-            SelectFolderButton.Bounds = bounds;
-
-            float FontSize = GlobalInterfaceData.Scale(12);
-            FolderLabel.FontSize = FontSize;
-        }
-
+        //Equivalent to that of FileDisplayItems that represent folders having a file/folder dragged on them
+        //Sends request to have a file/folder moved to be the subfile/subfolder of this folder if the file/folder is dragged on this object
         public void RecieveDragData()
         {
             FileData ReceivedData = InputManager.DragData as FileData;
@@ -118,6 +107,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         }
 
+        //Polls whether to draw a highlighted version of itself if user hovers over it with mause
         public void PollInput(bool IsInActionGroupFrame)
         {
             if (IsInActionGroupFrame && IsMouseOver())
@@ -133,6 +123,20 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         public bool IsMouseOver()
         {
             return (IsActive && InputManager.MouseData.X >= Position.X && InputManager.MouseData.X <= Position.X + bounds.X && InputManager.MouseData.Y >= Position.Y && InputManager.MouseData.Y <= Position.Y + bounds.Y);
+        }
+
+        void MoveLayout()
+        {
+            SelectFolderButton.Position = Position;
+            FolderLabel.Position = Position + new Vector2(GlobalInterfaceData.Scale(ReferencePadding / 2f), bounds.Y / 2f);
+        }
+
+        void ResizeLayout()
+        {
+            SelectFolderButton.Bounds = bounds;
+
+            float FontSize = GlobalInterfaceData.Scale(12);
+            FolderLabel.FontSize = FontSize;
         }
 
         public void Draw(Viewport? BoundPort = null)

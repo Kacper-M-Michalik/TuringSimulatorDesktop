@@ -33,6 +33,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             }
         }
 
+        //Applies canvas offsets to all UI elements used
         public void SetProjectionMatrix(Matrix projectionMatrix, Matrix inverseProjectionMatrix)
         {
             Background.SetProjectionMatrix(projectionMatrix, inverseProjectionMatrix);
@@ -114,12 +115,14 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         public void Clicked(Button Sender)
         {
+            //If its already been selected, clicking it again deselects the node
             if (LeftClickedOnce)
             {
                 ClickedAway(null);
                 return;
             }
 
+            //Calculate offset between mouse and node position, this will be applied when dragging the node
             Offset = Matrix.CreateTranslation(position.X, position.Y, 0) - ProgrammingView.TransitionCanvas.InverseMatrix * Matrix.CreateTranslation(InputManager.MouseData.X, InputManager.MouseData.Y, 0);
 
             Background.BaseColor = GlobalInterfaceData.Scheme.DarkInteractableAccent;
@@ -134,6 +137,17 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 LeftClickedOnce = true;
             }
         }
+
+        //Polls if the node is being dragged, if so moves to the mouse position - initial offset from mouse
+        public void PollInput(bool IsInActionGroupFrame)
+        {
+            if (IsInActionGroupFrame && LeftClickedOnce)
+            {
+                ProgrammingView.MoveTansition(this, Offset);
+            }
+        }
+
+        //Deselcts the node if th user clicked away on some other UI element
         public void ClickedAway(Button Sender)
         {
             LeftClickedOnce = false;
@@ -142,6 +156,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             ProgrammingView.TransitionCanvas.Draggable = true;
         }
 
+        //After typing in a new value into a input box, the input box checks if it needs to be resized to fit in the new text
         public void EditBoxResize(InputBox Sender)
         {
             if (Sender.OutputLabel.RichText.Size.X > Sender.Bounds.X)
@@ -180,13 +195,6 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             MoveDirectionTextBox.Draw(BoundPort);
         }
 
-        public void PollInput(bool IsInActionGroupFrame)
-        {
-            if (IsInActionGroupFrame && LeftClickedOnce)
-            {
-                ProgrammingView.MoveTansition(this, Offset);
-            }
-        }
 
         public void Close()
         {

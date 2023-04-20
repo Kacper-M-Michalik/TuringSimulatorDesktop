@@ -77,10 +77,9 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             Position = position;
             Bounds = bounds;
-
-            //DebugManager.LastCreatedWindow = this;
         }
 
+        //The header is the top area you can drag a window by, and contains headings for what views are open in that window
         public bool IsMouseOverHeader()
         {
             return (IsActive && InputManager.MouseData.X >= Position.X && InputManager.MouseData.X <= Position.X + bounds.X && InputManager.MouseData.Y >= Position.Y && InputManager.MouseData.Y <= Position.Y + 24);
@@ -91,17 +90,21 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             return (IsActive && InputManager.MouseData.X >= Position.X && InputManager.MouseData.X <= Position.X + bounds.X && InputManager.MouseData.Y >= Position.Y && InputManager.MouseData.Y <= Position.Y + 24);
         }
 
+        //Adds a view to the window
         public void AddView(IView View)
         {
+            //Ensure view representing the same object doesnt already exist
             foreach (WindowHeaderItem Header in Headers)
             {
                 if (View.OpenFileID != Guid.Empty && Header.View.OpenFileID == View.OpenFileID)
                 {
+                    //If it does we simply switch to that view
                     SetView(Header);
                     return;
                 }
             }
 
+            //Otherwise we generate a new header for our new view and add those to the list of headers + views
             WindowHeaderItem HB = new WindowHeaderItem(View, this, ButtonLayout.Group);
             View.OwnerWindow = this;
             Headers.Add(HB);
@@ -110,12 +113,15 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             SetView(HB);
         }
 
+        //Set the view to that of a specific header
         public void SetView(WindowHeaderItem ViewButton)
         {
+            //Deactivate previous view and header
             if (CurrentHeader != null) CurrentHeader.Deselect();
             CurrentHeader = ViewButton;
             CurrentHeader.Select();
 
+            //Activate new view and header
             if (CurrentView != null) CurrentView.IsActive = false;
             CurrentView = ViewButton.View;
             CurrentView.IsActive = true;
@@ -123,8 +129,10 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             CurrentView.Position = new Vector2(position.X, position.Y + 26);
         }
 
+        //Deletes a view and header from the list
         public void RemoveView(WindowHeaderItem ViewButton)
         {
+            //If the current view was closed, we must figure out which view to display next
             if (ViewButton.View == CurrentView)
             {
                 int Index = Headers.IndexOf(ViewButton);
@@ -138,11 +146,13 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 }
                 else
                 {
+                    //If no more views are left, close the window
                     CurrentView = null;
                     OwnerScreen.DeleteWindow(this);
                 }
             }
 
+            //Update UI
             ViewButton.Close();
             Headers.Remove(ViewButton);
             ButtonLayout.RemoveElement(ViewButton);
@@ -166,8 +176,9 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             }
         }
 
+        //Shut down this view correctly
         public void Close()
-        {
+        {            
             foreach (WindowHeaderItem CurrentHeader in Headers)
             {
                 CurrentHeader.Close();

@@ -37,7 +37,8 @@ namespace TuringSimulatorDesktop.UI
 
         public bool IsActive { get; set; } = true;
 
-        public RichTextLayout RichText = new RichTextLayout() { };// Text = " " };
+        //Richtext interprets special markup/foramtting when being rendered, which is useful in making text on a label prettier for the user
+        public RichTextLayout RichText = new RichTextLayout() { };
         RenderTarget2D RenderTexture;
         public FontSystem Font = GlobalInterfaceData.StandardRegularFont;
         public Color FontColor = GlobalInterfaceData.Scheme.FontColor;
@@ -114,6 +115,7 @@ namespace TuringSimulatorDesktop.UI
             AutoSizeMesh = true;
         }
 
+        //Resizes output texture and redraws text
         public void UpdateLabel()
         {
             RichText.Font = Font.GetFont(FontSize);            
@@ -125,6 +127,7 @@ namespace TuringSimulatorDesktop.UI
             DrawTextToTexture();
         }
 
+        //Draws text contained by label to a texture that is rendered to the user
         public void DrawTextToTexture()
         {
             Background.Position = new Vector2(MathF.Round(position.X), MathF.Round(position.Y - RichText.Size.Y * 0.5f));
@@ -148,6 +151,7 @@ namespace TuringSimulatorDesktop.UI
             Background.DrawTexture = RenderTexture;
         }
         
+        //Resizes the text texture if necessary
         public bool UpdateRenderTexture()
         {
             RenderTexture?.Dispose();

@@ -57,6 +57,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             set => ownerWindow = value;
         }
 
+        //Title used by window for headers
         string title = "Empty Alphabet Editor View";
         public string Title => title;
         public Guid OpenFileID => CurrentlyOpenedFileID;
@@ -89,11 +90,14 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             {
             }
         }
-
+        
+        //Constructor
+        //Arguement supplied point to which file to display
         public AlphabetEditorView(Guid FileToDisplay)
         {
             Group = InputManager.CreateActionGroup();
 
+            //Set up UI elements
             Background = new Icon(GlobalInterfaceData.Scheme.Background);
 
             HelpMenuButton = new TextureButton(Group);
@@ -134,43 +138,55 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             IsActive = false;
 
+            //Request file if a valid GUID is given
             if (FileToDisplay != Guid.Empty) SwitchOpenedAlphabet(FileToDisplay);
         }
 
+        //Request Alphabet
         public void SwitchOpenedAlphabet(Guid ID)
         {
+            //Mark as waiting for response and unsubscribe from any previous file loaded
             FullyLoadedFile = false;
             UIEventManager.Unsubscribe(CurrentlyOpenedFileID, ReceivedAlphabetData);
             Client.SendTCPData(ClientSendPacketFunctions.UnsubscribeFromFileUpdates(CurrentlyOpenedFileID));
             CurrentlyOpenedFileID = ID;
+            //Subscribe to UI event for when response arrives
             UIEventManager.Subscribe(CurrentlyOpenedFileID, ReceivedAlphabetData);
+            //Send request to server
             Client.SendTCPData(ClientSendPacketFunctions.RequestFile(ID, true));
         }
 
+        //Processing response
         public void ReceivedAlphabetData(object Data)
         {
             CustomLogging.Log("CLIENT: Window received Alphabet Data");
 
             FileDataMessage Message = (FileDataMessage)Data;
 
+            //Ensure response is one with file data, not just metadata
             if ((ServerSendPackets)Message.RequestType == ServerSendPackets.SentFileMetadata) return;
 
+            //Secuirty check, make sure file received is the one requested 
             if (Message.GUID != CurrentlyOpenedFileID)
             {
-                CustomLogging.Log("CLIENT: Alphabet Editor Window Fatal Error, recived unwanted file data!");
+                CustomLogging.Log("CLIENT: Alphabet Editor Window Fatal Error, received unwanted file data!");
                 return;
             }
 
+            //Security check, check received JSON object is valid, if not, discard the response
             try
             {
                 OpenedFile = JsonSerializer.Deserialize<Alphabet>(Message.Data);
             }
             catch
             {
-                CustomLogging.Log("CLIENT: Window - Invalid Alphabet recieved");
+                //Request file again
+                Client.SendTCPData(ClientSendPacketFunctions.RequestFile(CurrentlyOpenedFileID, true));
+                CustomLogging.Log("CLIENT: Window - Invalid Alphabet received");
                 return;
             }
 
+            //Update UI with newly received alphabet model
             title = Message.Name;
             FileVersion = Message.Version;
 
@@ -185,9 +201,12 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             }
             if (Builder.Length > 0) Builder.Remove(Builder.Length - 2, 2);
             CharacterInputItem.Text = Builder.ToString();
+
+            //Finish loading the file
             FullyLoadedFile = true;
         }
 
+        //Save current alphabet file
         public void Save()
         {
             if (!FullyLoadedFile)
@@ -195,6 +214,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 return;
             }
 
+            //Generate new JSON object based on user inputs
             Alphabet NewAlphabet = new Alphabet();
             NewAlphabet.EmptyCharacter = EmptyCharacterInputBox.Text;
             NewAlphabet.WildcardCharacter = WildcardCharacterInputBox.Text;
@@ -206,14 +226,17 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             {
                 AllowedCharacters.Add(Symbols[i]);
             }
+            //Error correction, make sure the symbols the user set as empty and wildcard symbols are indeed contained in the alphabet definition set
             AllowedCharacters.Add(EmptyCharacterInputBox.Text);
             AllowedCharacters.Add(WildcardCharacterInputBox.Text);
 
             NewAlphabet.Characters = AllowedCharacters;
 
+            //Send file update request o server with new JSON object data
             Client.SendTCPData(ClientSendPacketFunctions.UpdateFile(CurrentlyOpenedFileID, FileVersion, JsonSerializer.SerializeToUtf8Bytes(NewAlphabet, GlobalProjectAndUserData.JsonOptions)));
         }
 
+        //Update UI element positions on screen whenever this view is moved
         void MoveLayout()
         {
             Group.X = UIUtils.ConvertFloatToInt(position.X);
@@ -234,6 +257,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             CharacterInputItem.Position = position + GlobalInterfaceData.Scale(new Vector2(183, 30));
         }
 
+        //Update UI element sizes on screen whenever this view is resized
         void ResizeLayout()
         {
             Group.Width = bounds.X;
@@ -248,6 +272,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             CharacterInputItem.Bounds = GlobalInterfaceData.Scale(new Point(300, 500));
         }
 
+        //Draw view
         public void Draw(Viewport? BoundPort = null)
         {
             if (IsActive)
@@ -267,6 +292,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             }
         }
 
+        //Shut down view resources
         public void Close()
         {
             Group.IsMarkedForDeletion = true;

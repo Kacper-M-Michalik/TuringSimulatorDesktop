@@ -65,6 +65,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Position = Vector2.Zero;
         }
 
+        //Updates label displaying what Turing Program the run button is targeting
         public void UpdateTarget(string title)
         {
             CurrentFileTitle.Text = title;

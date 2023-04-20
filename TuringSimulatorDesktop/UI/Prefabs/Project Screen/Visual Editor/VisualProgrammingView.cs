@@ -63,6 +63,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             }
         }
 
+        //Boilerplate code
+        //Unfortunately this view could not be finished on time to ensure the write up was adequate
         public VisualProgrammingView(Guid FileToDisplay)
         {
             IsActive = false;

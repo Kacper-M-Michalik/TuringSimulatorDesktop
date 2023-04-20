@@ -11,6 +11,7 @@ namespace TuringSimulatorDesktop.UI
 {
     public class ColorButton : Button, IVisualElement, IClickable, IPollable, ICanvasInteractable
     {
+        //Update elements/properties on reposition/resize
         Vector2 position;
         public Vector2 Position
         {
@@ -33,6 +34,7 @@ namespace TuringSimulatorDesktop.UI
             }
         }
 
+        //For canvas placement
         public void SetProjectionMatrix(Matrix projectionMatrix, Matrix inverseProjectionMatrix)
         {
             ProjectionMatrix = projectionMatrix;
@@ -58,6 +60,7 @@ namespace TuringSimulatorDesktop.UI
 
         Icon Background;
 
+        //Constructors
         public ColorButton(ActionGroup group)
         {
             Group = group;
@@ -92,6 +95,7 @@ namespace TuringSimulatorDesktop.UI
             Position = position;
         }
 
+        //Can only be visible through IClickable interface 
         void IClickable.Clicked()
         {
             if (ClickListenType == ClickType.Both || (ClickListenType == ClickType.Left && InputManager.LeftMousePressed) || (ClickListenType == ClickType.Right && InputManager.RightMousePressed))
@@ -109,6 +113,7 @@ namespace TuringSimulatorDesktop.UI
             return (IsActive && MousePosition.X >= Position.X && MousePosition.X <= Position.X + bounds.X && MousePosition.Y >= Position.Y && MousePosition.Y <= Position.Y + bounds.Y);
         }
 
+        //Draws highlight color when mouse hovers over button
         public void PollInput(bool IsInActionGroupFrame)
         {
             if (IsInActionGroupFrame && HighlightOnMouseOver && IsMouseOver())
@@ -121,6 +126,7 @@ namespace TuringSimulatorDesktop.UI
             }
         }
 
+        //Bound port refers to a bounding area the element may be drawn in, were any parts of the element outside of his area/mask is not drawn
         public void Draw(Viewport? BoundPort = null)
         {
             if (IsActive)
@@ -129,6 +135,7 @@ namespace TuringSimulatorDesktop.UI
             }
         }
 
+        //Sets action group to be evaluated by inputManager, marks itself for deletion
         public void Close()
         {
             Group.IsDirtyClickable = true;

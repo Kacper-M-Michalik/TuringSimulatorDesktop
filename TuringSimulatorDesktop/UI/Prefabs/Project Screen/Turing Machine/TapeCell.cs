@@ -45,7 +45,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         public void SetProjectionMatrix(Matrix projectionMatrix, Matrix inverseProjectionMatrix)
         {
-            //might not wanan draw like this tough
+            //Apply canvas offsets to all UI elements
             Seperator.SetProjectionMatrix(projectionMatrix, inverseProjectionMatrix);
             InputOutputLabel.SetProjectionMatrix(projectionMatrix, inverseProjectionMatrix);
             IndexLabel.SetProjectionMatrix(projectionMatrix, inverseProjectionMatrix);
@@ -57,6 +57,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         public TapeVisualItem OwnerTape;
 
+        //The index of the cell on the tape this visual cell represents
         public int Index;
 
         public static int ReferenceCellWidth = 90;
@@ -83,6 +84,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             OwnerTape = ownerTape;
         }
 
+        //Event called by InputBox on typing, makes visual tape apply changes to underlying Tape model object
         public void UpdatedCell(InputBox Sender)
         {
             OwnerTape.UpdateTapeContents(Index, InputOutputLabel);
@@ -106,7 +108,6 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             if (IsActive)
             {
                 InputOutputLabel.Draw(BoundPort);
-                //Background.Draw(BoundPort);
                 Seperator.Draw(BoundPort);
                 IndexLabel.Draw(BoundPort);
             }

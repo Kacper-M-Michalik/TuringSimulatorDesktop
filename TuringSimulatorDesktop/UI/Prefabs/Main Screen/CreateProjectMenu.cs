@@ -70,11 +70,13 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         bool IsHosting = false;
         bool IsEmptyProject = true;
 
+        //Constructor
         public CreateProjectMenu(MainScreenView Screen)
         {
             Group = InputManager.CreateActionGroup();
             MainScreen = Screen;
 
+            //Setup all UI elements
             Header = new Icon(GlobalInterfaceData.Scheme.Header);
             Background = new Icon(GlobalInterfaceData.Scheme.InteractableAccent);
 
@@ -83,8 +85,6 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Title.Font = GlobalInterfaceData.StandardRegularFont;
             Title.FontColor = GlobalInterfaceData.Scheme.FontColorBright;
             Title.Text = "Create New Project";
-
-
 
             ProjectTitle = new Label();
             ProjectTitle.AutoSizeMesh = true;
@@ -156,9 +156,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             ClientsInputBox.OutputLabel.FontColor = GlobalInterfaceData.Scheme.FontColor;
             ClientsInputBox.Text = "Count";
             ClientsInputBox.IsActive = false;
-            ClientsInputBox.ClickEvent += ClearCount;
-            ClientsInputBox.ClickAwayEvent += ClearCount;
-            ClientsInputBox.EditEvent += SanitiseClientCount;
+            ClientsInputBox.ClickAwayEvent += FinaliseCount;
 
             CreateButton = new TextureButton(Group);
             CreateButton.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.CreateButton];
@@ -167,20 +165,24 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             CreateButton.OnClickedEvent += CreateProject;
         }
 
+        //Uses the windows file browser if the application is running on windows
         public void SelectLocation(Button Sender)
-        {            
-            FolderBrowserDialog Dialog = new FolderBrowserDialog
+        {
+            if (OperatingSystem.IsWindows())
             {
-                InitialDirectory = @"C:\",
-            };
+                FolderBrowserDialog Dialog = new FolderBrowserDialog
+                {
+                    InitialDirectory = @"C:\",
+                };
 
-            if (Dialog.ShowDialog() == DialogResult.OK)
-            {
-                ProjectLocationInputBox.Text = Dialog.SelectedPath;
-                //MainScreen.SelectedProject(Dialog.FileName, 1);
+                if (Dialog.ShowDialog() == DialogResult.OK)
+                {
+                    ProjectLocationInputBox.Text = Dialog.SelectedPath;
+                }
             }
         }
 
+        //Sets empty project button to be highlighted
         public void SelectEmptyProject(Button Sender)
         {
             IsEmptyProject = true;
@@ -188,6 +190,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             TemplateOption.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.TemplateProject];
         }
 
+        //Sets template project button to be highlighted
         public void SelectTemplateProject(Button Sender)
         {
             IsEmptyProject = false;
@@ -195,6 +198,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             TemplateOption.BaseTexture = GlobalInterfaceData.TextureLookup[UILookupKey.TemplateProjectSelected];
         }
 
+        //Toggles hosting option appearing/disappearing after host option being chosen
         public void ToggleHost(Button Sender)
         {
             IsHosting = !IsHosting;
@@ -213,22 +217,33 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             }
         }
 
+        //Creates a new project
         public void CreateProject(Button Sender)
         {
+            //First checks if the client count is required andif so if it is valid, if not we dont attempt to create a project
+            int ClientCount = 1;
+            if (IsHosting && !int.TryParse(ClientsInputBox.Text, out ClientCount)) return;
+
+            //Attempt to create a project on disk
             CreateProjectReturnData Result = FileManager.CreateProject(ProjectTitleInputBox.Text, ProjectLocationInputBox.Text, TuringCore.TuringProjectType.NonClassical);
          
+            //Throw Exception if we failed to do so
             if (!Result.Success)
             {
                 throw new Exception("Failed To create new project!");
             }
 
+            //if we have a template project we must copy over our templates
             if (!IsEmptyProject)
             {
+                //Create templates folder in our project
                 string Dir = ProjectLocationInputBox.Text + Path.DirectorySeparatorChar + ProjectTitleInputBox.Text + Path.DirectorySeparatorChar + ProjectTitleInputBox.Text + "Data" + Path.DirectorySeparatorChar + "Templates";
                 Directory.CreateDirectory(Dir);
-
+                
+                //Find the templates shipped with the application
                 string[] Templates = Directory.GetFiles(Environment.CurrentDirectory + @"\Assets\Templates\");
-                    
+                   
+                //Copy over all template files
                 foreach (string TemplatePath in Templates)
                 {
                     string FileName = TemplatePath.Substring(TemplatePath.LastIndexOf("\\"));
@@ -240,23 +255,23 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             if (IsHosting)
             {
-                MainScreen.SelectedProject(Result.SolutionPath, int.Parse(ClientsInputBox.Text));               
+                MainScreen.SelectedProject(Result.SolutionPath, ClientCount);               
             }
             else
             {
+                //Only need one max client if we are using a project locally, without hosting it for others
                 MainScreen.SelectedProject(Result.SolutionPath, 1);
             }
         }
 
-        public void ClearCount(InputBox Sender)
+        //Sanitise user input
+        public void FinaliseCount(InputBox Sender)
         {
-            if (!int.TryParse(ClientsInputBox.Text, out int Result)) ClientsInputBox.Text = "Count";
-        }
-        public void SanitiseClientCount(InputBox Sender)
-        {
-            if (!int.TryParse(ClientsInputBox.Text, out int Result) || Result < 1) ClientsInputBox.Text = "1";
+            if (ClientsInputBox.Text == "") ClientsInputBox.Text = "Count";
+            else if (!int.TryParse(ClientsInputBox.Text, out int Result) || Result < 1) ClientsInputBox.Text = "1";
         }
 
+        //Move all UI elements when the menu is moved
         void MoveLayout()
         {
             Group.X = UIUtils.ConvertFloatToInt(Position.X);
@@ -284,10 +299,10 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             ClientsTitle.Position = Position + new Vector2(17, 460);
             ClientsInputBox.Position = Position + new Vector2(16, 486);
 
-            //create  utton label
             CreateButton.Position = Position + new Vector2(16, 630);
         }
 
+        //Reszie all UI elements when the menu is resized
         void ResizeLayout()
         {
             Group.Width = bounds.X;
@@ -296,10 +311,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Background.Bounds = bounds;
             Header.Bounds = new Point(bounds.X, 28);
 
-            //ProjectTitle.Bounds = new Point(300, 42);
             ProjectTitleInputBox.Bounds = new Point(300, 42);
-
-            //ProjectLocationTitle.Bounds = new Point(300, 42);
+            
             ProjectLocationInputBox.Bounds = new Point(376, 42);
             ProjectLocationSelectionButton.Bounds = new Point(42, 42);
 
@@ -313,6 +326,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         public void Draw(Viewport? BoundPort = null)
         {
+            //Don't need to worry about bounding ports as this menu doesn't move or have other menus eclipse it
             Background.Draw();
             Header.Draw();
             Title.Draw();
@@ -337,6 +351,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             CreateButton.Draw();
         }
 
+        //Mark this menus action group for deletion
         public void Close()
         {
             Group.IsMarkedForDeletion = true;

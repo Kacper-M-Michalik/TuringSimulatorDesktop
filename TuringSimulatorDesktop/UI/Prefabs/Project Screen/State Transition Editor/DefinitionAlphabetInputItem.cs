@@ -57,6 +57,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Bounds = new Point(FileLabel.Bounds.X + 4, 16);
         }
 
+
         public void ChangeAlphabet(FileData AlphabetFile)
         {
             ReferenceFileData = AlphabetFile;
@@ -78,6 +79,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             return (IsActive && InputManager.MouseData.X >= Position.X && InputManager.MouseData.X <= Position.X + bounds.X && InputManager.MouseData.Y >= Position.Y && InputManager.MouseData.Y <= Position.Y + bounds.Y);
         }
 
+        //Listens for a drag event
+        //If dragged item is a reference to an Alphabet Definition File, accept drag & drop and process the data
         public void RecieveDragData()
         {
             FileData Data = InputManager.DragData as FileData;
@@ -95,7 +98,6 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         void ResizeLayout()
         {
-            //FileLabel.Bounds = bounds;
             Background.Bounds = bounds;
         }
 

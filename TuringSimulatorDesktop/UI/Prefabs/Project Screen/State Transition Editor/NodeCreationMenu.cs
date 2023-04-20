@@ -50,6 +50,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         TextProgrammingView Editor;
 
+        //Constructor
+        //This context menu requires the owner Text Programming View
         public NodeCreationMenu(TextProgrammingView editor)
         {
             Editor = editor;
@@ -57,6 +59,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             Background = new Icon(GlobalInterfaceData.Scheme.CanvasContextMenu);
 
+            //Setup UI elements for user to use
             CreateTransitionButton = new ColorButton(Group);
             CreateTransitionButton.BaseColor = GlobalInterfaceData.Scheme.CanvasContextMenu;
             CreateTransitionButton.HighlightColor = GlobalInterfaceData.Scheme.CanvasContextMenuSelected;

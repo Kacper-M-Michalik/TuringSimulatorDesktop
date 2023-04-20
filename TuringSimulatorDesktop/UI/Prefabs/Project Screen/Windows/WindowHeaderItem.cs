@@ -60,6 +60,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             group.PollableObjects.Add(this);
             Group = group;
 
+            //Define UI elements
             Background = new Icon(GlobalInterfaceData.Scheme.Header);
             SelectionStrip = new Icon(GlobalInterfaceData.Scheme.BrightAccent);
             SelectionStrip.IsActive = false;
@@ -79,14 +80,18 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Bounds = new Point(42 + Title.Bounds.X, 26);
         }
 
+        //Updates UI to show highlighted state
         public void Select()
         {
             Selected = true;
             SelectionStrip.IsActive = true;
+            //Font change
             Title.Font = GlobalInterfaceData.MediumRegularFont;
+            //Label redraws text to apply new font
             Title.UpdateLabel();
         }
 
+        //Updates UI to show highlighted state
         public void Deselect()
         {
             Selected = false;
@@ -115,8 +120,10 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             return (InputManager.MouseData.X >= Position.X && InputManager.MouseData.X <= Position.X + bounds.X && InputManager.MouseData.Y >= Position.Y && InputManager.MouseData.Y <= Position.Y + bounds.Y);
         }
 
+        //Polls to see if user mouse is over the header
         public void PollInput(bool IsInActionGroupFrame)
         {
+            //Checks to see if the header needs to updates its title, as views title may have been updated after a file was renamed for example
             if (View.Title != Title.Text)
             {
                 Title.Text = View.Title;
@@ -124,10 +131,10 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 OwnerWindow.UpdateHeader();
             }
 
+            //Displays the close button if the mouse is over the header
             if (Selected || (IsInActionGroupFrame && IsMouseOver()))
             {
                 CloseButton.IsActive = true;
-                //do background highlight
             }
             else
             {
@@ -135,6 +142,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             }
         }
 
+        //Draw all UI elements to screen
         public void Draw(Viewport? BoundPort = null)
         {
             Background.Draw(BoundPort);

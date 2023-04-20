@@ -45,10 +45,10 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         InputBox HostIPInputBox;
 
         TextureButton JoinButton;
-        //Label JoinLabel;
 
         MainScreenView MainScreen;
 
+        //Cosntructor
         public JoinProjectMenu(MainScreenView Screen)
         {
             Group = InputManager.CreateActionGroup();
@@ -82,11 +82,18 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             JoinButton.OnClickedEvent += Join;
         }
 
+        //Starts the join server process through the main menu
         public void Join(Button Sender)
         {
+            //If a valid IP is in the input box, we continue
             if (System.Net.IPAddress.TryParse(HostIPInputBox.Text, out System.Net.IPAddress IP))
             {
                 MainScreen.ConnectToOtherDevice(IP);
+            }
+            else
+            {
+                //Wrong IP is replaced with error
+                HostIPInputBox.Text = "Invalid IP!";
             }
         }
 
@@ -128,12 +135,12 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             HostIPInputBox.Draw();
 
             JoinButton.Draw();
-            //JoinLabel.Draw();
         }
+
 
         public void Close()
         {
-
+            Group.IsMarkedForDeletion = true;
         }
 
     }

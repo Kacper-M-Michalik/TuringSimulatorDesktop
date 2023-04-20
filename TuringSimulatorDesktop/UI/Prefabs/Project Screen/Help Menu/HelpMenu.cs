@@ -65,6 +65,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         ActionGroup Group;
 
+        //Help menus are like slideshows, the help contents is a series of images the help menu displays and lets the user cycle through
         List<Texture2D> Views;
         int CurrentView = 0;
 
@@ -73,8 +74,16 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         TextureButton LeftButton;
         TextureButton RightButton;
 
+        //Constructor
+        //Creating a help menu requires the creating object to pass in a series of textures (images/slides) the help menu will display
         public HelpMenu(List<Texture2D> Textures)
         {
+            //Ensure there it at least 1 base slide to display
+            if (Textures.Count == 0)
+            {
+                throw new Exception("Cannot supply 0 slides to a Help Menu");
+            }
+
             Views = Textures;
             Group = InputManager.CreateActionGroup();
 
@@ -118,6 +127,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             RightButton.Bounds = new Point(26, 31);
         }
 
+        //Changes slide one left one if available
         public void ChangeMenuLeft(Button Sender)
         {
             if (CurrentView > 0) CurrentView--;
@@ -125,6 +135,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             CurrentMenuLabel.Text = (CurrentView + 1).ToString() + "/" + Views.Count;
         }
 
+        //Changes slide one right one if available
         public void ChangeMenuRight(Button Sender)
         {
             if (CurrentView < Views.Count - 1) CurrentView++;

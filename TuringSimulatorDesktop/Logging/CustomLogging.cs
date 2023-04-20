@@ -37,6 +37,9 @@ namespace TuringSimulatorDesktop.Debugging
         public static void Write(string Message)
         {
             Debug.Write(Message);
+            byte[] Data = Encoding.ASCII.GetBytes(Message);
+            LogStream?.Write(Data, 0, Data.Length);
+            LogStream?.Flush();
         }
     }
 }

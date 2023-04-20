@@ -123,22 +123,29 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         const double BaseTimeBetweenSteps = 800;
         double TimeBetweenStepsMS;
 
-        Alphabet EmptyAlphabet = new Alphabet() { EmptyCharacter = "" };        
+        Alphabet EmptyAlphabet = new Alphabet() { EmptyCharacter = "" };
 
+        //Constructor
+        //Takes in GUID of file to display
         public TuringMachineView(Guid FileToDisplay)
         {
+            //UI elements created
             Canvas = new DraggableCanvas();
             VisualTape = new TapeVisualItem(Canvas.Group);
 
             Background = new Icon(GlobalInterfaceData.Scheme.Background);
 
+            //Action group created
             Group = InputManager.CreateActionGroup();
             Group.ClickableObjects.Add(this);
             Group.PollableObjects.Add(this);
 
+            //Help Menu slides assigned
             HelpMenus = new List<Texture2D>() { GlobalInterfaceData.TextureLookup[UILookupKey.HelpMenuTuringExecution1], GlobalInterfaceData.TextureLookup[UILookupKey.HelpMenuTuringExecution2] };
 
+            //More UI elements defined
             CurrentStateTableTitle = new Label();
+            //Properties of element updated
             CurrentStateTableTitle.FontSize = 11;
             CurrentStateTableTitle.FontColor = GlobalInterfaceData.Scheme.FontGrayedOutColor;
             CurrentStateTableTitle.Text = "Current State Table";
@@ -168,6 +175,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             StartStateInputBox.OutputLabel.FontSize = 20;
             StartStateInputBox.OutputLabel.FontColor = GlobalInterfaceData.Scheme.FontColor;
             StartStateInputBox.Text = "";
+            //Events hooked up to UI
             StartStateInputBox.EditEvent += ResizeInputBox;
             StartStateInputBox.BackgroundColor = GlobalInterfaceData.Scheme.InteractableAccent;
 
@@ -268,18 +276,22 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Canvas.Elements.Add(VisualTape);
             Canvas.Elements.Add(ReadHead);
 
+            //Core Model Turing Machine simulator
             Machine = new TuringMachine();
             TimeBetweenStepsMS = BaseTimeBetweenSteps;
-
+            
+            //Set Turing Machine's current tape to be the default, empty one
             Machine.SetActiveTape(new TapeTemplate());
 
             IsActive = false;
 
+            //If a valid program was specified, request and laod it
             if (FileToDisplay != Guid.Empty) LoadStateTableSource(FileToDisplay);
         }
-
+                
         public void LoadStateTableSource(Guid FileID)
-        {            
+        {
+            //Unsubscribe from previous alphabet if a previous TurinG program was loaded in
             if (CurrentlyOpenedAlphabetID != Guid.Empty)
             {
                 UIEventManager.Unsubscribe(CurrentlyOpenedAlphabetID, ReceivedAlphabetData);
@@ -287,7 +299,8 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 CurrentlyOpenedAlphabetID = Guid.Empty;
                 TempAlphabet = null;
             }
-            
+
+            //Unsubscribe from previous Turing Program source if a previous Turing Program source was loaded in
             if (CurrentlyOpenedFileID != Guid.Empty)
             {
                 UIEventManager.Unsubscribe(CurrentlyOpenedFileID, ReceivedStateTableSourceData);
@@ -297,7 +310,9 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             CurrentlyOpenedFileID = FileID;
 
+            //Subscribe to responses regarding the desired Turing Program source
             UIEventManager.Subscribe(CurrentlyOpenedFileID, ReceivedStateTableSourceData);
+            //Send request for the Turing Porgram File
             Client.SendTCPData(ClientSendPacketFunctions.RequestFile(CurrentlyOpenedFileID, true));
 
             /*
@@ -315,18 +330,22 @@ namespace TuringSimulatorDesktop.UI.Prefabs
              */
         }
 
+        //Process Response
         public void ReceivedStateTableSourceData(object Data)
         {
             FileDataMessage Message = (FileDataMessage)Data;
 
+            //Ignore metadata responses
             if ((ServerSendPackets)Message.RequestType == ServerSendPackets.SentFileMetadata) return;
 
+            //Security check, ensure the received JSON payload represents the file we want
             if (Message.GUID != CurrentlyOpenedFileID)
             {
-                //new request was sent, throw error or whatver
+                //Return if it was not
                 return;
             }
 
+            /*
             //unnecessary check?
             if (Message.FileType != CoreFileType.TransitionFile && Message.FileType != CoreFileType.CustomGraphFile)
             {
@@ -334,8 +353,9 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 CustomLogging.Log("Client: Turing Machine Window Fatal Error, received an unexpected non table source data!");
                 return;            
             }
+            */
 
-            //deserialize on seperate thread later
+            //Security check, ensure the Turing Program source file itself is valid
             try
             {
                 if (Message.FileType == CoreFileType.TransitionFile)
@@ -349,18 +369,23 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             }
             catch
             {
-                //display error to ui here
+                //Rerequest it if it was invalid (means may have been altered by 3rd party during transport from server to client)
+                Client.SendTCPData(ClientSendPacketFunctions.RequestFile(CurrentlyOpenedFileID, true));
+
+                //Log error
                 CustomLogging.Log("Client: Turing Machine Window error, received corrupted transition/slate file");
                 return;
             }
 
             CurrentStateTableLabel.Text = Message.Name;
 
+            //Request the Definition Alphabet File data of the alpoghabet the Turing Program is defined by
             CurrentlyOpenedAlphabetID = TempFile.DefinitionAlphabetFileID;
             UIEventManager.Subscribe(CurrentlyOpenedAlphabetID, ReceivedAlphabetData);
             Client.SendTCPData(ClientSendPacketFunctions.RequestFile(CurrentlyOpenedAlphabetID, true));
         }
                 
+        //Process Response
         public void ReceivedAlphabetData(object Data)
         {
             FileDataMessage Message = (FileDataMessage)Data;
@@ -368,37 +393,38 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             if (Message.GUID != CurrentlyOpenedAlphabetID)
             {
-                //new request was sent, throw error or whatver
                 return;
             }
 
-            //unnecessary check?
             if (Message.FileType != CoreFileType.Alphabet)
             {
-                //diosplay error to UI HERE
                 CustomLogging.Log("Client: Turing Machine Window Fatal Error, received an unexpected non alphabet!");
                 return;
             }
 
             try
-            {                
+            {
                 TempAlphabet = JsonSerializer.Deserialize<Alphabet>(Message.Data);               
             }
             catch
             {
-                //display error to ui here
+                Client.SendTCPData(ClientSendPacketFunctions.RequestFile(CurrentlyOpenedAlphabetID, true));
+
                 CustomLogging.Log("Client: Turing Machine Window error, received corrupted alphabet file");
                 return;
             }
 
+            //Update the UI with the new alphabet
             TempTape = Machine.OriginalTape.Clone(TempAlphabet);
             VisualTape.SetSourceTape(TempTape);
 
+            //Once we have successfully received all files, we can compile our Turing Program
             CompileSourceFile();
         }
                 
         public void CompileSourceFile()
         {            
+            //Compile statetable, will retuirn null if there was an error compiling it (due to logic/syntax error program)
             TempStateTable = TempFile.Compile(TempAlphabet);
             if (TempStateTable == null)
             {
@@ -409,6 +435,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             IsStateTableOutdated = true;            
         }
 
+        //Requests a TapeTempalte Core Model Object
         public void LoadTape(Guid FileID)
         {
             if (CurrentlyOpenedTapeID != Guid.Empty)
@@ -429,13 +456,11 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             if (Message.GUID != CurrentlyOpenedTapeID)
             {
-                //new request was sent, throw error or whatver
                 return;
             }
 
             if (Message.FileType != CoreFileType.Tape)
             {
-                //diosplay error to UI HERE
                 CustomLogging.Log("Client: Turing Machine Window Fatal Error, received an unexpected non tape!");
                 return;
             }
@@ -447,13 +472,15 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             }
             catch
             {
-                //display error to ui here
+                Client.SendTCPData(ClientSendPacketFunctions.RequestFile(CurrentlyOpenedTapeID, true));
                 CustomLogging.Log("Client: Turing Machine Window error, received corrupted tape file");
                 return;
             }
 
+            //Update core model
             Machine.SetActiveTape(Tape);
 
+            //Update UI elements
             if (TempAlphabet != null)
             {
                 TempTape = Machine.OriginalTape.Clone(TempAlphabet);
@@ -466,9 +493,11 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
             CurrentTapeLabel.Text = Message.Name;
 
+            //Restart the core model
             Restart(null);
         }
 
+        //Polls time passed to step the core model when automatic stepping is active
         public void PollInput(bool IsInActionGroupFrame)
         {
             if (IsAutoStepActive)
@@ -486,6 +515,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             }
         }
 
+        //Resizes the start state and start index boxes if the value in the exceeds the input box's size
         void ResizeInputBox(InputBox Sender)
         {
             if (Sender.OutputLabel.RichText.Size.X > Sender.Bounds.X - 4) Sender.Bounds = new Point(Sender.OutputLabel.RichText.Size.X + 4, 26);
@@ -493,6 +523,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             if (Sender.Bounds.X > 200 && Sender.OutputLabel.RichText.Size.X + 4 < Sender.Bounds.X) Sender.Bounds = new Point(200, 26);
         }
 
+        //Start core model and update UI
         public int StartMachine()
         {
             //Add Checks HERE
@@ -505,30 +536,34 @@ namespace TuringSimulatorDesktop.UI.Prefabs
                 IsStateTableOutdated = false;
             }
                
+            //Starting core model returs code
+            //0 means success
+            //Other codes mean some type of error
             int Code = Machine.Start(StartStateInputBox.Text, Convert.ToInt32(StartIndexInputBox.Text));
            
             if (Code == 0) VisualTape.SetSourceTape(Machine.ActiveTape); 
             
             if (Code == 1)
             {
-                //Outdated error code
+                CustomLogging.Log("Error Code 1 Running TM");
             }
             if (Code == 2)
             {
-                //set error ui
+                CustomLogging.Log("Error Code 2 Running TM");
             }
             if (Code == 3)
             {
-                //set error ui
+                CustomLogging.Log("Error Code 3 Running TM");
             }
             if (Code == 4)
             {
-                //set error ui
+                CustomLogging.Log("Error Code 4 Running TM");
             }
 
             return Code;
         }
 
+        //Steps the program until it reaches an end state, letting the user instantly execute a program
         public void Execute(Button Sender)
         {
             if (Machine.ReachedHaltState) return;
@@ -538,6 +573,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             while (Machine.IsActive) Machine.StepProgram();
             UpdateUI();
         }
+        //Steps program one isntruction forward and updates UI
         public void Step(Button Sender)
         {
             if (Machine.ReachedHaltState)
@@ -556,12 +592,14 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             }
             UpdateUI();            
         }
+        //Restart code model and UI
         public void Restart(Button Sender)
         {
             IsAutoStepActive = false;
             StartMachine();
             UpdateUI();
         }
+        //Starts autamtic stepping of program
         public void AutoStep(Button Sender)
         {
             if (!Machine.IsActive)
@@ -572,12 +610,15 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             TimeLeftToNextStep = TimeBetweenStepsMS;
             IsAutoStepActive = true;
         }
+        //Pauses automatic stepping of program
         public void Pause(Button Sender)
         {
             IsAutoStepActive = false;
         }
+        //Adjust speed of automatic stepping
         public void SetSpeed1(Button Sender)
         {
+            //Time taken in milliseconds
             TimeBetweenStepsMS = BaseTimeBetweenSteps;
         }
         public void SetSpeed2(Button Sender)
@@ -589,6 +630,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             TimeBetweenStepsMS = BaseTimeBetweenSteps / 4;
         }
 
+        //Updates UI elements with core model state
         public void UpdateUI()
         {
             if (Machine.CurrentState != "Null") CurrentStateLabel.Text = Machine.CurrentState;
@@ -598,12 +640,14 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             ReadHead.Position = VisualTape.GetIndexWorldPosition(Machine.HeadPosition) - new Vector2(ReadHead.Bounds.X * 0.5f, 100.5f);
         }
 
+        //Opens up a new window and adds a help menu view to it
         public void OpenHelpMenu(Button Sender)
         {
             Window Win = OwnerWindow.OwnerScreen.CreateWindow(InputManager.MouseData.X - HelpMenus[0].Width, InputManager.MouseData.Y, HelpMenus[0].Width, HelpMenus[0].Height);
             Win.AddView(new HelpMenu(HelpMenus));
         }
 
+        //If a tape file is draggewd and dropped onto the TM view, the tape is loaded into the TM
         public void RecieveDragData()
         {
             FileData Data = InputManager.DragData as FileData;
@@ -628,6 +672,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             return (IsActive && InputManager.MouseData.X >= Position.X && InputManager.MouseData.X <= Position.X + bounds.X && InputManager.MouseData.Y >= Position.Y && InputManager.MouseData.Y <= Position.Y + bounds.Y);
         }
 
+        //Move all UI elements when view is moved
         void MoveLayout()
         {
             Group.X = UIUtils.ConvertFloatToInt(position.X);
@@ -657,6 +702,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
 
         }
 
+        //Resize all UI elements when view is resized
         void ResizeLayout()
         {
             Group.Width = bounds.X;
@@ -682,11 +728,15 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             Canvas.Bounds = bounds;
         }
 
+        //Draw all UI elements
         public void Draw(Viewport? BoundPort = null)
         {
             if (IsActive)
             {
-                Background.Draw(BoundPort); 
+                Background.Draw(BoundPort);
+
+                //Calculate where the camera/views edges lie on the canvas coordinate space, and feed this data to the tape instance
+                //Required for tape to render appropriate tape cells (tape is infinite so rendering every cell is impossible, using previous calculations we can figure out which nodes are visible and the render them when calling the VisualTape objects Draw() function) 
                 VisualTape.CameraMin = (Matrix.CreateTranslation(Canvas.Position.X, 0, 0) * Canvas.InverseMatrix).Translation.X;
                 VisualTape.CameraMax = (Matrix.CreateTranslation(Canvas.Position.X + Canvas.Bounds.X, 0, 0) * Canvas.InverseMatrix).Translation.X;
                 VisualTape.UpdateLayout();
@@ -711,8 +761,10 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             }
         }
 
+        //Shut down this view correctly
         public void Close()
         {
+            //Cleans up UI elements with own action groups
             Canvas.Close();
             Group.IsMarkedForDeletion = true;
         }
