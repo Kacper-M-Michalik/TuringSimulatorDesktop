@@ -138,15 +138,25 @@ namespace TuringSimulatorDesktop.UI.Prefabs
             {
                 for (int i = 0; i < Cells.Count; i++)
                 {
-                    if (Cells[i].Index > SourceTape.HighestIndex || Cells[i].Index < SourceTape.LowestIndex)
-                    {
-                        Cells[i].InputOutputLabel.Text = SourceTape.DefinitionAlphabet.EmptyCharacter;
-                    }
-                    else
+                    if (SourceTape.Data.ContainsKey(Cells[i].Index))
                     {
                         Cells[i].InputOutputLabel.Text = SourceTape[Cells[i].Index];
                     }
-                }
+                    else
+                    {
+                        Cells[i].InputOutputLabel.Text = SourceTape.DefinitionAlphabet.EmptyCharacter;
+                    }
+                        /*
+                        if (Cells[i].Index > SourceTape.HighestIndex || Cells[i].Index < SourceTape.LowestIndex)
+                        {
+                            Cells[i].InputOutputLabel.Text = SourceTape.DefinitionAlphabet.EmptyCharacter;
+                        }
+                        else
+                        {
+                            Cells[i].InputOutputLabel.Text = SourceTape[Cells[i].Index];
+                        }
+                        */
+                    }
             }
 
         }

@@ -181,6 +181,7 @@ namespace TuringSimulatorDesktop.UI
         }
         public static void UpdateScaleAuto()
         {
+            UIScale = Device.PresentationParameters.BackBufferHeight / ReferenceHeight;
             //UIScale = main;
         }
         public static Point Scale(Point Value)
