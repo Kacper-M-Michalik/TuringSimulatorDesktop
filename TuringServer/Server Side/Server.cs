@@ -92,11 +92,20 @@ namespace TuringServer.ServerSide
         //Sends a packet to specific client
         public static void SendTCPData(int ClientID, Packet Data)
         {
-            Data.InsertPacketLength();
-            Clients[ClientID].TCP.SendDataToClient(Data.SaveTemporaryBufferToPernamentReadBuffer());
+            Packet Copy = new Packet();
+            Copy.Write(Data.TemporaryWriteBuffer.ToArray(), false);
+            Copy.InsertPacketLength();
+            Clients[ClientID].TCP.SendDataToClient(Copy.SaveTemporaryBufferToPernamentReadBuffer());
             //Data.Dispose();
         }
+
         /*
+        public static void SendTCPDataAlreadySetup(int ClientID, Packet Data)
+        {
+            Clients[ClientID].TCP.SendDataToClient(Data.ReadBytes(Data.Length()));
+            //Data.Dispose();
+        }
+        
         public static void SendTCPData(int ClientID, byte[] Data)
         {
             Clients[ClientID].TCP.SendDataToClient(Data);
@@ -335,6 +344,17 @@ namespace TuringServer.ServerSide
 
                 //Read incoming data
                 int IncomingDataLength = DataStream.EndRead(Result);
+
+                //0 length data also means disconnect
+                if (IncomingDataLength == 0)
+                {
+                    TCPInternalDisconnect();
+                    CustomLogging.Log("SERVER: Client " + ID.ToString() + " has disconnected!");
+
+                    if (CustomLogging.LogClientID == ID) CustomLogging.LogClientID = -1;
+
+                    return;
+                }
 
                 //Copy into temp buffer
                 byte[] UsefuldataBuffer = new byte[IncomingDataLength];

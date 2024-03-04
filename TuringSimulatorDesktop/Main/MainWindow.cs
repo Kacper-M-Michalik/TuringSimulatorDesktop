@@ -125,7 +125,7 @@ namespace TuringSimulatorDesktop
             DirectoryInfo Info = Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + Path.DirectorySeparatorChar + "Turing Machine - Desktop");
             string DataPath = Info.FullName + Path.DirectorySeparatorChar + "LocalUserData.txt";
 
-            if (!File.Exists(DataPath))
+            if (!File.Exists(DataPath) || !GlobalProjectAndUserData.LoadUserData(DataPath))
             {
                 try
                 {
@@ -138,9 +138,7 @@ namespace TuringSimulatorDesktop
                 {
                     CustomLogging.Log("UI Error: Failed to generate fresh LocalUserData File - " + E.ToString());
                 }
-            }
-
-            GlobalProjectAndUserData.LoadUserData(DataPath);
+            }            
 
             CustomLogging.Log("Load Time: " + (DateTime.UtcNow-Start).TotalSeconds.ToString());
 

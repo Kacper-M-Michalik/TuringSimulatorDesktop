@@ -240,6 +240,8 @@ namespace TuringSimulatorDesktop.UI
         //Reset all conenction events
         void ResetConnection(object sender, EventArgs e)
         {
+            JoinProjectMenu Menu = OpenMenu as JoinProjectMenu;
+            if (OpenMenu != null && UIEventManager.ClientFailedConnecting) Menu.HostIPInputBox.Text = "Failed connection attempt!";
             UIEventManager.ClientSuccessConnecting = false;
             UIEventManager.ClientSuccessConnectingDelegate = null;
             UIEventManager.ClientFailedConnecting = false;

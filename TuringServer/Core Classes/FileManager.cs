@@ -168,8 +168,31 @@ namespace TuringServer
                         {
                             MetadataFile = JsonSerializer.Deserialize<ObjectMetadataFile>(Data);
 
-                            //Check if equivalent object file exists, if it doesn't there is an error, and so we fai lto laod it in
+                            //Check if equivalent object file exists, if it doesn't there is an error, and so we fail to load it in
                             Failed = !File.Exists(FolderInfo.Item1 + Path.DirectorySeparatorChar + MetadataFile.FileName + FileManager.FileTypeToExtension(MetadataFile.FileType));
+                                      
+                            //Verify JSON objects are valid
+                            if (!Failed)
+                            {
+                                switch (MetadataFile.FileType)
+                                {                                                            
+                                    case CoreFileType.Alphabet:
+                                        JsonSerializer.Deserialize<Alphabet>(File.ReadAllBytes(FolderInfo.Item1 + Path.DirectorySeparatorChar + MetadataFile.FileName + FileManager.FileTypeToExtension(MetadataFile.FileType)));
+                                        break;
+                                    case CoreFileType.Tape:
+                                        JsonSerializer.Deserialize<TapeTemplate>(File.ReadAllBytes(FolderInfo.Item1 + Path.DirectorySeparatorChar + MetadataFile.FileName + FileManager.FileTypeToExtension(MetadataFile.FileType)));
+                                        break;
+                                    case CoreFileType.TransitionFile:
+                                        JsonSerializer.Deserialize<TransitionFile>(File.ReadAllBytes(FolderInfo.Item1 + Path.DirectorySeparatorChar + MetadataFile.FileName + FileManager.FileTypeToExtension(MetadataFile.FileType)));
+                                        break;
+                                    case CoreFileType.CustomGraphFile:
+                                        JsonSerializer.Deserialize<VisualProgrammingFile>(File.ReadAllBytes(FolderInfo.Item1 + Path.DirectorySeparatorChar + MetadataFile.FileName + FileManager.FileTypeToExtension(MetadataFile.FileType)));
+                                        break;
+                                    default:
+                                        Failed = true;
+                                        break;
+                                }
+                            }
                         }
                         catch
                         {

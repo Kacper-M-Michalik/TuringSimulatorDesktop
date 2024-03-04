@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
-using TuringCore;
+using TuringCore.Networking;
 
-namespace TuringTesting
+namespace NetworkTesting
 {
     public static class Client
     {
@@ -45,16 +45,14 @@ namespace TuringTesting
 
                     if (!IsConnected)
                     {
-                        CustomLogging.Log("CLIENT: Connection timed out.");
+                        Console.WriteLine("CLIENT: Connection timed out.");
                         TCPInternalDisconnect();
-                        UIEventManager.ClientFailedConnecting = true;
                     }
 
                 }
                 catch (Exception E)
                 {
-                    CustomLogging.Log("CLIENT: Connection attempt failure! " + E.ToString());
-                    UIEventManager.ClientFailedConnecting = true;
+                    Console.WriteLine("CLIENT: Connection attempt failure! " + E.ToString());
                     TCPInternalDisconnect();
                 }
             }
@@ -66,19 +64,17 @@ namespace TuringTesting
                     //whats point of this?
                     if (ConnectionSocket == null) return;
 
-                    CustomLogging.Log("CLIENT: Connect callback called.");
+                    Console.WriteLine("CLIENT: Connect callback called.");
 
                     ConnectionSocket.EndConnect(Result);
                     DataStream = ConnectionSocket.GetStream();
                     PacketCurrentlyBeingRebuilt = new Packet();
 
-                    UIEventManager.ClientSuccessConnecting = true;
-
                     DataStream.BeginRead(ReceiveDataBuffer, 0, DataBufferSize, OnReceiveDataFromServer, null);
                 }
                 catch (Exception E)
                 {
-                    CustomLogging.Log(E.ToString());
+                    Console.WriteLine(E.ToString());
                     TCPInternalDisconnect();
                 }
             }
@@ -87,13 +83,13 @@ namespace TuringTesting
             {
                 try
                 {
-                    CustomLogging.Log("CLIENT: Client is writing data to server");
+                    Console.WriteLine("CLIENT: Client is writing data to server");
                     Data.InsertPacketLength();
                     DataStream.BeginWrite(Data.SaveTemporaryBufferToPernamentReadBuffer(), 0, Data.Length(), null, null);
                 }
                 catch (Exception E)
                 {
-                    CustomLogging.Log("CLIENT: Error Sending Data To Server! " + E.ToString());
+                    Console.WriteLine("CLIENT: Error Sending Data To Server! " + E.ToString());
                 }
             }
 
@@ -103,7 +99,7 @@ namespace TuringTesting
                 {
                     if (ConnectionSocket == null || !ConnectionSocket.Connected)
                     {
-                        CustomLogging.Log("CLIENT: Server disconnected me!");
+                        Console.WriteLine("CLIENT: Server disconnected me!");
                         TCPInternalDisconnect();
 
                         return;
@@ -111,16 +107,6 @@ namespace TuringTesting
 
                     int IncomingDataLength = DataStream.EndRead(Result);
 
-                    /*
-                    if (IncomingDataLength == 0)
-                    {
-                        CustomLogging.Log("CLIENT: SERVER DISCONNECTED ME");
-                        TCPInternalDisconnect();
-                        return;
-                    }
-                    */
-
-                    //ReceiveBuffer is always 4096 or whatever , we need to only pack data that is useful into our rebuilt packet -> as such we only copy IncomingDataLength of recievebuffer.
                     byte[] UsefuldataBuffer = new byte[IncomingDataLength];
                     Array.Copy(ReceiveDataBuffer, UsefuldataBuffer, IncomingDataLength);
 
@@ -154,7 +140,7 @@ namespace TuringTesting
                 }
                 catch (Exception E)
                 {
-                    CustomLogging.Log(E.ToString());
+                    Console.WriteLine(E.ToString());
                 }
             }
 
@@ -201,7 +187,6 @@ namespace TuringTesting
                     //Execute function
                     if (ClientReceiveFunctions.PacketToFunction.ContainsKey(PacketType))
                         ClientReceiveFunctions.PacketToFunction[PacketType](Data);
-                    Data.Dispose();
                 }
 
             }
@@ -219,12 +204,11 @@ namespace TuringTesting
         public static void SendTCPData(Packet Data)
         {
             TCP.SendDataToServer(Data);
-            Data.Dispose();
         }
 
         public static void Disconnect()
         {
-            CustomLogging.Log("CLIENT: DISCONNECTING FROM SERVER!");
+            Console.WriteLine("CLIENT: DISCONNECTING FROM SERVER!");
             TCP.TCPInternalDisconnect();
         }
     }

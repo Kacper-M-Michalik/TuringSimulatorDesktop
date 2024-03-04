@@ -52,16 +52,18 @@ namespace TuringSimulatorDesktop
         }
 
         //Load local user data
-        public static void LoadUserData(string Path)
+        public static bool LoadUserData(string Path)
         {
             try
             {
                 UserData = JsonSerializer.Deserialize<LocalUserData>(File.ReadAllBytes(Path));
                 UserDataPath = Path;
+                return true;
             }
             catch (Exception E)
             {
                 CustomLogging.Log("UI Error: Failed to deserialize LocalUserData File" + E.ToString());
+                return false;
             }
 
         }

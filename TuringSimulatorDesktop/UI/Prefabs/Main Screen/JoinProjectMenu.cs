@@ -42,7 +42,7 @@ namespace TuringSimulatorDesktop.UI.Prefabs
         Label Title;
 
         Label HostIPLabel;
-        InputBox HostIPInputBox;
+        public InputBox HostIPInputBox;
 
         TextureButton JoinButton;
 
